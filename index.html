@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nina Pitch Studio - Switzerland Native App</title>
+    <title>Nina Pitch Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,32 +22,22 @@
             --radius-md: 14px;
             --radius-sm: 10px;
 
-            /* Soft pastel section highlights for readability */
-            --hl-1: rgba(168, 85, 247, 0.22); /* Saludo */
-            --hl-1-text: #e9d5ff;
-            --hl-2: rgba(59, 130, 246, 0.22);  /* Rol */
-            --hl-2-text: #bfdbfe;
-            --hl-3: rgba(16, 185, 129, 0.22);  /* Chill */
-            --hl-3-text: #a7f3d0;
-            --hl-4: rgba(245, 158, 11, 0.22);  /* Suiza */
-            --hl-4-text: #fde68a;
-            --hl-5: rgba(244, 63, 94, 0.22);   /* Cierre CTA */
-            --hl-5-text: #fecdd3;
+            /* Highlighting Section Pastels */
+            --hl-1: rgba(168, 85, 247, 0.22); --hl-1-text: #e9d5ff;
+            --hl-2: rgba(59, 130, 246, 0.22);  --hl-2-text: #bfdbfe;
+            --hl-3: rgba(16, 185, 129, 0.22);  --hl-3-text: #a7f3d0;
+            --hl-4: rgba(245, 158, 11, 0.22);  --hl-4-text: #fde68a;
+            --hl-5: rgba(244, 63, 94, 0.22);   --hl-5-text: #fecdd3;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
+            margin: 0; padding: 0;
+            display: flex; justify-content: center;
             min-height: 100vh;
         }
 
@@ -60,7 +50,7 @@
             gap: 16px;
         }
 
-        /* Top Header */
+        /* Header App Bar */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -68,40 +58,57 @@
             padding: 4px 0;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .user-info { display: flex; align-items: center; gap: 12px; }
+
+        .avatar-container {
+            position: relative;
+            width: 46px;
+            height: 46px;
+            cursor: pointer;
         }
 
-        .avatar {
-            width: 40px;
-            height: 40px;
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
             background: linear-gradient(135deg, #a855f7, #6366f1);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: white;
             box-shadow: 0 0 12px var(--primary-glow);
         }
 
-        .user-titles h1 {
-            font-size: 0.9rem;
-            margin: 0;
-            font-weight: 700;
+        .avatar-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
         }
 
-        .user-titles p {
-            font-size: 0.72rem;
-            margin: 0;
-            color: var(--accent);
-            font-weight: 600;
-        }
+        .user-titles h1 { font-size: 0.95rem; margin: 0; font-weight: 700; }
+        .user-titles p { font-size: 0.72rem; margin: 0; color: var(--accent); font-weight: 600; }
 
-        /* Level Selector */
+        /* Level Pills */
         .level-pills {
             display: flex;
             background: var(--surface);
@@ -123,19 +130,15 @@
             transition: all 0.2s;
         }
 
-        .pill-btn.active {
-            background: var(--primary);
-            color: white;
-        }
+        .pill-btn.active { background: var(--primary); color: white; }
 
-        /* Hero Pitch Output Display */
+        /* Live Display Card */
         .hero-display {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             padding: 18px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-            position: relative;
         }
 
         .hero-controls {
@@ -153,13 +156,9 @@
             padding: 3px 8px;
             border-radius: 12px;
             border: 1px solid rgba(16, 185, 129, 0.3);
-            letter-spacing: 0.03em;
         }
 
-        .hero-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .hero-actions { display: flex; gap: 8px; }
 
         .icon-btn {
             background: var(--surface-card);
@@ -170,16 +169,9 @@
             font-size: 0.75rem;
             font-weight: 700;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
 
-        .icon-btn.active {
-            background: rgba(99, 102, 241, 0.2);
-            border-color: var(--primary);
-            color: #a5b4fc;
-        }
+        .icon-btn.active { background: rgba(99, 102, 241, 0.2); border-color: var(--primary); color: #a5b4fc; }
 
         .pitch-body {
             font-size: 1.05rem;
@@ -187,21 +179,98 @@
             font-weight: 600;
             margin: 0;
             color: #f1f5f9;
-            min-height: 90px;
+            min-height: 80px;
         }
 
-        /* Chunk Highlighting Classes */
-        .chunk-hl {
-            padding: 2px 6px;
-            border-radius: 6px;
-            display: inline;
-            margin-right: 2px;
-        }
+        .chunk-hl { padding: 2px 6px; border-radius: 6px; display: inline; margin-right: 2px; }
         .hl-1 { background: var(--hl-1); color: var(--hl-1-text); }
         .hl-2 { background: var(--hl-2); color: var(--hl-2-text); }
         .hl-3 { background: var(--hl-3); color: var(--hl-3-text); }
         .hl-4 { background: var(--hl-4); color: var(--hl-4-text); }
         .hl-5 { background: var(--hl-5); color: var(--hl-5-text); }
+
+        /* Audio Recordings Recent Section */
+        .recordings-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+        }
+
+        .recordings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .recordings-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-all-btn {
+            background: transparent;
+            border: none;
+            color: #a5b4fc;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .recordings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .audio-item {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .audio-item-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .audio-item-text {
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .audio-controls-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .audio-controls-row audio { height: 28px; flex-grow: 1; }
+
+        .btn-del-audio {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #f87171;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
 
         /* Modules Swiper */
         .section-label {
@@ -213,11 +282,7 @@
             margin: 4px 2px;
         }
 
-        .modules-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .modules-stack { display: flex; flex-direction: column; gap: 10px; }
 
         .module-box {
             background: var(--surface);
@@ -233,24 +298,17 @@
             margin-bottom: 8px;
         }
 
-        .module-title {
-            font-size: 0.72rem;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
+        .module-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; }
 
         .add-custom-btn {
             background: transparent;
             border: none;
-            color: var(--primary-glow);
             color: #a5b4fc;
             font-size: 0.72rem;
             font-weight: 700;
             cursor: pointer;
-            padding: 0;
         }
 
-        /* Chips Carousel */
         .chips-container {
             display: flex;
             gap: 8px;
@@ -259,7 +317,6 @@
             padding-bottom: 2px;
             -webkit-overflow-scrolling: touch;
         }
-
         .chips-container::-webkit-scrollbar { display: none; }
 
         .chip-item {
@@ -274,22 +331,77 @@
             cursor: pointer;
             transition: all 0.2s;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .chip-item.active {
-            background: var(--primary);
-            color: white;
-            border-color: #818cf8;
+        .chip-item.active { background: var(--primary); color: white; border-color: #818cf8; }
+
+        .chip-del-btn {
+            background: rgba(0,0,0,0.25);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: #fca5a5;
         }
 
-        /* Bottom Fixed Navigation Bar */
-        .bottom-bar {
+        /* Modal Drawer for Full History */
+        .modal-overlay {
             position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 200;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
             width: 100%;
             max-width: 480px;
+            max-height: 80vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 { margin: 0; font-size: 1rem; }
+
+        .close-modal-btn {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 50%;
+            width: 30px; height: 30px;
+            cursor: pointer;
+        }
+
+        /* Bottom Fixed Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 100%; max-width: 480px;
             background: rgba(11, 15, 25, 0.88);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -307,13 +419,9 @@
             align-items: center;
             font-size: 0.75rem;
             color: var(--text-muted);
-            padding: 0 2px;
         }
 
-        .speed-options {
-            display: flex;
-            gap: 6px;
-        }
+        .speed-options { display: flex; gap: 6px; }
 
         .speed-tag {
             background: var(--surface);
@@ -326,87 +434,45 @@
             cursor: pointer;
         }
 
-        .speed-tag.active {
-            color: var(--accent);
-            border-color: var(--accent);
-        }
+        .speed-tag.active { color: var(--accent); border-color: var(--accent); }
 
-        .actions-row {
-            display: grid;
-            grid-template-columns: 2fr 2fr 1fr;
-            gap: 8px;
-        }
+        .actions-row { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 8px; }
 
         .main-btn {
-            border: none;
-            padding: 14px;
+            border: none; padding: 14px;
             border-radius: var(--radius-sm);
-            font-family: inherit;
-            font-size: 0.85rem;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: transform 0.1s;
+            font-family: inherit; font-size: 0.85rem; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            gap: 6px; transition: transform 0.1s;
         }
-
         .main-btn:active { transform: scale(0.96); }
 
-        .btn-listen {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 14px var(--primary-glow);
-        }
+        .btn-listen { background: var(--primary); color: white; box-shadow: 0 4px 14px var(--primary-glow); }
+        .btn-listen.playing { background: #e11d48; }
 
-        .btn-listen.playing {
-            background: #e11d48;
-            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4);
-        }
+        .btn-record { background: #f43f5e; color: white; }
+        .btn-record.recording { animation: pulse-mic 1.2s infinite; }
 
-        .btn-record {
-            background: #f43f5e;
-            color: white;
-        }
+        @keyframes pulse-mic { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        .btn-record.recording {
-            animation: pulse-mic 1.2s infinite;
-        }
-
-        @keyframes pulse-mic {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-
-        .btn-copy {
-            background: var(--surface);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
-
-        .audio-preview-box {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 8px;
-            display: none;
-        }
-
-        audio { width: 100%; height: 32px; }
+        .btn-copy { background: var(--surface); color: var(--text-main); border: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
 <div class="mobile-app">
-    <!-- Header App Bar -->
+    <!-- Header -->
     <div class="app-header">
         <div class="user-info">
-            <div class="avatar">N</div>
+            <div class="avatar-container" onclick="triggerAvatarUpload()">
+                <div id="avatar-display" class="avatar-placeholder">N</div>
+                <div class="avatar-badge">📷</div>
+            </div>
+            <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="handleAvatarSelected(event)">
+            
             <div class="user-titles">
                 <h1>Nina's Pitch App</h1>
-                <p>🇨🇭 Switzerland Networking</p>
+                <p>🇨🇭 Switzerland Offline DB</p>
             </div>
         </div>
 
@@ -422,11 +488,24 @@
         <div class="hero-controls">
             <span class="tag-active">● DISCURSO EN VIVO</span>
             <div class="hero-actions">
-                <button class="icon-btn" id="hl-btn" onclick="toggleHighlight()">🎨 Resaltar</button>
-                <button class="icon-btn" onclick="randomizeAll()" title="Generar mezcla aleatoria">🎲 Random</button>
+                <button class="icon-btn active" id="hl-btn" onclick="toggleHighlight()">🎨 Resaltar</button>
+                <button class="icon-btn" onclick="randomizeAll()">🎲 Random</button>
             </div>
         </div>
         <p class="pitch-body" id="pitch-text">Cargando guion...</p>
+    </div>
+
+    <!-- Recent Voice Recordings (IndexedDB Powered) -->
+    <div class="recordings-card">
+        <div class="recordings-header">
+            <span class="recordings-title">🎙️ Últimos Ensayos Grabados</span>
+            <button class="view-all-btn" onclick="openHistoryModal()">Ver historial (<span id="total-recs-count">0</span>)</button>
+        </div>
+        <div class="recordings-list" id="recent-recordings-list">
+            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 10px;">
+                Aún no has grabado ensayos. Pulsa 🎤 Grabar abajo.
+            </div>
+        </div>
     </div>
 
     <!-- Modules Selection -->
@@ -437,7 +516,7 @@
         <div class="module-box">
             <div class="module-top">
                 <span class="module-title" style="color: #c084fc;">1. Saludo Inicial</span>
-                <button class="add-custom-btn" onclick="addCustomOption('greetings', 'chips-greeting')">+ Agregar frase</button>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('greetings', 'chips-greeting')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-greeting"></div>
         </div>
@@ -446,7 +525,7 @@
         <div class="module-box">
             <div class="module-top">
                 <span class="module-title" style="color: #60a5fa;">2. Quién Soy & Agencia</span>
-                <button class="add-custom-btn" onclick="addCustomOption('roles', 'chips-role')">+ Agregar frase</button>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('roles', 'chips-role')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-role"></div>
         </div>
@@ -455,7 +534,7 @@
         <div class="module-box">
             <div class="module-top">
                 <span class="module-title" style="color: #34d399;">3. Dato Personal / Vibe Chill</span>
-                <button class="add-custom-btn" onclick="addCustomOption('chill', 'chips-chill')">+ Agregar frase</button>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('chill', 'chips-chill')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-chill"></div>
         </div>
@@ -464,7 +543,7 @@
         <div class="module-box">
             <div class="module-top">
                 <span class="module-title" style="color: #fbbf24;">4. Presencia en Suiza (Hoy)</span>
-                <button class="add-custom-btn" onclick="addCustomOption('switzerland', 'chips-switzerland')">+ Agregar frase</button>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('switzerland', 'chips-switzerland')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-switzerland"></div>
         </div>
@@ -473,22 +552,28 @@
         <div class="module-box">
             <div class="module-top">
                 <span class="module-title" style="color: #f87171;">5. Cierre Conversacional (Gancho)</span>
-                <button class="add-custom-btn" onclick="addCustomOption('closings', 'chips-closing')">+ Agregar frase</button>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('closings', 'chips-closing')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-closing"></div>
         </div>
     </div>
+</div>
 
-    <!-- Audio Player Output -->
-    <div class="audio-preview-box" id="audio-preview">
-        <audio id="audio-player" controls></audio>
+<!-- Full Audio History Modal -->
+<div class="modal-overlay" id="history-modal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Historial de Ensayos de Voz</h3>
+            <button class="close-modal-btn" onclick="closeHistoryModal()">✕</button>
+        </div>
+        <div class="recordings-list" id="full-recordings-list"></div>
     </div>
 </div>
 
 <!-- Fixed Mobile Bottom Bar -->
 <div class="bottom-bar">
     <div class="speed-control">
-        <span>Velocidad de pronunciación:</span>
+        <span>Velocidad de voz nativa:</span>
         <div class="speed-options">
             <button class="speed-tag active" onclick="setSpeed(0.85, this)">0.85x</button>
             <button class="speed-tag" onclick="setSpeed(1.0, this)">1.0x (Real)</button>
@@ -502,15 +587,127 @@
         <button class="main-btn btn-record" id="mic-btn" onclick="toggleRecording()">
             <span>🎤</span> Grabar
         </button>
-        <button class="main-btn btn-copy" onclick="copyToClipboard()" title="Copiar texto al portapapeles">
+        <button class="main-btn btn-copy" onclick="copyToClipboard()" title="Copiar texto">
             📋
         </button>
     </div>
 </div>
 
 <script>
-    // --- BASE DE DATOS DE NINA: CONTEXTO SUIZA + CIERRES ABIERTOS ---
-    const database = {
+    // ==========================================
+    // 1. INDEXED DB MODULE (SIN ESPAGUETI)
+    // ==========================================
+    const DB_NAME = 'NinaPitchStudioDB';
+    const DB_VERSION = 1;
+    let dbInstance = null;
+
+    function initIndexedDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = e => reject("Error iniciando IndexedDB: " + e.target.error);
+            request.onsuccess = e => {
+                dbInstance = e.target.result;
+                resolve(dbInstance);
+            };
+            request.onupgradeneeded = e => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('custom_phrases')) {
+                    db.createObjectStore('custom_phrases', { keyPath: 'id', autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains('audio_recordings')) {
+                    db.createObjectStore('audio_recordings', { keyPath: 'id', autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains('user_settings')) {
+                    db.createObjectStore('user_settings', { keyPath: 'key' });
+                }
+            };
+        });
+    }
+
+    // Database Helpers
+    function dbSaveCustomPhrase(level, category, text) {
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction('custom_phrases', 'readwrite');
+            const store = tx.objectStore('custom_phrases');
+            const item = { level, category, text };
+            const req = store.add(item);
+            req.onsuccess = (e) => resolve(e.target.result);
+        });
+    }
+
+    function dbGetCustomPhrases() {
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction('custom_phrases', 'readonly');
+            const store = tx.objectStore('custom_phrases');
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result || []);
+        });
+    }
+
+    function dbDeleteCustomPhrase(id) {
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction('custom_phrases', 'readwrite');
+            const store = tx.objectStore('custom_phrases');
+            const req = store.delete(id);
+            req.onsuccess = () => resolve(true);
+        });
+    }
+
+    function dbSaveAudioRecording(blob, pitchText, level) {
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction('audio_recordings', 'readwrite');
+            const store = tx.objectStore('audio_recordings');
+            const item = {
+                timestamp: new Date().toISOString(),
+                pitchText,
+                level,
+                audioBlob: blob
+            };
+            const req = store.add(item);
+            req.onsuccess = () => resolve(true);
+        });
+    }
+
+    function dbGetAudioRecordings() {
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction('audio_recordings', 'readonly');
+            const store = tx.objectStore('audio_recordings');
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result || []);
+        });
+    }
+
+    function dbDeleteAudioRecording(id) {
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction('audio_recordings', 'readwrite');
+            const store = tx.objectStore('audio_recordings');
+            const req = store.delete(id);
+            req.onsuccess = () => resolve(true);
+        });
+    }
+
+    function dbSaveSetting(key, val) {
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction('user_settings', 'readwrite');
+            const store = tx.objectStore('user_settings');
+            store.put({ key, val });
+            tx.oncomplete = () => resolve(true);
+        });
+    }
+
+    function dbGetSetting(key) {
+        return new Promise((resolve) => {
+            const tx = dbInstance.transaction('user_settings', 'readonly');
+            const store = tx.objectStore('user_settings');
+            const req = store.get(key);
+            req.onsuccess = () => resolve(req.result ? req.result.val : null);
+        });
+    }
+
+    // ==========================================
+    // 2. BASE DE DATOS DE NATIVA Y ESTADO
+    // ==========================================
+    const nativeDatabase = {
         a1: {
             greetings: ["Hi there!", "Hello!", "Good morning!"],
             roles: [
@@ -582,57 +779,99 @@
         }
     };
 
-    let activeLevel = 'a1';
-    let isHighlightActive = true;
-    let selectedSpeechRate = 0.85;
-    let selectedIndices = { greeting: 0, role: 0, chill: 0, switzerland: 0, closing: 0 };
+    let state = {
+        activeLevel: 'a1',
+        isHighlightActive: true,
+        selectedSpeechRate: 0.85,
+        selectedIndices: { greeting: 0, role: 0, chill: 0, switzerland: 0, closing: 0 },
+        customPhrases: [],
+        recordings: []
+    };
 
-    let isSpeaking = false;
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
 
-    // Load Chips into containers
-    function renderCategoryChips(containerId, items, categoryKey) {
+    // ==========================================
+    // 3. LOGICA DE RENDER Y UI
+    // ==========================================
+
+    function getCombinedCategoryItems(categoryKey) {
+        const nativeItems = nativeDatabase[state.activeLevel][categoryKey].map(text => ({ text, isCustom: false }));
+        const customItems = state.customPhrases
+            .filter(item => item.level === state.activeLevel && item.category === categoryKey)
+            .map(item => ({ text: item.text, isCustom: true, id: item.id }));
+
+        return [...nativeItems, ...customItems];
+    }
+
+    function renderCategoryChips(containerId, categoryKey) {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
 
-        items.forEach((text, idx) => {
+        const items = getCombinedCategoryItems(categoryKey);
+
+        items.forEach((item, idx) => {
             const chip = document.createElement('div');
-            chip.className = `chip-item ${selectedIndices[categoryKey] === idx ? 'active' : ''}`;
-            chip.textContent = text;
+            chip.className = `chip-item ${state.selectedIndices[categoryKey] === idx ? 'active' : ''}`;
+            
+            const textSpan = document.createElement('span');
+            textSpan.textContent = item.text;
+            chip.appendChild(textSpan);
+
+            // Si es personalizada, agregar botón eliminar
+            if (item.isCustom) {
+                const delBtn = document.createElement('span');
+                delBtn.className = 'chip-del-btn';
+                delBtn.textContent = '✕';
+                delBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    await dbDeleteCustomPhrase(item.id);
+                    state.customPhrases = await dbGetCustomPhrases();
+                    if (state.selectedIndices[categoryKey] >= idx && state.selectedIndices[categoryKey] > 0) {
+                        state.selectedIndices[categoryKey]--;
+                    }
+                    loadAllCategoryChips();
+                };
+                chip.appendChild(delBtn);
+            }
+
             chip.onclick = () => {
-                selectedIndices[categoryKey] = idx;
+                state.selectedIndices[categoryKey] = idx;
                 Array.from(container.children).forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
                 renderPitchText();
             };
+
             container.appendChild(chip);
         });
     }
 
     function loadAllCategoryChips() {
-        const data = database[activeLevel];
-        renderCategoryChips('chips-greeting', data.greetings, 'greeting');
-        renderCategoryChips('chips-role', data.roles, 'role');
-        renderCategoryChips('chips-chill', data.chill, 'chill');
-        renderCategoryChips('chips-switzerland', data.switzerland, 'switzerland');
-        renderCategoryChips('chips-closing', data.closings, 'closing');
+        renderCategoryChips('chips-greeting', 'greetings');
+        renderCategoryChips('chips-role', 'roles');
+        renderCategoryChips('chips-chill', 'chill');
+        renderCategoryChips('chips-switzerland', 'switzerland');
+        renderCategoryChips('chips-closing', 'closings');
         renderPitchText();
     }
 
-    // Render Full Pitch Text with optional Chunk Highlighting
     function renderPitchText() {
-        const data = database[activeLevel];
-        const g = data.greetings[selectedIndices.greeting] || data.greetings[0];
-        const r = data.roles[selectedIndices.role] || data.roles[0];
-        const c = data.chill[selectedIndices.chill] || data.chill[0];
-        const s = data.switzerland[selectedIndices.switzerland] || data.switzerland[0];
-        const cl = data.closings[selectedIndices.closing] || data.closings[0];
+        const gItems = getCombinedCategoryItems('greetings');
+        const rItems = getCombinedCategoryItems('roles');
+        const cItems = getCombinedCategoryItems('chill');
+        const sItems = getCombinedCategoryItems('switzerland');
+        const clItems = getCombinedCategoryItems('closings');
+
+        const g = (gItems[state.selectedIndices.greetings] || gItems[0])?.text || '';
+        const r = (rItems[state.selectedIndices.roles] || rItems[0])?.text || '';
+        const c = (cItems[state.selectedIndices.chill] || cItems[0])?.text || '';
+        const s = (sItems[state.selectedIndices.switzerland] || sItems[0])?.text || '';
+        const cl = (clItems[state.selectedIndices.closings] || clItems[0])?.text || '';
 
         const container = document.getElementById('pitch-text');
 
-        if (isHighlightActive) {
+        if (state.isHighlightActive) {
             container.innerHTML = `
                 <span class="chunk-hl hl-1">${g}</span>
                 <span class="chunk-hl hl-2">${r}</span>
@@ -646,46 +885,148 @@
     }
 
     function toggleHighlight() {
-        isHighlightActive = !isHighlightActive;
+        state.isHighlightActive = !state.isHighlightActive;
         const btn = document.getElementById('hl-btn');
-        btn.classList.toggle('active', isHighlightActive);
+        btn.classList.toggle('active', state.isHighlightActive);
         renderPitchText();
     }
 
     function randomizeAll() {
-        const data = database[activeLevel];
-        selectedIndices.greeting = Math.floor(Math.random() * data.greetings.length);
-        selectedIndices.role = Math.floor(Math.random() * data.roles.length);
-        selectedIndices.chill = Math.floor(Math.random() * data.chill.length);
-        selectedIndices.switzerland = Math.floor(Math.random() * data.switzerland.length);
-        selectedIndices.closing = Math.floor(Math.random() * data.closings.length);
+        ['greetings', 'roles', 'chill', 'switzerland', 'closings'].forEach(key => {
+            const len = getCombinedCategoryItems(key).length;
+            state.selectedIndices[key] = Math.floor(Math.random() * len);
+        });
         loadAllCategoryChips();
     }
 
     function changeLevel(level, btn) {
-        activeLevel = level;
+        state.activeLevel = level;
         document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        selectedIndices = { greeting: 0, role: 0, chill: 0, switzerland: 0, closing: 0 };
+        state.selectedIndices = { greetings: 0, roles: 0, chill: 0, switzerland: 0, closings: 0 };
         loadAllCategoryChips();
     }
 
-    function addCustomOption(categoryKey, containerId) {
-        const customText = prompt("Escribe tu frase personalizada para este bloque:");
-        if (customText && customText.trim() !== "") {
-            database[activeLevel][categoryKey].push(customText.trim());
-            selectedIndices[categoryKey] = database[activeLevel][categoryKey].length - 1;
+    async function promptAddCustomOption(categoryKey, containerId) {
+        const text = prompt("Escribe tu frase personalizada para este bloque:");
+        if (text && text.trim() !== "") {
+            await dbSaveCustomPhrase(state.activeLevel, categoryKey, text.trim());
+            state.customPhrases = await dbGetCustomPhrases();
+            const totalLen = getCombinedCategoryItems(categoryKey).length;
+            state.selectedIndices[categoryKey] = totalLen - 1;
             loadAllCategoryChips();
         }
     }
 
     function setSpeed(rate, btn) {
-        selectedSpeechRate = rate;
+        state.selectedSpeechRate = rate;
         document.querySelectorAll('.speed-tag').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    // --- AUDIO SPEECH SYNTHESIS (PLAY / STOP) ---
+    // ==========================================
+    // 4. HISTORIAL Y AUDIO RECORDINGS (DB)
+    // ==========================================
+
+    async function renderRecordingsList() {
+        state.recordings = await dbGetAudioRecordings();
+        state.recordings.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)); // Recientes primero
+
+        document.getElementById('total-recs-count').textContent = state.recordings.length;
+
+        const recentListContainer = document.getElementById('recent-recordings-list');
+        const fullListContainer = document.getElementById('full-recordings-list');
+
+        recentListContainer.innerHTML = '';
+        fullListContainer.innerHTML = '';
+
+        if (state.recordings.length === 0) {
+            recentListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 10px;">Aún no has grabado ensayos. Pulsa 🎤 Grabar abajo.</div>`;
+            fullListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 20px;">Sin grabaciones guardadas.</div>`;
+            return;
+        }
+
+        // Render Top 3 Recent
+        state.recordings.slice(0, 3).forEach(rec => {
+            recentListContainer.appendChild(createAudioItemElement(rec));
+        });
+
+        // Render All
+        state.recordings.forEach(rec => {
+            fullListContainer.appendChild(createAudioItemElement(rec));
+        });
+    }
+
+    function createAudioItemElement(rec) {
+        const item = document.createElement('div');
+        item.className = 'audio-item';
+
+        const dateStr = new Date(rec.timestamp).toLocaleString('es-ES', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        const audioUrl = URL.createObjectURL(rec.audioBlob);
+
+        item.innerHTML = `
+            <div class="audio-item-meta">
+                <span>🇨🇭 Nivel ${rec.level.toUpperCase()} • ${dateStr}</span>
+            </div>
+            <div class="audio-item-text" title="${rec.pitchText}">${rec.pitchText}</div>
+            <div class="audio-controls-row">
+                <audio src="${audioUrl}" controls></audio>
+                <button class="btn-del-audio" onclick="deleteAudioItem(${rec.id})">🗑️</button>
+            </div>
+        `;
+        return item;
+    }
+
+    async function deleteAudioItem(id) {
+        if (confirm("¿Borrar esta grabación de tu historial?")) {
+            await dbDeleteAudioRecording(id);
+            await renderRecordingsList();
+        }
+    }
+
+    function openHistoryModal() {
+        document.getElementById('history-modal').classList.add('active');
+    }
+
+    function closeHistoryModal() {
+        document.getElementById('history-modal').classList.remove('active');
+    }
+
+    // ==========================================
+    // 5. PERFIL DE USUARIO Y FOTO
+    // ==========================================
+
+    function triggerAvatarUpload() {
+        document.getElementById('avatar-input').click();
+    }
+
+    async function handleAvatarSelected(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64Data = e.target.result;
+                await dbSaveSetting('user_avatar', base64Data);
+                updateAvatarUI(base64Data);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function updateAvatarUI(imageData) {
+        const container = document.getElementById('avatar-display');
+        if (imageData) {
+            container.outerHTML = `<img id="avatar-display" class="avatar-img" src="${imageData}" alt="Nina Avatar">`;
+        }
+    }
+
+    // ==========================================
+    // 6. CONTROL DE AUDIO Y GRABACION
+    // ==========================================
+
     function toggleAudioSpeech() {
         const btn = document.getElementById('listen-btn');
         const icon = document.getElementById('listen-icon');
@@ -699,10 +1040,9 @@
                 const pitchContent = document.getElementById('pitch-text').textContent;
                 const utterance = new SpeechSynthesisUtterance(pitchContent);
                 utterance.lang = 'en-US';
-                utterance.rate = selectedSpeechRate;
+                utterance.rate = state.selectedSpeechRate;
 
                 utterance.onstart = () => {
-                    isSpeaking = true;
                     btn.classList.add('playing');
                     icon.textContent = '⏹️';
                     text.textContent = 'Detener';
@@ -713,13 +1053,10 @@
 
                 window.speechSynthesis.speak(utterance);
             }
-        } else {
-            alert('Tu navegador no admite síntesis de voz.');
         }
     }
 
     function resetListenBtn() {
-        isSpeaking = false;
         const btn = document.getElementById('listen-btn');
         const icon = document.getElementById('listen-icon');
         const text = document.getElementById('listen-text');
@@ -728,11 +1065,8 @@
         text.textContent = 'Escuchar';
     }
 
-    // --- MICROPHONE RECORDER ---
     async function toggleRecording() {
         const btn = document.getElementById('mic-btn');
-        const box = document.getElementById('audio-preview');
-        const player = document.getElementById('audio-player');
 
         if (!isRecording) {
             try {
@@ -741,10 +1075,11 @@
                 audioChunks = [];
 
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
+                mediaRecorder.onstop = async () => {
                     const blob = new Blob(audioChunks, { type: 'audio/wav' });
-                    player.src = URL.createObjectURL(blob);
-                    box.style.display = 'block';
+                    const pitchText = document.getElementById('pitch-text').textContent;
+                    await dbSaveAudioRecording(blob, pitchText, state.activeLevel);
+                    await renderRecordingsList();
                 };
 
                 mediaRecorder.start();
@@ -752,7 +1087,7 @@
                 btn.classList.add('recording');
                 btn.innerHTML = '<span>⏹️</span> Detener';
             } catch (err) {
-                alert('Por favor autoriza el acceso al micrófono.');
+                alert('Por favor autoriza el uso del micrófono.');
             }
         } else {
             mediaRecorder.stop();
@@ -768,10 +1103,20 @@
         alert('¡Pitch copiado al portapapeles!');
     }
 
-    // Initialize UI
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('hl-btn').classList.add('active');
+    // ==========================================
+    // 7. INICIALIZACION
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', async () => {
+        await initIndexedDB();
+        
+        // Cargar datos persistidos
+        state.customPhrases = await dbGetCustomPhrases();
+        const savedAvatar = await dbGetSetting('user_avatar');
+        if (savedAvatar) updateAvatarUI(savedAvatar);
+
+        // Inicializar UI
         loadAllCategoryChips();
+        await renderRecordingsList();
     });
 </script>
 
