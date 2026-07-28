@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pitch Studio </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --surface: #151d2a;
+            --surface-card: #1e293b;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.25);
+            --accent: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #2e3b4e;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+
+            /* Soft pastel section highlights for readability */
+            --hl-1: rgba(168, 85, 247, 0.22); /* Saludo */
+            --hl-1-text: #e9d5ff;
+            --hl-2: rgba(59, 130, 246, 0.22);  /* Rol */
+            --hl-2-text: #bfdbfe;
+            --hl-3: rgba(16, 185, 129, 0.22);  /* Chill */
+            --hl-3-text: #a7f3d0;
+            --hl-4: rgba(245, 158, 11, 0.22);  /* Suiza */
+            --hl-4-text: #fde68a;
+            --hl-5: rgba(244, 63, 94, 0.22);   /* Cierre CTA */
+            --hl-5-text: #fecdd3;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .mobile-app {
+            width: 100%;
+            max-width: 480px;
+            padding: 16px 16px 150px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Top Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            color: white;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .user-titles h1 {
+            font-size: 0.9rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .user-titles p {
+            font-size: 0.72rem;
+            margin: 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Level Selector */
+        .level-pills {
+            display: flex;
+            background: var(--surface);
+            padding: 3px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            gap: 2px;
+        }
+
+        .pill-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pill-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Hero Pitch Output Display */
+        .hero-display {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .hero-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .tag-active {
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: var(--accent);
+            background: rgba(16, 185, 129, 0.15);
+            padding: 3px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            letter-spacing: 0.03em;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .icon-btn.active {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+            color: #a5b4fc;
+        }
+
+        .pitch-body {
+            font-size: 1.05rem;
+            line-height: 1.65;
+            font-weight: 600;
+            margin: 0;
+            color: #f1f5f9;
+            min-height: 90px;
+        }
+
+        /* Chunk Highlighting Classes */
+        .chunk-hl {
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: inline;
+            margin-right: 2px;
+        }
+        .hl-1 { background: var(--hl-1); color: var(--hl-1-text); }
+        .hl-2 { background: var(--hl-2); color: var(--hl-2-text); }
+        .hl-3 { background: var(--hl-3); color: var(--hl-3-text); }
+        .hl-4 { background: var(--hl-4); color: var(--hl-4-text); }
+        .hl-5 { background: var(--hl-5); color: var(--hl-5-text); }
+
+        /* Modules Swiper */
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 4px 2px;
+        }
+
+        .modules-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .module-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+        }
+
+        .module-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .module-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .add-custom-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary-glow);
+            color: #a5b4fc;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* Chips Carousel */
+        .chips-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 2px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chips-container::-webkit-scrollbar { display: none; }
+
+        .chip-item {
+            white-space: nowrap;
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: 18px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .chip-item.active {
+            background: var(--primary);
+            color: white;
+            border-color: #818cf8;
+        }
+
+        /* Bottom Fixed Navigation Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: rgba(11, 15, 25, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px 22px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .speed-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding: 0 2px;
+        }
+
+        .speed-options {
+            display: flex;
+            gap: 6px;
+        }
+
+        .speed-tag {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .speed-tag.active {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .actions-row {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr;
+            gap: 8px;
+        }
+
+        .main-btn {
+            border: none;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: transform 0.1s;
+        }
+
+        .main-btn:active { transform: scale(0.96); }
+
+        .btn-listen {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .btn-listen.playing {
+            background: #e11d48;
+            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4);
+        }
+
+        .btn-record {
+            background: #f43f5e;
+            color: white;
+        }
+
+        .btn-record.recording {
+            animation: pulse-mic 1.2s infinite;
+        }
+
+        @keyframes pulse-mic {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .btn-copy {
+            background: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .audio-preview-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            display: none;
+        }
+
+        audio { width: 100%; height: 32px; }
+    </style>
+</head>
+<body>
+
+<div class="mobile-app">
+    <!-- Header App Bar -->
+    <div class="app-header">
+        <div class="user-info">
+            <div class="avatar">N</div>
+            <div class="user-titles">
+                <h1>Nina's Pitch App</h1>
+                <p>🇨🇭 Switzerland Networking</p>
+            </div>
+        </div>
+
+        <div class="level-pills">
+            <button class="pill-btn active" onclick="changeLevel('a1', this)">A1</button>
+            <button class="pill-btn" onclick="changeLevel('b2', this)">B2</button>
+            <button class="pill-btn" onclick="changeLevel('c1', this)">C1</button>
+        </div>
+    </div>
+
+    <!-- Live Pitch Output -->
+    <div class="hero-display">
+        <div class="hero-controls">
+            <span class="tag-active">● DISCURSO EN VIVO</span>
+            <div class="hero-actions">
+                <button class="icon-btn" id="hl-btn" onclick="toggleHighlight()">🎨 Resaltar</button>
+                <button class="icon-btn" onclick="randomizeAll()" title="Generar mezcla aleatoria">🎲 Random</button>
+            </div>
+        </div>
+        <p class="pitch-body" id="pitch-text">Cargando guion...</p>
+    </div>
+
+    <!-- Modules Selection -->
+    <div class="section-label">Toca una opción para armar tu frase</div>
+
+    <div class="modules-stack">
+        <!-- Module 1: Saludo -->
+        <div class="module-box">
+            <div class="module-top">
+                <span class="module-title" style="color: #c084fc;">1. Saludo Inicial</span>
+                <button class="add-custom-btn" onclick="addCustomOption('greetings', 'chips-greeting')">+ Agregar frase</button>
+            </div>
+            <div class="chips-container" id="chips-greeting"></div>
+        </div>
+
+        <!-- Module 2: Rol / Agencia -->
+        <div class="module-box">
+            <div class="module-top">
+                <span class="module-title" style="color: #60a5fa;">2. Quién Soy & Agencia</span>
+                <button class="add-custom-btn" onclick="addCustomOption('roles', 'chips-role')">+ Agregar frase</button>
+            </div>
+            <div class="chips-container" id="chips-role"></div>
+        </div>
+
+        <!-- Module 3: Vibe Personal -->
+        <div class="module-box">
+            <div class="module-top">
+                <span class="module-title" style="color: #34d399;">3. Dato Personal / Vibe Chill</span>
+                <button class="add-custom-btn" onclick="addCustomOption('chill', 'chips-chill')">+ Agregar frase</button>
+            </div>
+            <div class="chips-container" id="chips-chill"></div>
+        </div>
+
+        <!-- Module 4: Suiza Hoy -->
+        <div class="module-box">
+            <div class="module-top">
+                <span class="module-title" style="color: #fbbf24;">4. Presencia en Suiza (Hoy)</span>
+                <button class="add-custom-btn" onclick="addCustomOption('switzerland', 'chips-switzerland')">+ Agregar frase</button>
+            </div>
+            <div class="chips-container" id="chips-switzerland"></div>
+        </div>
+
+        <!-- Module 5: Cierre & Gancho Conversacional -->
+        <div class="module-box">
+            <div class="module-top">
+                <span class="module-title" style="color: #f87171;">5. Cierre Conversacional (Gancho)</span>
+                <button class="add-custom-btn" onclick="addCustomOption('closings', 'chips-closing')">+ Agregar frase</button>
+            </div>
+            <div class="chips-container" id="chips-closing"></div>
+        </div>
+    </div>
+
+    <!-- Audio Player Output -->
+    <div class="audio-preview-box" id="audio-preview">
+        <audio id="audio-player" controls></audio>
+    </div>
+</div>
+
+<!-- Fixed Mobile Bottom Bar -->
+<div class="bottom-bar">
+    <div class="speed-control">
+        <span>Velocidad de pronunciación:</span>
+        <div class="speed-options">
+            <button class="speed-tag active" onclick="setSpeed(0.85, this)">0.85x</button>
+            <button class="speed-tag" onclick="setSpeed(1.0, this)">1.0x (Real)</button>
+        </div>
+    </div>
+
+    <div class="actions-row">
+        <button class="main-btn btn-listen" id="listen-btn" onclick="toggleAudioSpeech()">
+            <span id="listen-icon">🔊</span> <span id="listen-text">Escuchar</span>
+        </button>
+        <button class="main-btn btn-record" id="mic-btn" onclick="toggleRecording()">
+            <span>🎤</span> Grabar
+        </button>
+        <button class="main-btn btn-copy" onclick="copyToClipboard()" title="Copiar texto al portapapeles">
+            📋
+        </button>
+    </div>
+</div>
+
+<script>
+    // --- BASE DE DATOS DE NINA: CONTEXTO SUIZA + CIERRES ABIERTOS ---
+    const database = {
+        a1: {
+            greetings: ["Hi there!", "Hello!", "Good morning!"],
+            roles: [
+                "I am Nina, and I run a video marketing agency.",
+                "I'm Nina. I direct a digital agency for creative brands.",
+                "My name is Nina, and I produce visual content for companies."
+            ],
+            chill: [
+                "In my free time, I love taking photos and drinking good coffee.",
+                "I really enjoy cinema, alpine views, and design.",
+                "I love traveling, watching movies, and creative projects."
+            ],
+            switzerland: [
+                "I am currently in Switzerland meeting local partners.",
+                "I am staying here in Switzerland for a few weeks.",
+                "I am in Switzerland expanding my agency work."
+            ],
+            closings: [
+                "Are you based here in Switzerland, or traveling too?",
+                "Do you know any good coffee spots around here?",
+                "Are you attending the networking event today?"
+            ]
+        },
+        b2: {
+            greetings: ["Hi everyone!", "Hey there, great to connect!", "Good afternoon!"],
+            roles: [
+                "I'm Nina, founder of a digital agency specializing in video marketing.",
+                "My name is Nina. I lead a boutique marketing firm focused on video campaigns.",
+                "I'm Nina. I help brands grow through creative video strategies."
+            ],
+            chill: [
+                "When I'm not directing video campaigns, you'll find me searching for great local coffee.",
+                "I'm deeply passionate about visual storytelling, photography, and mountain scenery.",
+                "I'm a film enthusiast and love connecting with creative people everywhere."
+            ],
+            switzerland: [
+                "I'm currently based in Switzerland for a few weeks, connecting with local brands.",
+                "I'm spending time here in Switzerland to expand our European partnerships.",
+                "I'm working remotely from Switzerland this month while exploring new projects."
+            ],
+            closings: [
+                "What about you, what projects are you working on right now?",
+                "How long have you been in this industry?",
+                "Are you local to Zurich, or also visiting for business?"
+            ]
+        },
+        c1: {
+            greetings: ["It's a pleasure to meet you.", "Delighted to join you today.", "Good day, everyone."],
+            roles: [
+                "I'm Nina, managing director of an agency driving global brand campaigns through video.",
+                "My name is Nina. I head a boutique agency focused on high-impact visual strategy.",
+                "I'm Nina. I specialize in scaling brand presence through strategic video content."
+            ],
+            chill: [
+                "Off duty, I'm a visual culture enthusiast, coffee snob, and avid traveler.",
+                "Beyond marketing, my creative passion lies in photography and aesthetic storytelling.",
+                "I thrive at the intersection of creative media, travel, and strategic design."
+            ],
+            switzerland: [
+                "I'm currently in Switzerland establishing strategic creative connections across Europe.",
+                "I'm spending time here in Switzerland to build cross-border partnerships for our agency.",
+                "I'm temporarily based in Switzerland, bridging projects between Latin America and Europe."
+            ],
+            closings: [
+                "What's your take on the creative scene here in Switzerland?",
+                "I'd love to hear about your experience in the market—are you free for a coffee this week?",
+                "How does your team usually handle visual content for new markets?"
+            ]
+        }
+    };
+
+    let activeLevel = 'a1';
+    let isHighlightActive = true;
+    let selectedSpeechRate = 0.85;
+    let selectedIndices = { greeting: 0, role: 0, chill: 0, switzerland: 0, closing: 0 };
+
+    let isSpeaking = false;
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    // Load Chips into containers
+    function renderCategoryChips(containerId, items, categoryKey) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+
+        items.forEach((text, idx) => {
+            const chip = document.createElement('div');
+            chip.className = `chip-item ${selectedIndices[categoryKey] === idx ? 'active' : ''}`;
+            chip.textContent = text;
+            chip.onclick = () => {
+                selectedIndices[categoryKey] = idx;
+                Array.from(container.children).forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                renderPitchText();
+            };
+            container.appendChild(chip);
+        });
+    }
+
+    function loadAllCategoryChips() {
+        const data = database[activeLevel];
+        renderCategoryChips('chips-greeting', data.greetings, 'greeting');
+        renderCategoryChips('chips-role', data.roles, 'role');
+        renderCategoryChips('chips-chill', data.chill, 'chill');
+        renderCategoryChips('chips-switzerland', data.switzerland, 'switzerland');
+        renderCategoryChips('chips-closing', data.closings, 'closing');
+        renderPitchText();
+    }
+
+    // Render Full Pitch Text with optional Chunk Highlighting
+    function renderPitchText() {
+        const data = database[activeLevel];
+        const g = data.greetings[selectedIndices.greeting] || data.greetings[0];
+        const r = data.roles[selectedIndices.role] || data.roles[0];
+        const c = data.chill[selectedIndices.chill] || data.chill[0];
+        const s = data.switzerland[selectedIndices.switzerland] || data.switzerland[0];
+        const cl = data.closings[selectedIndices.closing] || data.closings[0];
+
+        const container = document.getElementById('pitch-text');
+
+        if (isHighlightActive) {
+            container.innerHTML = `
+                <span class="chunk-hl hl-1">${g}</span>
+                <span class="chunk-hl hl-2">${r}</span>
+                <span class="chunk-hl hl-3">${c}</span>
+                <span class="chunk-hl hl-4">${s}</span>
+                <span class="chunk-hl hl-5">${cl}</span>
+            `;
+        } else {
+            container.textContent = `${g} ${r} ${c} ${s} ${cl}`;
+        }
+    }
+
+    function toggleHighlight() {
+        isHighlightActive = !isHighlightActive;
+        const btn = document.getElementById('hl-btn');
+        btn.classList.toggle('active', isHighlightActive);
+        renderPitchText();
+    }
+
+    function randomizeAll() {
+        const data = database[activeLevel];
+        selectedIndices.greeting = Math.floor(Math.random() * data.greetings.length);
+        selectedIndices.role = Math.floor(Math.random() * data.roles.length);
+        selectedIndices.chill = Math.floor(Math.random() * data.chill.length);
+        selectedIndices.switzerland = Math.floor(Math.random() * data.switzerland.length);
+        selectedIndices.closing = Math.floor(Math.random() * data.closings.length);
+        loadAllCategoryChips();
+    }
+
+    function changeLevel(level, btn) {
+        activeLevel = level;
+        document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedIndices = { greeting: 0, role: 0, chill: 0, switzerland: 0, closing: 0 };
+        loadAllCategoryChips();
+    }
+
+    function addCustomOption(categoryKey, containerId) {
+        const customText = prompt("Escribe tu frase personalizada para este bloque:");
+        if (customText && customText.trim() !== "") {
+            database[activeLevel][categoryKey].push(customText.trim());
+            selectedIndices[categoryKey] = database[activeLevel][categoryKey].length - 1;
+            loadAllCategoryChips();
+        }
+    }
+
+    function setSpeed(rate, btn) {
+        selectedSpeechRate = rate;
+        document.querySelectorAll('.speed-tag').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // --- AUDIO SPEECH SYNTHESIS (PLAY / STOP) ---
+    function toggleAudioSpeech() {
+        const btn = document.getElementById('listen-btn');
+        const icon = document.getElementById('listen-icon');
+        const text = document.getElementById('listen-text');
+
+        if ('speechSynthesis' in window) {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                resetListenBtn();
+            } else {
+                const pitchContent = document.getElementById('pitch-text').textContent;
+                const utterance = new SpeechSynthesisUtterance(pitchContent);
+                utterance.lang = 'en-US';
+                utterance.rate = selectedSpeechRate;
+
+                utterance.onstart = () => {
+                    isSpeaking = true;
+                    btn.classList.add('playing');
+                    icon.textContent = '⏹️';
+                    text.textContent = 'Detener';
+                };
+
+                utterance.onend = resetListenBtn;
+                utterance.onerror = resetListenBtn;
+
+                window.speechSynthesis.speak(utterance);
+            }
+        } else {
+            alert('Tu navegador no admite síntesis de voz.');
+        }
+    }
+
+    function resetListenBtn() {
+        isSpeaking = false;
+        const btn = document.getElementById('listen-btn');
+        const icon = document.getElementById('listen-icon');
+        const text = document.getElementById('listen-text');
+        btn.classList.remove('playing');
+        icon.textContent = '🔊';
+        text.textContent = 'Escuchar';
+    }
+
+    // --- MICROPHONE RECORDER ---
+    async function toggleRecording() {
+        const btn = document.getElementById('mic-btn');
+        const box = document.getElementById('audio-preview');
+        const player = document.getElementById('audio-player');
+
+        if (!isRecording) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/wav' });
+                    player.src = URL.createObjectURL(blob);
+                    box.style.display = 'block';
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                btn.classList.add('recording');
+                btn.innerHTML = '<span>⏹️</span> Detener';
+            } catch (err) {
+                alert('Por favor autoriza el acceso al micrófono.');
+            }
+        } else {
+            mediaRecorder.stop();
+            isRecording = false;
+            btn.classList.remove('recording');
+            btn.innerHTML = '<span>🎤</span> Grabar';
+        }
+    }
+
+    function copyToClipboard() {
+        const text = document.getElementById('pitch-text').textContent;
+        navigator.clipboard.writeText(text);
+        alert('¡Pitch copiado al portapapeles!');
+    }
+
+    // Initialize UI
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('hl-btn').classList.add('active');
+        loadAllCategoryChips();
+    });
+</script>
+
+</body>
+</html>
