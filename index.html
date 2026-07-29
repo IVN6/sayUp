@@ -22,12 +22,12 @@
             --radius-md: 14px;
             --radius-sm: 10px;
 
-            /* Highlighting Section Pastels */
-            --hl-1: rgba(168, 85, 247, 0.25); --hl-1-text: #e9d5ff; --hl-1-border: #a855f7;
-            --hl-2: rgba(59, 130, 246, 0.25);  --hl-2-text: #bfdbfe; --hl-2-border: #3b82f6;
-            --hl-3: rgba(16, 185, 129, 0.25);  --hl-3-text: #a7f3d0; --hl-3-border: #10b981;
-            --hl-4: rgba(245, 158, 11, 0.25);  --hl-4-text: #fde68a; --hl-4-border: #f59e0b;
-            --hl-5: rgba(244, 63, 94, 0.25);   --hl-5-text: #fecdd3; --hl-5-border: #f43f5e;
+            /* Visual Pastels (Límpias, sin subrayados recargados) */
+            --hl-1-bg: rgba(168, 85, 247, 0.15); --hl-1-text: #e9d5ff;
+            --hl-2-bg: rgba(59, 130, 246, 0.15);  --hl-2-text: #bfdbfe;
+            --hl-3-bg: rgba(16, 185, 129, 0.15);  --hl-3-text: #a7f3d0;
+            --hl-4-bg: rgba(245, 158, 11, 0.15);  --hl-4-text: #fde68a;
+            --hl-5-bg: rgba(244, 63, 94, 0.15);   --hl-5-text: #fecdd3;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -130,7 +130,7 @@
 
         .pill-btn.active { background: var(--primary); color: white; }
 
-        /* Live Display Card */
+        /* Clean Live Pitch Card */
         .hero-display {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -160,6 +160,7 @@
             font-size: 0.68rem;
             color: var(--text-muted);
             font-style: italic;
+            margin-left: 4px;
         }
 
         .hero-actions { display: flex; gap: 8px; }
@@ -179,32 +180,34 @@
 
         .pitch-body {
             font-size: 1.05rem;
-            line-height: 1.7;
+            line-height: 1.8;
             font-weight: 600;
             margin: 0;
             color: #f1f5f9;
             min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
         }
 
-        /* Chunk Interactive Styles */
+        /* Clean Chunk Highlight Style (Sin subrayado) */
         .chunk-hl {
-            padding: 3px 6px;
-            border-radius: 6px;
-            display: inline;
-            margin-right: 3px;
+            padding: 4px 8px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
-            position: relative;
+            display: inline-block;
         }
 
-        .chunk-hl:hover { filter: brightness(1.3); transform: translateY(-1px); }
+        .chunk-hl:hover { filter: brightness(1.25); transform: translateY(-1px); }
         .chunk-hl:active { transform: scale(0.97); }
 
-        .hl-1 { background: var(--hl-1); color: var(--hl-1-text); border-bottom: 2px solid var(--hl-1-border); }
-        .hl-2 { background: var(--hl-2); color: var(--hl-2-text); border-bottom: 2px solid var(--hl-2-border); }
-        .hl-3 { background: var(--hl-3); color: var(--hl-3-text); border-bottom: 2px solid var(--hl-3-border); }
-        .hl-4 { background: var(--hl-4); color: var(--hl-4-text); border-bottom: 2px solid var(--hl-4-border); }
-        .hl-5 { background: var(--hl-5); color: var(--hl-5-text); border-bottom: 2px solid var(--hl-5-border); }
+        .hl-1 { background: var(--hl-1-bg); color: var(--hl-1-text); }
+        .hl-2 { background: var(--hl-2-bg); color: var(--hl-2-text); }
+        .hl-3 { background: var(--hl-3-bg); color: var(--hl-3-text); }
+        .hl-4 { background: var(--hl-4-bg); color: var(--hl-4-text); }
+        .hl-5 { background: var(--hl-5-bg); color: var(--hl-5-text); }
 
         /* Auditor Dashboard Metrics */
         .audit-card {
@@ -305,7 +308,30 @@
             cursor: pointer;
         }
 
-        /* Modules Swiper */
+        /* Filter Controls Bar in Modal */
+        .filter-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            background: var(--surface-card);
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        .filter-select {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        /* Modules Stack */
         .section-label {
             font-size: 0.75rem;
             font-weight: 800;
@@ -379,7 +405,7 @@
             font-size: 0.65rem; color: #fca5a5;
         }
 
-        /* Modals (History & Profile) */
+        /* Modals */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -404,7 +430,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             overflow-y: auto;
         }
 
@@ -429,20 +455,20 @@
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         .form-group label {
-            font-size: 0.75rem;
+            font-size: 0.73rem;
             color: var(--text-muted);
             font-weight: 700;
         }
 
-        .form-group input {
+        .form-group input, .form-group select {
             background: var(--surface-card);
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 10px 12px;
+            padding: 9px 12px;
             border-radius: var(--radius-sm);
             font-family: inherit;
             font-size: 0.85rem;
@@ -456,7 +482,7 @@
             border-radius: var(--radius-sm);
             font-weight: 800;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 6px;
         }
 
         /* Bottom Fixed Bar */
@@ -545,7 +571,7 @@
         </div>
     </div>
 
-    <!-- Live Pitch Output -->
+    <!-- Live Pitch Output (Limpio) -->
     <div class="hero-display">
         <div class="hero-controls">
             <div>
@@ -553,7 +579,7 @@
                 <span class="hero-hint">(Toca un bloque para escucharlo)</span>
             </div>
             <div class="hero-actions">
-                <button class="icon-btn active" id="hl-btn" onclick="toggleHighlight()">🎨 Resaltar</button>
+                <button class="icon-btn active" id="hl-btn" onclick="toggleHighlight()">🎨 Color</button>
                 <button class="icon-btn" onclick="randomizeAll()">🎲 Random</button>
             </div>
         </div>
@@ -564,7 +590,7 @@
     <div class="audit-card">
         <div class="audit-header">
             <span class="audit-title">📊 Auditoría de Progreso</span>
-            <button class="add-custom-btn" onclick="openHistoryModal()">Ver todo el historial</button>
+            <button class="add-custom-btn" onclick="openHistoryModal()">Ver historial filtrado</button>
         </div>
 
         <div class="audit-grid">
@@ -602,10 +628,10 @@
             <div class="chips-container" id="chips-greeting"></div>
         </div>
 
-        <!-- Module 2: Rol / Agencia -->
+        <!-- Module 2: Rol / Ocupación Inteligente -->
         <div class="module-box">
             <div class="module-top">
-                <span class="module-title" style="color: #60a5fa;">2. Quién Soy & Rol</span>
+                <span class="module-title" style="color: #60a5fa;">2. Quién Soy & Ocupación</span>
                 <button class="add-custom-btn" onclick="promptAddCustomOption('roles')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-role"></div>
@@ -640,42 +666,77 @@
     </div>
 </div>
 
-<!-- Modal: Historial Completo de Audios -->
+<!-- Modal: Historial Completo con Filtros -->
 <div class="modal-overlay" id="history-modal">
     <div class="modal-card">
         <div class="modal-header">
             <h3>Historial Auditoría de Ensayos</h3>
             <button class="close-modal-btn" onclick="closeHistoryModal()">✕</button>
         </div>
+
+        <!-- Filtros de Historial -->
+        <div class="filter-bar">
+            <select class="filter-select" id="filter-level" onchange="renderFilteredHistory()">
+                <option value="all">Nivel: Todos</option>
+                <option value="a1">Solo A1</option>
+                <option value="b2">Solo B2</option>
+                <option value="c1">Solo C1</option>
+            </select>
+            <select class="filter-select" id="filter-date" onchange="renderFilteredHistory()">
+                <option value="all">Fecha: Todas</option>
+                <option value="today">Hoy</option>
+                <option value="week">Esta semana</option>
+            </select>
+            <select class="filter-select" id="filter-sort" onchange="renderFilteredHistory()">
+                <option value="newest">Más recientes</option>
+                <option value="duration">Más largos</option>
+            </select>
+        </div>
+
         <div class="recordings-list" id="full-recordings-list"></div>
     </div>
 </div>
 
-<!-- Modal: Perfil del Usuario / Variables Dinámicas -->
+<!-- Modal: Perfil del Usuario / Datos Flexibles -->
 <div class="modal-overlay" id="profile-modal">
     <div class="modal-card">
         <div class="modal-header">
-            <h3>Perfil de Usuario y Plantilla</h3>
+            <h3>Perfil & Variables de Plantilla</h3>
             <button class="close-modal-btn" onclick="closeProfileModal()">✕</button>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
             <div class="avatar-container" onclick="triggerAvatarUpload()">
                 <div id="modal-avatar-display" class="avatar-placeholder">N</div>
                 <div class="avatar-badge">📷</div>
             </div>
             <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="handleAvatarSelected(event)">
-            <span style="font-size: 0.75rem; color: var(--text-muted);">Toca la imagen para cambiar la foto de perfil.</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Toca la imagen para cambiar foto.</span>
         </div>
 
         <div class="form-group">
-            <label>Nombre del Estudiante / Usuario:</label>
+            <label>Nombre del Estudiante:</label>
             <input type="text" id="prof-name" placeholder="Ej: Nina">
         </div>
 
         <div class="form-group">
-            <label>Rol o Agencia / Empresa:</label>
-            <input type="text" id="prof-role" placeholder="Ej: video marketing agency">
+            <label>Estado / Rol Principal:</label>
+            <select id="prof-status-type">
+                <option value="student">Estudiante</option>
+                <option value="professional">Profesional / Empleado</option>
+                <option value="entrepreneur">Emprendedor / Fundador</option>
+                <option value="freelance">Freelance / Creador Independiente</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Área o Industria de Enfoque:</label>
+            <input type="text" id="prof-field" placeholder="Ej: video marketing, computer science, design">
+        </div>
+
+        <div class="form-group">
+            <label>Actividad Secundaria (Opcional - Estudiar/Emprender):</label>
+            <input type="text" id="prof-secondary" placeholder="Ej: studying English, building my startup">
         </div>
 
         <div class="form-group">
@@ -684,11 +745,11 @@
         </div>
 
         <div class="form-group">
-            <label>Hobby / Interés Personal:</label>
+            <label>Hobby / Gusto Personal:</label>
             <input type="text" id="prof-hobby" placeholder="Ej: photography and coffee">
         </div>
 
-        <button class="btn-save-profile" onclick="saveProfileData()">Guardar Cambios de Perfil</button>
+        <button class="btn-save-profile" onclick="saveProfileData()">Guardar y Ajustar Frases</button>
     </div>
 </div>
 
@@ -718,7 +779,7 @@
 
 <script>
     // ==========================================
-    // 1. INDEXED DB MODULE (MODULAR & PERSISTENTE)
+    // 1. INDEXED DB MODULE
     // ==========================================
     const DB_NAME = 'PitchStudioProDB';
     const DB_VERSION = 2;
@@ -827,70 +888,79 @@
     }
 
     // ==========================================
-    // 2. TEMPLATE PHRASES & PERFIL DINAMICO
+    // 2. LOGICA INTELIGENTE DE PLANTILLAS Y ROLES
     // ==========================================
+    let userProfile = {
+        name: "Nina",
+        statusType: "entrepreneur", // student, professional, entrepreneur, freelance
+        field: "video marketing agency",
+        secondary: "expanding my projects",
+        location: "Switzerland",
+        hobby: "photography and coffee"
+    };
+
     const nativeDatabase = {
         a1: {
             greetings: ["Hi there!", "Hello!", "Good morning!"],
             roles: [
-                "I am {{NAME}}, and I run a {{ROLE}}.",
-                "I'm {{NAME}}. I direct a creative team in {{ROLE}}.",
-                "My name is {{NAME}}, and I produce visual content for brands."
+                "I am {{NAME}}, and {{DYNAMIC_ROLE_A1_1}}.",
+                "I'm {{NAME}}, working around {{FIELD}}.",
+                "My name is {{NAME}}, focusing on {{FIELD}}."
             ],
             chill: [
                 "In my free time, I really enjoy {{HOBBY}}.",
-                "I love cinema, mountain views, and {{HOBBY}}.",
+                "I love cinema, good conversations, and {{HOBBY}}.",
                 "I enjoy traveling and exploring {{HOBBY}}."
             ],
             switzerland: [
                 "I am currently in {{LOCATION}} meeting local partners.",
                 "I am staying here in {{LOCATION}} for a few weeks.",
-                "I am in {{LOCATION}} expanding my agency work."
+                "I am in {{LOCATION}} expanding my network."
             ],
             closings: [
                 "Are you based here in {{LOCATION}}, or traveling too?",
                 "Do you know any good coffee spots around here?",
-                "Are you attending the networking event today?"
+                "Are you attending the event today?"
             ]
         },
         b2: {
             greetings: ["Hi everyone!", "Hey there, great to connect!", "Good afternoon!"],
             roles: [
-                "I'm {{NAME}}, founder of a firm specializing in {{ROLE}}.",
-                "My name is {{NAME}}. I lead a boutique firm focused on {{ROLE}}.",
-                "I'm {{NAME}}. I help brands grow through creative strategies in {{ROLE}}."
+                "I'm {{NAME}}, {{DYNAMIC_ROLE_B2_1}}.",
+                "My name is {{NAME}}. {{DYNAMIC_ROLE_B2_2}}.",
+                "I'm {{NAME}}, specializing in {{FIELD}}."
             ],
             chill: [
-                "When I'm not managing projects, you'll find me enjoying {{HOBBY}}.",
+                "When I'm not focused on projects, you'll find me enjoying {{HOBBY}}.",
                 "I'm deeply passionate about visual storytelling and {{HOBBY}}.",
-                "I thrive on creative projects and always make time for {{HOBBY}}."
+                "I thrive on creative challenges and always make time for {{HOBBY}}."
             ],
             switzerland: [
-                "I'm currently based in {{LOCATION}} for a few weeks, connecting with local brands.",
-                "I'm spending time here in {{LOCATION}} to expand our European partnerships.",
-                "I'm working remotely from {{LOCATION}} this month while exploring new projects."
+                "I'm currently based in {{LOCATION}} for a few weeks, connecting with local partners.",
+                "I'm spending time here in {{LOCATION}} to expand our European connections.",
+                "I'm working remotely from {{LOCATION}} this month while exploring new ideas."
             ],
             closings: [
                 "What about you, what projects are you working on right now?",
-                "How long have you been in this industry?",
+                "How long have you been in this field?",
                 "Are you local to {{LOCATION}}, or also visiting for business?"
             ]
         },
         c1: {
             greetings: ["It's a pleasure to meet you.", "Delighted to join you today.", "Good day, everyone."],
             roles: [
-                "I'm {{NAME}}, managing director of an agency driving campaigns in {{ROLE}}.",
-                "My name is {{NAME}}. I head a boutique agency focused on {{ROLE}}.",
-                "I'm {{NAME}}. I specialize in scaling brand presence through {{ROLE}}."
+                "I'm {{NAME}}, {{DYNAMIC_ROLE_C1_1}}.",
+                "My name is {{NAME}}. {{DYNAMIC_ROLE_C1_2}}.",
+                "I'm {{NAME}}, driving strategic growth in {{FIELD}}."
             ],
             chill: [
                 "Off duty, I'm a creative culture enthusiast and avid fan of {{HOBBY}}.",
-                "Beyond my professional work, my creative passion lies in {{HOBBY}}.",
-                "I thrive at the intersection of media, innovation, and {{HOBBY}}."
+                "Beyond my core focus, my primary personal outlet lies in {{HOBBY}}.",
+                "I thrive at the intersection of strategy, innovation, and {{HOBBY}}."
             ],
             switzerland: [
                 "I'm currently in {{LOCATION}} establishing strategic creative connections across Europe.",
-                "I'm spending time in {{LOCATION}} to build cross-border partnerships for our agency.",
+                "I'm spending time in {{LOCATION}} to build cross-border partnerships.",
                 "I'm temporarily based in {{LOCATION}}, bridging international client projects."
             ],
             closings: [
@@ -899,13 +969,6 @@
                 "How does your team usually handle visual content for new markets?"
             ]
         }
-    };
-
-    let userProfile = {
-        name: "Nina",
-        role: "video marketing agency",
-        location: "Switzerland",
-        hobby: "photography and coffee"
     };
 
     let state = {
@@ -922,18 +985,66 @@
     let isRecording = false;
     let recordStartTime = 0;
 
-    // Helper: Sustituye variables dinámicas en las plantillas
+    // Helper Dinámico para construir expresiones gramaticales perfectas
+    function getDynamicRolePhrases() {
+        const field = userProfile.field || "my field";
+        const sec = userProfile.secondary ? ` and ${userProfile.secondary}` : "";
+
+        switch (userProfile.statusType) {
+            case "student":
+                return {
+                    a1_1: `I am a student in ${field}`,
+                    b2_1: `currently studying ${field}${sec}`,
+                    b2_2: `I'm a student dedicated to ${field}`,
+                    c1_1: `a dedicated scholar exploring developments in ${field}`,
+                    c1_2: `I focus my academic and practical efforts on ${field}`
+                };
+            case "professional":
+                return {
+                    a1_1: `I work in ${field}`,
+                    b2_1: `working professionally in ${field}${sec}`,
+                    b2_2: `I work as a specialist in ${field}`,
+                    c1_1: `a professional leading initiatives in ${field}`,
+                    c1_2: `I spearhead projects across the ${field} sector`
+                };
+            case "freelance":
+                return {
+                    a1_1: `I am an independent creator in ${field}`,
+                    b2_1: `a freelancer specialized in ${field}${sec}`,
+                    b2_2: `I offer independent consulting in ${field}`,
+                    c1_1: `a freelance strategy consultant operating in ${field}`,
+                    c1_2: `I advise brands on creative direction within ${field}`
+                };
+            case "entrepreneur":
+            default:
+                return {
+                    a1_1: `I run projects in ${field}`,
+                    b2_1: `founder of a firm focused on ${field}${sec}`,
+                    b2_2: `I lead a boutique agency specializing in ${field}`,
+                    c1_1: `managing director of a firm driving campaigns in ${field}`,
+                    c1_2: `I direct a boutique agency expanding in ${field}`
+                };
+        }
+    }
+
     function replaceProfileVars(str) {
         if (!str) return '';
+        const dyn = getDynamicRolePhrases();
+
         return str
             .replace(/\{\{NAME\}\}/g, userProfile.name || "Nina")
-            .replace(/\{\{ROLE\}\}/g, userProfile.role || "agency")
+            .replace(/\{\{FIELD\}\}/g, userProfile.field || "creative visual marketing")
             .replace(/\{\{LOCATION\}\}/g, userProfile.location || "Switzerland")
-            .replace(/\{\{HOBBY\}\}/g, userProfile.hobby || "creative arts");
+            .replace(/\{\{HOBBY\}\}/g, userProfile.hobby || "photography")
+            .replace(/\{\{DYNAMIC_ROLE_A1_1\}\}/g, dyn.a1_1)
+            .replace(/\{\{DYNAMIC_ROLE_B2_1\}\}/g, dyn.b2_1)
+            .replace(/\{\{DYNAMIC_ROLE_B2_2\}\}/g, dyn.b2_2)
+            .replace(/\{\{DYNAMIC_ROLE_C1_1\}\}/g, dyn.c1_1)
+            .replace(/\{\{DYNAMIC_ROLE_C1_2\}\}/g, dyn.c1_2);
     }
 
     // ==========================================
-    // 3. LOGICA DE RENDER Y CHUNKS INTERACTIVOS
+    // 3. RENDER DE CHIPS Y PITCH TEXT
     // ==========================================
 
     function getCombinedCategoryItems(categoryKey) {
@@ -1022,12 +1133,14 @@
             ];
 
             chunks.forEach(chunk => {
-                const span = document.createElement('span');
-                span.className = `chunk-hl ${chunk.hlClass}`;
-                span.textContent = chunk.text + ' ';
-                // REPRODUCIR SOLO ESTE CHUNK AL HACER CLIC
-                span.onclick = () => speakSingleChunk(chunk.text);
-                container.appendChild(span);
+                if (chunk.text) {
+                    const span = document.createElement('span');
+                    span.className = `chunk-hl ${chunk.hlClass}`;
+                    span.textContent = chunk.text;
+                    // REPRODUCIR SOLO ESTE CHUNK AL HACER CLIC
+                    span.onclick = () => speakSingleChunk(chunk.text);
+                    container.appendChild(span);
+                }
             });
         } else {
             container.textContent = `${g} ${r} ${c} ${s} ${cl}`;
@@ -1093,12 +1206,11 @@
     }
 
     // ==========================================
-    // 4. AUDITORIA Y METRICAS PARA PROFESOR
+    // 4. AUDITORIA CON FILTROS AVANZADOS
     // ==========================================
 
     async function renderAuditMetrics() {
         state.recordings = await dbGetAudioRecordings();
-        state.recordings.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
 
         // Calcular Tiempo Total Hablado
         const totalSecs = state.recordings.reduce((sum, r) => sum + (r.durationSec || 0), 0);
@@ -1111,24 +1223,57 @@
         document.getElementById('stat-top-level').textContent = state.activeLevel.toUpperCase();
 
         const recentListContainer = document.getElementById('recent-recordings-list');
-        const fullListContainer = document.getElementById('full-recordings-list');
-
         recentListContainer.innerHTML = '';
-        fullListContainer.innerHTML = '';
 
         if (state.recordings.length === 0) {
             recentListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 6px;">Sin grabaciones recientes. Pulsa 🎤 Grabar abajo.</div>`;
-            fullListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 20px;">Sin historial acumulado.</div>`;
             return;
         }
 
-        // Renderizar las últimas 2 grabaciones en el dashboard principal
-        state.recordings.slice(0, 2).forEach(rec => {
+        const sortedRecent = [...state.recordings].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        sortedRecent.slice(0, 2).forEach(rec => {
             recentListContainer.appendChild(createAudioItemElement(rec));
         });
 
-        // Renderizar todo en el modal
-        state.recordings.forEach(rec => {
+        renderFilteredHistory();
+    }
+
+    function renderFilteredHistory() {
+        const fullListContainer = document.getElementById('full-recordings-list');
+        fullListContainer.innerHTML = '';
+
+        let filtered = [...state.recordings];
+
+        // 1. Filtro de Nivel
+        const lvl = document.getElementById('filter-level').value;
+        if (lvl !== 'all') {
+            filtered = filtered.filter(r => r.level === lvl);
+        }
+
+        // 2. Filtro de Fecha
+        const dateFilter = document.getElementById('filter-date').value;
+        const now = new Date();
+        if (dateFilter === 'today') {
+            filtered = filtered.filter(r => new Date(r.timestamp).toDateString() === now.toDateString());
+        } else if (dateFilter === 'week') {
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            filtered = filtered.filter(r => new Date(r.timestamp) >= oneWeekAgo);
+        }
+
+        // 3. Orden
+        const sortBy = document.getElementById('filter-sort').value;
+        if (sortBy === 'newest') {
+            filtered.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        } else if (sortBy === 'duration') {
+            filtered.sort((a,b) => (b.durationSec || 0) - (a.durationSec || 0));
+        }
+
+        if (filtered.length === 0) {
+            fullListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 20px;">No se encontraron registros con los filtros seleccionados.</div>`;
+            return;
+        }
+
+        filtered.forEach(rec => {
             fullListContainer.appendChild(createAudioItemElement(rec));
         });
     }
@@ -1164,16 +1309,21 @@
         }
     }
 
-    function openHistoryModal() { document.getElementById('history-modal').classList.add('active'); }
+    function openHistoryModal() { 
+        renderFilteredHistory();
+        document.getElementById('history-modal').classList.add('active'); 
+    }
     function closeHistoryModal() { document.getElementById('history-modal').classList.remove('active'); }
 
     // ==========================================
-    // 5. MODAL DE PERFIL Y VARIABLES
+    // 5. MODAL DE PERFIL Y DATOS DE USUARIO
     // ==========================================
 
     function openProfileModal() {
         document.getElementById('prof-name').value = userProfile.name || '';
-        document.getElementById('prof-role').value = userProfile.role || '';
+        document.getElementById('prof-status-type').value = userProfile.statusType || 'entrepreneur';
+        document.getElementById('prof-field').value = userProfile.field || '';
+        document.getElementById('prof-secondary').value = userProfile.secondary || '';
         document.getElementById('prof-loc').value = userProfile.location || '';
         document.getElementById('prof-hobby').value = userProfile.hobby || '';
         document.getElementById('profile-modal').classList.add('active');
@@ -1185,9 +1335,11 @@
 
     async function saveProfileData() {
         userProfile.name = document.getElementById('prof-name').value.trim() || 'Nina';
-        userProfile.role = document.getElementById('prof-role').value.trim() || 'agency';
+        userProfile.statusType = document.getElementById('prof-status-type').value;
+        userProfile.field = document.getElementById('prof-field').value.trim() || 'video marketing';
+        userProfile.secondary = document.getElementById('prof-secondary').value.trim();
         userProfile.location = document.getElementById('prof-loc').value.trim() || 'Switzerland';
-        userProfile.hobby = document.getElementById('prof-hobby').value.trim() || 'creative projects';
+        userProfile.hobby = document.getElementById('prof-hobby').value.trim() || 'creative hobbies';
 
         await dbSaveSetting('user_profile', userProfile);
         updateHeaderProfileUI();
@@ -1223,7 +1375,7 @@
     }
 
     // ==========================================
-    // 6. AUDIO SPEECH & MIC RECORDING
+    // 6. CONTROL DE AUDIO & GRABACION
     // ==========================================
 
     function toggleAudioSpeech() {
@@ -1310,7 +1462,6 @@
     document.addEventListener('DOMContentLoaded', async () => {
         await initIndexedDB();
         
-        // Cargar datos persistidos
         state.customPhrases = await dbGetCustomPhrases();
         
         const savedProfile = await dbGetSetting('user_profile');
@@ -1322,7 +1473,6 @@
         const savedSpeed = await dbGetSetting('last_speed');
         if (savedSpeed) state.selectedSpeechRate = savedSpeed;
 
-        // Render inicial
         updateHeaderProfileUI();
         updateSpeedUI(state.selectedSpeechRate);
         loadAllCategoryChips();
