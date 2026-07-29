@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nina Pitch Studio</title>
+    <title>Pitch Studio - Smart Offline Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,11 +23,11 @@
             --radius-sm: 10px;
 
             /* Highlighting Section Pastels */
-            --hl-1: rgba(168, 85, 247, 0.22); --hl-1-text: #e9d5ff;
-            --hl-2: rgba(59, 130, 246, 0.22);  --hl-2-text: #bfdbfe;
-            --hl-3: rgba(16, 185, 129, 0.22);  --hl-3-text: #a7f3d0;
-            --hl-4: rgba(245, 158, 11, 0.22);  --hl-4-text: #fde68a;
-            --hl-5: rgba(244, 63, 94, 0.22);   --hl-5-text: #fecdd3;
+            --hl-1: rgba(168, 85, 247, 0.25); --hl-1-text: #e9d5ff; --hl-1-border: #a855f7;
+            --hl-2: rgba(59, 130, 246, 0.25);  --hl-2-text: #bfdbfe; --hl-2-border: #3b82f6;
+            --hl-3: rgba(16, 185, 129, 0.25);  --hl-3-text: #a7f3d0; --hl-3-border: #10b981;
+            --hl-4: rgba(245, 158, 11, 0.25);  --hl-4-text: #fde68a; --hl-4-border: #f59e0b;
+            --hl-5: rgba(244, 63, 94, 0.25);   --hl-5-text: #fecdd3; --hl-5-border: #f43f5e;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -44,7 +44,7 @@
         .mobile-app {
             width: 100%;
             max-width: 480px;
-            padding: 16px 16px 150px 16px;
+            padding: 16px 16px 160px 16px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -55,16 +55,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 4px 0;
         }
 
-        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-info { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 
         .avatar-container {
             position: relative;
-            width: 46px;
-            height: 46px;
-            cursor: pointer;
+            width: 48px;
+            height: 48px;
         }
 
         .avatar-img {
@@ -85,7 +83,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: white;
             box-shadow: 0 0 12px var(--primary-glow);
         }
@@ -97,15 +95,15 @@
             background: var(--surface-card);
             border: 1px solid var(--border);
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.65rem;
+            font-size: 0.68rem;
         }
 
-        .user-titles h1 { font-size: 0.95rem; margin: 0; font-weight: 700; }
+        .user-titles h1 { font-size: 0.95rem; margin: 0; font-weight: 800; }
         .user-titles p { font-size: 0.72rem; margin: 0; color: var(--accent); font-weight: 600; }
 
         /* Level Pills */
@@ -158,6 +156,12 @@
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
+        .hero-hint {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
         .hero-actions { display: flex; gap: 8px; }
 
         .icon-btn {
@@ -175,36 +179,49 @@
 
         .pitch-body {
             font-size: 1.05rem;
-            line-height: 1.65;
+            line-height: 1.7;
             font-weight: 600;
             margin: 0;
             color: #f1f5f9;
             min-height: 80px;
         }
 
-        .chunk-hl { padding: 2px 6px; border-radius: 6px; display: inline; margin-right: 2px; }
-        .hl-1 { background: var(--hl-1); color: var(--hl-1-text); }
-        .hl-2 { background: var(--hl-2); color: var(--hl-2-text); }
-        .hl-3 { background: var(--hl-3); color: var(--hl-3-text); }
-        .hl-4 { background: var(--hl-4); color: var(--hl-4-text); }
-        .hl-5 { background: var(--hl-5); color: var(--hl-5-text); }
+        /* Chunk Interactive Styles */
+        .chunk-hl {
+            padding: 3px 6px;
+            border-radius: 6px;
+            display: inline;
+            margin-right: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
 
-        /* Audio Recordings Recent Section */
-        .recordings-card {
+        .chunk-hl:hover { filter: brightness(1.3); transform: translateY(-1px); }
+        .chunk-hl:active { transform: scale(0.97); }
+
+        .hl-1 { background: var(--hl-1); color: var(--hl-1-text); border-bottom: 2px solid var(--hl-1-border); }
+        .hl-2 { background: var(--hl-2); color: var(--hl-2-text); border-bottom: 2px solid var(--hl-2-border); }
+        .hl-3 { background: var(--hl-3); color: var(--hl-3-text); border-bottom: 2px solid var(--hl-3-border); }
+        .hl-4 { background: var(--hl-4); color: var(--hl-4-text); border-bottom: 2px solid var(--hl-4-border); }
+        .hl-5 { background: var(--hl-5); color: var(--hl-5-text); border-bottom: 2px solid var(--hl-5-border); }
+
+        /* Auditor Dashboard Metrics */
+        .audit-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: 14px;
         }
 
-        .recordings-header {
+        .audit-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
-        .recordings-title {
+        .audit-title {
             font-size: 0.8rem;
             font-weight: 800;
             color: var(--text-main);
@@ -213,20 +230,36 @@
             gap: 6px;
         }
 
-        .view-all-btn {
-            background: transparent;
-            border: none;
-            color: #a5b4fc;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
+        .audit-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
-        .recordings-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .stat-box {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 8px;
+            text-align: center;
         }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #a5b4fc;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Audio Recordings List */
+        .recordings-list { display: flex; flex-direction: column; gap: 8px; }
 
         .audio-item {
             background: var(--surface-card);
@@ -341,16 +374,12 @@
         .chip-del-btn {
             background: rgba(0,0,0,0.25);
             border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            color: #fca5a5;
+            width: 16px; height: 16px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.65rem; color: #fca5a5;
         }
 
-        /* Modal Drawer for Full History */
+        /* Modals (History & Profile) */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -371,7 +400,7 @@
             border-top-right-radius: var(--radius-lg);
             width: 100%;
             max-width: 480px;
-            max-height: 80vh;
+            max-height: 85vh;
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -396,13 +425,47 @@
             cursor: pointer;
         }
 
+        /* Profile Inputs */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .form-group input {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+
+        .btn-save-profile {
+            background: var(--accent);
+            color: #0b0f19;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
         /* Bottom Fixed Bar */
         .bottom-bar {
             position: fixed;
             bottom: 0; left: 50%;
             transform: translateX(-50%);
             width: 100%; max-width: 480px;
-            background: rgba(11, 15, 25, 0.88);
+            background: rgba(11, 15, 25, 0.92);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-top: 1px solid var(--border);
@@ -427,14 +490,14 @@
             background: var(--surface);
             border: 1px solid var(--border);
             color: var(--text-muted);
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 6px;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             font-weight: 700;
             cursor: pointer;
         }
 
-        .speed-tag.active { color: var(--accent); border-color: var(--accent); }
+        .speed-tag.active { color: var(--accent); border-color: var(--accent); background: rgba(16, 185, 129, 0.1); }
 
         .actions-row { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 8px; }
 
@@ -461,18 +524,17 @@
 <body>
 
 <div class="mobile-app">
-    <!-- Header -->
+    <!-- Header / User Profile -->
     <div class="app-header">
-        <div class="user-info">
-            <div class="avatar-container" onclick="triggerAvatarUpload()">
+        <div class="user-info" onclick="openProfileModal()">
+            <div class="avatar-container">
                 <div id="avatar-display" class="avatar-placeholder">N</div>
-                <div class="avatar-badge">📷</div>
+                <div class="avatar-badge">✏️</div>
             </div>
-            <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="handleAvatarSelected(event)">
             
             <div class="user-titles">
-                <h1>Nina's Pitch App</h1>
-                <p>🇨🇭 Switzerland Offline DB</p>
+                <h1 id="header-user-name">Nina Pitch</h1>
+                <p id="header-user-loc">🇨🇭 Switzerland Offline DB</p>
             </div>
         </div>
 
@@ -486,7 +548,10 @@
     <!-- Live Pitch Output -->
     <div class="hero-display">
         <div class="hero-controls">
-            <span class="tag-active">● DISCURSO EN VIVO</span>
+            <div>
+                <span class="tag-active">● DISCURSO EN VIVO</span>
+                <span class="hero-hint">(Toca un bloque para escucharlo)</span>
+            </div>
             <div class="hero-actions">
                 <button class="icon-btn active" id="hl-btn" onclick="toggleHighlight()">🎨 Resaltar</button>
                 <button class="icon-btn" onclick="randomizeAll()">🎲 Random</button>
@@ -495,28 +560,44 @@
         <p class="pitch-body" id="pitch-text">Cargando guion...</p>
     </div>
 
-    <!-- Recent Voice Recordings (IndexedDB Powered) -->
-    <div class="recordings-card">
-        <div class="recordings-header">
-            <span class="recordings-title">🎙️ Últimos Ensayos Grabados</span>
-            <button class="view-all-btn" onclick="openHistoryModal()">Ver historial (<span id="total-recs-count">0</span>)</button>
+    <!-- Auditoria / Dashboard Profesor y Registros Recientes -->
+    <div class="audit-card">
+        <div class="audit-header">
+            <span class="audit-title">📊 Auditoría de Progreso</span>
+            <button class="add-custom-btn" onclick="openHistoryModal()">Ver todo el historial</button>
         </div>
+
+        <div class="audit-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="stat-total-time">0s</div>
+                <div class="stat-label">Tiempo Hablado</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="stat-total-recs">0</div>
+                <div class="stat-label">Grabaciones</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="stat-top-level">A1</div>
+                <div class="stat-label">Nivel Activo</div>
+            </div>
+        </div>
+
         <div class="recordings-list" id="recent-recordings-list">
-            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 10px;">
-                Aún no has grabado ensayos. Pulsa 🎤 Grabar abajo.
+            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 6px;">
+                Sin grabaciones recientes. Pulsa 🎤 Grabar abajo.
             </div>
         </div>
     </div>
 
     <!-- Modules Selection -->
-    <div class="section-label">Toca una opción para armar tu frase</div>
+    <div class="section-label">Selecciona frases para armar tu pitch</div>
 
     <div class="modules-stack">
         <!-- Module 1: Saludo -->
         <div class="module-box">
             <div class="module-top">
                 <span class="module-title" style="color: #c084fc;">1. Saludo Inicial</span>
-                <button class="add-custom-btn" onclick="promptAddCustomOption('greetings', 'chips-greeting')">+ Agregar frase</button>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('greetings')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-greeting"></div>
         </div>
@@ -524,8 +605,8 @@
         <!-- Module 2: Rol / Agencia -->
         <div class="module-box">
             <div class="module-top">
-                <span class="module-title" style="color: #60a5fa;">2. Quién Soy & Agencia</span>
-                <button class="add-custom-btn" onclick="promptAddCustomOption('roles', 'chips-role')">+ Agregar frase</button>
+                <span class="module-title" style="color: #60a5fa;">2. Quién Soy & Rol</span>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('roles')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-role"></div>
         </div>
@@ -533,17 +614,17 @@
         <!-- Module 3: Vibe Personal -->
         <div class="module-box">
             <div class="module-top">
-                <span class="module-title" style="color: #34d399;">3. Dato Personal / Vibe Chill</span>
-                <button class="add-custom-btn" onclick="promptAddCustomOption('chill', 'chips-chill')">+ Agregar frase</button>
+                <span class="module-title" style="color: #34d399;">3. Dato Personal / Hobby</span>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('chill')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-chill"></div>
         </div>
 
-        <!-- Module 4: Suiza Hoy -->
+        <!-- Module 4: Ubicación Actual -->
         <div class="module-box">
             <div class="module-top">
-                <span class="module-title" style="color: #fbbf24;">4. Presencia en Suiza (Hoy)</span>
-                <button class="add-custom-btn" onclick="promptAddCustomOption('switzerland', 'chips-switzerland')">+ Agregar frase</button>
+                <span class="module-title" style="color: #fbbf24;">4. Presencia / Ubicación</span>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('switzerland')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-switzerland"></div>
         </div>
@@ -551,32 +632,74 @@
         <!-- Module 5: Cierre & Gancho Conversacional -->
         <div class="module-box">
             <div class="module-top">
-                <span class="module-title" style="color: #f87171;">5. Cierre Conversacional (Gancho)</span>
-                <button class="add-custom-btn" onclick="promptAddCustomOption('closings', 'chips-closing')">+ Agregar frase</button>
+                <span class="module-title" style="color: #f87171;">5. Cierre Conversacional</span>
+                <button class="add-custom-btn" onclick="promptAddCustomOption('closings')">+ Agregar frase</button>
             </div>
             <div class="chips-container" id="chips-closing"></div>
         </div>
     </div>
 </div>
 
-<!-- Full Audio History Modal -->
+<!-- Modal: Historial Completo de Audios -->
 <div class="modal-overlay" id="history-modal">
     <div class="modal-card">
         <div class="modal-header">
-            <h3>Historial de Ensayos de Voz</h3>
+            <h3>Historial Auditoría de Ensayos</h3>
             <button class="close-modal-btn" onclick="closeHistoryModal()">✕</button>
         </div>
         <div class="recordings-list" id="full-recordings-list"></div>
     </div>
 </div>
 
-<!-- Fixed Mobile Bottom Bar -->
+<!-- Modal: Perfil del Usuario / Variables Dinámicas -->
+<div class="modal-overlay" id="profile-modal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Perfil de Usuario y Plantilla</h3>
+            <button class="close-modal-btn" onclick="closeProfileModal()">✕</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+            <div class="avatar-container" onclick="triggerAvatarUpload()">
+                <div id="modal-avatar-display" class="avatar-placeholder">N</div>
+                <div class="avatar-badge">📷</div>
+            </div>
+            <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="handleAvatarSelected(event)">
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Toca la imagen para cambiar la foto de perfil.</span>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre del Estudiante / Usuario:</label>
+            <input type="text" id="prof-name" placeholder="Ej: Nina">
+        </div>
+
+        <div class="form-group">
+            <label>Rol o Agencia / Empresa:</label>
+            <input type="text" id="prof-role" placeholder="Ej: video marketing agency">
+        </div>
+
+        <div class="form-group">
+            <label>Ubicación Actual / País:</label>
+            <input type="text" id="prof-loc" placeholder="Ej: Switzerland">
+        </div>
+
+        <div class="form-group">
+            <label>Hobby / Interés Personal:</label>
+            <input type="text" id="prof-hobby" placeholder="Ej: photography and coffee">
+        </div>
+
+        <button class="btn-save-profile" onclick="saveProfileData()">Guardar Cambios de Perfil</button>
+    </div>
+</div>
+
+<!-- Bottom Fixed Controls Bar -->
 <div class="bottom-bar">
     <div class="speed-control">
         <span>Velocidad de voz nativa:</span>
         <div class="speed-options">
-            <button class="speed-tag active" onclick="setSpeed(0.85, this)">0.85x</button>
-            <button class="speed-tag" onclick="setSpeed(1.0, this)">1.0x (Real)</button>
+            <button class="speed-tag" id="speed-085" onclick="setSpeed(0.85)">0.85x</button>
+            <button class="speed-tag" id="speed-100" onclick="setSpeed(1.0)">1.0x (Normal)</button>
+            <button class="speed-tag" id="speed-125" onclick="setSpeed(1.25)">1.25x</button>
         </div>
     </div>
 
@@ -595,16 +718,16 @@
 
 <script>
     // ==========================================
-    // 1. INDEXED DB MODULE (SIN ESPAGUETI)
+    // 1. INDEXED DB MODULE (MODULAR & PERSISTENTE)
     // ==========================================
-    const DB_NAME = 'NinaPitchStudioDB';
-    const DB_VERSION = 1;
+    const DB_NAME = 'PitchStudioProDB';
+    const DB_VERSION = 2;
     let dbInstance = null;
 
     function initIndexedDB() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
-            request.onerror = e => reject("Error iniciando IndexedDB: " + e.target.error);
+            request.onerror = e => reject("Error en IndexedDB: " + e.target.error);
             request.onsuccess = e => {
                 dbInstance = e.target.result;
                 resolve(dbInstance);
@@ -624,13 +747,11 @@
         });
     }
 
-    // Database Helpers
     function dbSaveCustomPhrase(level, category, text) {
         return new Promise((resolve) => {
             const tx = dbInstance.transaction('custom_phrases', 'readwrite');
             const store = tx.objectStore('custom_phrases');
-            const item = { level, category, text };
-            const req = store.add(item);
+            const req = store.add({ level, category, text });
             req.onsuccess = (e) => resolve(e.target.result);
         });
     }
@@ -653,7 +774,7 @@
         });
     }
 
-    function dbSaveAudioRecording(blob, pitchText, level) {
+    function dbSaveAudioRecording(blob, pitchText, level, durationSec) {
         return new Promise((resolve) => {
             const tx = dbInstance.transaction('audio_recordings', 'readwrite');
             const store = tx.objectStore('audio_recordings');
@@ -661,6 +782,7 @@
                 timestamp: new Date().toISOString(),
                 pitchText,
                 level,
+                durationSec,
                 audioBlob: blob
             };
             const req = store.add(item);
@@ -705,28 +827,28 @@
     }
 
     // ==========================================
-    // 2. BASE DE DATOS DE NATIVA Y ESTADO
+    // 2. TEMPLATE PHRASES & PERFIL DINAMICO
     // ==========================================
     const nativeDatabase = {
         a1: {
             greetings: ["Hi there!", "Hello!", "Good morning!"],
             roles: [
-                "I am Nina, and I run a video marketing agency.",
-                "I'm Nina. I direct a digital agency for creative brands.",
-                "My name is Nina, and I produce visual content for companies."
+                "I am {{NAME}}, and I run a {{ROLE}}.",
+                "I'm {{NAME}}. I direct a creative team in {{ROLE}}.",
+                "My name is {{NAME}}, and I produce visual content for brands."
             ],
             chill: [
-                "In my free time, I love taking photos and drinking good coffee.",
-                "I really enjoy cinema, alpine views, and design.",
-                "I love traveling, watching movies, and creative projects."
+                "In my free time, I really enjoy {{HOBBY}}.",
+                "I love cinema, mountain views, and {{HOBBY}}.",
+                "I enjoy traveling and exploring {{HOBBY}}."
             ],
             switzerland: [
-                "I am currently in Switzerland meeting local partners.",
-                "I am staying here in Switzerland for a few weeks.",
-                "I am in Switzerland expanding my agency work."
+                "I am currently in {{LOCATION}} meeting local partners.",
+                "I am staying here in {{LOCATION}} for a few weeks.",
+                "I am in {{LOCATION}} expanding my agency work."
             ],
             closings: [
-                "Are you based here in Switzerland, or traveling too?",
+                "Are you based here in {{LOCATION}}, or traveling too?",
                 "Do you know any good coffee spots around here?",
                 "Are you attending the networking event today?"
             ]
@@ -734,56 +856,63 @@
         b2: {
             greetings: ["Hi everyone!", "Hey there, great to connect!", "Good afternoon!"],
             roles: [
-                "I'm Nina, founder of a digital agency specializing in video marketing.",
-                "My name is Nina. I lead a boutique marketing firm focused on video campaigns.",
-                "I'm Nina. I help brands grow through creative video strategies."
+                "I'm {{NAME}}, founder of a firm specializing in {{ROLE}}.",
+                "My name is {{NAME}}. I lead a boutique firm focused on {{ROLE}}.",
+                "I'm {{NAME}}. I help brands grow through creative strategies in {{ROLE}}."
             ],
             chill: [
-                "When I'm not directing video campaigns, you'll find me searching for great local coffee.",
-                "I'm deeply passionate about visual storytelling, photography, and mountain scenery.",
-                "I'm a film enthusiast and love connecting with creative people everywhere."
+                "When I'm not managing projects, you'll find me enjoying {{HOBBY}}.",
+                "I'm deeply passionate about visual storytelling and {{HOBBY}}.",
+                "I thrive on creative projects and always make time for {{HOBBY}}."
             ],
             switzerland: [
-                "I'm currently based in Switzerland for a few weeks, connecting with local brands.",
-                "I'm spending time here in Switzerland to expand our European partnerships.",
-                "I'm working remotely from Switzerland this month while exploring new projects."
+                "I'm currently based in {{LOCATION}} for a few weeks, connecting with local brands.",
+                "I'm spending time here in {{LOCATION}} to expand our European partnerships.",
+                "I'm working remotely from {{LOCATION}} this month while exploring new projects."
             ],
             closings: [
                 "What about you, what projects are you working on right now?",
                 "How long have you been in this industry?",
-                "Are you local to Zurich, or also visiting for business?"
+                "Are you local to {{LOCATION}}, or also visiting for business?"
             ]
         },
         c1: {
             greetings: ["It's a pleasure to meet you.", "Delighted to join you today.", "Good day, everyone."],
             roles: [
-                "I'm Nina, managing director of an agency driving global brand campaigns through video.",
-                "My name is Nina. I head a boutique agency focused on high-impact visual strategy.",
-                "I'm Nina. I specialize in scaling brand presence through strategic video content."
+                "I'm {{NAME}}, managing director of an agency driving campaigns in {{ROLE}}.",
+                "My name is {{NAME}}. I head a boutique agency focused on {{ROLE}}.",
+                "I'm {{NAME}}. I specialize in scaling brand presence through {{ROLE}}."
             ],
             chill: [
-                "Off duty, I'm a visual culture enthusiast, coffee snob, and avid traveler.",
-                "Beyond marketing, my creative passion lies in photography and aesthetic storytelling.",
-                "I thrive at the intersection of creative media, travel, and strategic design."
+                "Off duty, I'm a creative culture enthusiast and avid fan of {{HOBBY}}.",
+                "Beyond my professional work, my creative passion lies in {{HOBBY}}.",
+                "I thrive at the intersection of media, innovation, and {{HOBBY}}."
             ],
             switzerland: [
-                "I'm currently in Switzerland establishing strategic creative connections across Europe.",
-                "I'm spending time here in Switzerland to build cross-border partnerships for our agency.",
-                "I'm temporarily based in Switzerland, bridging projects between Latin America and Europe."
+                "I'm currently in {{LOCATION}} establishing strategic creative connections across Europe.",
+                "I'm spending time in {{LOCATION}} to build cross-border partnerships for our agency.",
+                "I'm temporarily based in {{LOCATION}}, bridging international client projects."
             ],
             closings: [
-                "What's your take on the creative scene here in Switzerland?",
-                "I'd love to hear about your experience in the market—are you free for a coffee this week?",
+                "What's your take on the market scene here in {{LOCATION}}?",
+                "I'd love to hear about your experience—are you free for a coffee this week?",
                 "How does your team usually handle visual content for new markets?"
             ]
         }
     };
 
+    let userProfile = {
+        name: "Nina",
+        role: "video marketing agency",
+        location: "Switzerland",
+        hobby: "photography and coffee"
+    };
+
     let state = {
         activeLevel: 'a1',
         isHighlightActive: true,
-        selectedSpeechRate: 0.85,
-        selectedIndices: { greeting: 0, role: 0, chill: 0, switzerland: 0, closing: 0 },
+        selectedSpeechRate: 1.0,
+        selectedIndices: { greetings: 0, roles: 0, chill: 0, switzerland: 0, closings: 0 },
         customPhrases: [],
         recordings: []
     };
@@ -791,16 +920,27 @@
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
+    let recordStartTime = 0;
+
+    // Helper: Sustituye variables dinámicas en las plantillas
+    function replaceProfileVars(str) {
+        if (!str) return '';
+        return str
+            .replace(/\{\{NAME\}\}/g, userProfile.name || "Nina")
+            .replace(/\{\{ROLE\}\}/g, userProfile.role || "agency")
+            .replace(/\{\{LOCATION\}\}/g, userProfile.location || "Switzerland")
+            .replace(/\{\{HOBBY\}\}/g, userProfile.hobby || "creative arts");
+    }
 
     // ==========================================
-    // 3. LOGICA DE RENDER Y UI
+    // 3. LOGICA DE RENDER Y CHUNKS INTERACTIVOS
     // ==========================================
 
     function getCombinedCategoryItems(categoryKey) {
-        const nativeItems = nativeDatabase[state.activeLevel][categoryKey].map(text => ({ text, isCustom: false }));
+        const nativeItems = nativeDatabase[state.activeLevel][categoryKey].map(text => ({ text: replaceProfileVars(text), isCustom: false }));
         const customItems = state.customPhrases
             .filter(item => item.level === state.activeLevel && item.category === categoryKey)
-            .map(item => ({ text: item.text, isCustom: true, id: item.id }));
+            .map(item => ({ text: replaceProfileVars(item.text), isCustom: true, id: item.id }));
 
         return [...nativeItems, ...customItems];
     }
@@ -819,7 +959,6 @@
             textSpan.textContent = item.text;
             chip.appendChild(textSpan);
 
-            // Si es personalizada, agregar botón eliminar
             if (item.isCustom) {
                 const delBtn = document.createElement('span');
                 delBtn.className = 'chip-del-btn';
@@ -872,15 +1011,36 @@
         const container = document.getElementById('pitch-text');
 
         if (state.isHighlightActive) {
-            container.innerHTML = `
-                <span class="chunk-hl hl-1">${g}</span>
-                <span class="chunk-hl hl-2">${r}</span>
-                <span class="chunk-hl hl-3">${c}</span>
-                <span class="chunk-hl hl-4">${s}</span>
-                <span class="chunk-hl hl-5">${cl}</span>
-            `;
+            container.innerHTML = '';
+
+            const chunks = [
+                { text: g, hlClass: 'hl-1' },
+                { text: r, hlClass: 'hl-2' },
+                { text: c, hlClass: 'hl-3' },
+                { text: s, hlClass: 'hl-4' },
+                { text: cl, hlClass: 'hl-5' }
+            ];
+
+            chunks.forEach(chunk => {
+                const span = document.createElement('span');
+                span.className = `chunk-hl ${chunk.hlClass}`;
+                span.textContent = chunk.text + ' ';
+                // REPRODUCIR SOLO ESTE CHUNK AL HACER CLIC
+                span.onclick = () => speakSingleChunk(chunk.text);
+                container.appendChild(span);
+            });
         } else {
             container.textContent = `${g} ${r} ${c} ${s} ${cl}`;
+        }
+    }
+
+    function speakSingleChunk(textChunk) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(textChunk);
+            utterance.lang = 'en-US';
+            utterance.rate = state.selectedSpeechRate;
+            window.speechSynthesis.speak(utterance);
         }
     }
 
@@ -905,10 +1065,11 @@
         btn.classList.add('active');
         state.selectedIndices = { greetings: 0, roles: 0, chill: 0, switzerland: 0, closings: 0 };
         loadAllCategoryChips();
+        renderAuditMetrics();
     }
 
-    async function promptAddCustomOption(categoryKey, containerId) {
-        const text = prompt("Escribe tu frase personalizada para este bloque:");
+    async function promptAddCustomOption(categoryKey) {
+        const text = prompt("Escribe tu nueva frase personalizada:");
         if (text && text.trim() !== "") {
             await dbSaveCustomPhrase(state.activeLevel, categoryKey, text.trim());
             state.customPhrases = await dbGetCustomPhrases();
@@ -918,21 +1079,36 @@
         }
     }
 
-    function setSpeed(rate, btn) {
+    async function setSpeed(rate) {
         state.selectedSpeechRate = rate;
+        await dbSaveSetting('last_speed', rate);
+        updateSpeedUI(rate);
+    }
+
+    function updateSpeedUI(rate) {
         document.querySelectorAll('.speed-tag').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if (rate === 0.85) document.getElementById('speed-085').classList.add('active');
+        else if (rate === 1.25) document.getElementById('speed-125').classList.add('active');
+        else document.getElementById('speed-100').classList.add('active');
     }
 
     // ==========================================
-    // 4. HISTORIAL Y AUDIO RECORDINGS (DB)
+    // 4. AUDITORIA Y METRICAS PARA PROFESOR
     // ==========================================
 
-    async function renderRecordingsList() {
+    async function renderAuditMetrics() {
         state.recordings = await dbGetAudioRecordings();
-        state.recordings.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)); // Recientes primero
+        state.recordings.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-        document.getElementById('total-recs-count').textContent = state.recordings.length;
+        // Calcular Tiempo Total Hablado
+        const totalSecs = state.recordings.reduce((sum, r) => sum + (r.durationSec || 0), 0);
+        const mins = Math.floor(totalSecs / 60);
+        const secs = Math.round(totalSecs % 60);
+        const timeDisplay = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+
+        document.getElementById('stat-total-time').textContent = timeDisplay;
+        document.getElementById('stat-total-recs').textContent = state.recordings.length;
+        document.getElementById('stat-top-level').textContent = state.activeLevel.toUpperCase();
 
         const recentListContainer = document.getElementById('recent-recordings-list');
         const fullListContainer = document.getElementById('full-recordings-list');
@@ -941,17 +1117,17 @@
         fullListContainer.innerHTML = '';
 
         if (state.recordings.length === 0) {
-            recentListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 10px;">Aún no has grabado ensayos. Pulsa 🎤 Grabar abajo.</div>`;
-            fullListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 20px;">Sin grabaciones guardadas.</div>`;
+            recentListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 6px;">Sin grabaciones recientes. Pulsa 🎤 Grabar abajo.</div>`;
+            fullListContainer.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding: 20px;">Sin historial acumulado.</div>`;
             return;
         }
 
-        // Render Top 3 Recent
-        state.recordings.slice(0, 3).forEach(rec => {
+        // Renderizar las últimas 2 grabaciones en el dashboard principal
+        state.recordings.slice(0, 2).forEach(rec => {
             recentListContainer.appendChild(createAudioItemElement(rec));
         });
 
-        // Render All
+        // Renderizar todo en el modal
         state.recordings.forEach(rec => {
             fullListContainer.appendChild(createAudioItemElement(rec));
         });
@@ -965,11 +1141,12 @@
             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
+        const durStr = rec.durationSec ? `${Math.round(rec.durationSec)}s` : '';
         const audioUrl = URL.createObjectURL(rec.audioBlob);
 
         item.innerHTML = `
             <div class="audio-item-meta">
-                <span>🇨🇭 Nivel ${rec.level.toUpperCase()} • ${dateStr}</span>
+                <span>🇨🇭 Nivel ${rec.level.toUpperCase()} • ${dateStr} ${durStr ? '• (' + durStr + ')' : ''}</span>
             </div>
             <div class="audio-item-text" title="${rec.pitchText}">${rec.pitchText}</div>
             <div class="audio-controls-row">
@@ -981,27 +1158,44 @@
     }
 
     async function deleteAudioItem(id) {
-        if (confirm("¿Borrar esta grabación de tu historial?")) {
+        if (confirm("¿Borrar esta grabación del historial?")) {
             await dbDeleteAudioRecording(id);
-            await renderRecordingsList();
+            await renderAuditMetrics();
         }
     }
 
-    function openHistoryModal() {
-        document.getElementById('history-modal').classList.add('active');
-    }
-
-    function closeHistoryModal() {
-        document.getElementById('history-modal').classList.remove('active');
-    }
+    function openHistoryModal() { document.getElementById('history-modal').classList.add('active'); }
+    function closeHistoryModal() { document.getElementById('history-modal').classList.remove('active'); }
 
     // ==========================================
-    // 5. PERFIL DE USUARIO Y FOTO
+    // 5. MODAL DE PERFIL Y VARIABLES
     // ==========================================
 
-    function triggerAvatarUpload() {
-        document.getElementById('avatar-input').click();
+    function openProfileModal() {
+        document.getElementById('prof-name').value = userProfile.name || '';
+        document.getElementById('prof-role').value = userProfile.role || '';
+        document.getElementById('prof-loc').value = userProfile.location || '';
+        document.getElementById('prof-hobby').value = userProfile.hobby || '';
+        document.getElementById('profile-modal').classList.add('active');
     }
+
+    function closeProfileModal() {
+        document.getElementById('profile-modal').classList.remove('active');
+    }
+
+    async function saveProfileData() {
+        userProfile.name = document.getElementById('prof-name').value.trim() || 'Nina';
+        userProfile.role = document.getElementById('prof-role').value.trim() || 'agency';
+        userProfile.location = document.getElementById('prof-loc').value.trim() || 'Switzerland';
+        userProfile.hobby = document.getElementById('prof-hobby').value.trim() || 'creative projects';
+
+        await dbSaveSetting('user_profile', userProfile);
+        updateHeaderProfileUI();
+        loadAllCategoryChips();
+        closeProfileModal();
+    }
+
+    function triggerAvatarUpload() { document.getElementById('avatar-input').click(); }
 
     async function handleAvatarSelected(event) {
         const file = event.target.files[0];
@@ -1017,14 +1211,19 @@
     }
 
     function updateAvatarUI(imageData) {
-        const container = document.getElementById('avatar-display');
         if (imageData) {
-            container.outerHTML = `<img id="avatar-display" class="avatar-img" src="${imageData}" alt="Nina Avatar">`;
+            document.getElementById('avatar-display').outerHTML = `<img id="avatar-display" class="avatar-img" src="${imageData}" alt="Avatar">`;
+            document.getElementById('modal-avatar-display').outerHTML = `<img id="modal-avatar-display" class="avatar-img" src="${imageData}" alt="Avatar">`;
         }
     }
 
+    function updateHeaderProfileUI() {
+        document.getElementById('header-user-name').textContent = `${userProfile.name}'s Pitch`;
+        document.getElementById('header-user-loc').textContent = `🇨🇭 ${userProfile.location}`;
+    }
+
     // ==========================================
-    // 6. CONTROL DE AUDIO Y GRABACION
+    // 6. AUDIO SPEECH & MIC RECORDING
     // ==========================================
 
     function toggleAudioSpeech() {
@@ -1073,13 +1272,15 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
                 audioChunks = [];
+                recordStartTime = Date.now();
 
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.onstop = async () => {
+                    const durationSec = (Date.now() - recordStartTime) / 1000;
                     const blob = new Blob(audioChunks, { type: 'audio/wav' });
                     const pitchText = document.getElementById('pitch-text').textContent;
-                    await dbSaveAudioRecording(blob, pitchText, state.activeLevel);
-                    await renderRecordingsList();
+                    await dbSaveAudioRecording(blob, pitchText, state.activeLevel, durationSec);
+                    await renderAuditMetrics();
                 };
 
                 mediaRecorder.start();
@@ -1087,7 +1288,7 @@
                 btn.classList.add('recording');
                 btn.innerHTML = '<span>⏹️</span> Detener';
             } catch (err) {
-                alert('Por favor autoriza el uso del micrófono.');
+                alert('Por favor permite el permiso del micrófono.');
             }
         } else {
             mediaRecorder.stop();
@@ -1111,12 +1312,21 @@
         
         // Cargar datos persistidos
         state.customPhrases = await dbGetCustomPhrases();
+        
+        const savedProfile = await dbGetSetting('user_profile');
+        if (savedProfile) userProfile = savedProfile;
+
         const savedAvatar = await dbGetSetting('user_avatar');
         if (savedAvatar) updateAvatarUI(savedAvatar);
 
-        // Inicializar UI
+        const savedSpeed = await dbGetSetting('last_speed');
+        if (savedSpeed) state.selectedSpeechRate = savedSpeed;
+
+        // Render inicial
+        updateHeaderProfileUI();
+        updateSpeedUI(state.selectedSpeechRate);
         loadAllCategoryChips();
-        await renderRecordingsList();
+        await renderAuditMetrics();
     });
 </script>
 
