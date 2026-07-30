@@ -950,6 +950,8 @@
                         span.className = chunk.segClass;
                     }
                     span.textContent = chunk.text + (index < chunks.length - 1 ? " " : "");
+                    span.style.cursor = 'pointer'; // Muestra la mano al pasar el cursor
+            span.onclick = () => speakSingleChunk(chunk.text); // Activa la lectura del bloque individual
                     container.appendChild(span);
                 }
             });
