@@ -148,25 +148,26 @@
         /* Pitch Body Container */
         .pitch-body {
             font-size: 1.05rem;
-            line-height: 1.75;
+            line-height: 1.65;
             font-weight: 600;
             margin: 0;
             color: #f1f5f9;
             min-height: 80px;
+               
         }
 
         /* Continuous Mode ("De corrido") */
+ /* Continuous Mode ("De corrido") con resaltado de fondo */
 /* Continuous Mode ("De corrido") con resaltado estilo píldora/etiqueta */
 .pitch-body.mode-text {
     white-space: normal;
-    line-height: 1.8; /* Aumenta ligeramente para que no se chocen las cajas */
+    line-height: 1.65; /* Aumenta ligeramente para que no se chocen las cajas */
 }
 
 /* Estilo común para todos los bloques de texto en modo de corrido */
 .pitch-body.mode-text span {
     padding: 2px 6px;
     border-radius: 6px;
-    display: inline-block;
     margin-right: 4px;
     margin-bottom: 4px;
     cursor: pointer;
@@ -183,7 +184,6 @@
 .pitch-body.mode-text .text-seg-3 { background: var(--hl-3-bg); color: var(--hl-3-text); }
 .pitch-body.mode-text .text-seg-4 { background: var(--hl-4-bg); color: var(--hl-4-text); }
 .pitch-body.mode-text .text-seg-5 { background: var(--hl-5-bg); color: var(--hl-5-text); }
-
 
 
         /* Block Mode ("Por bloques") */
@@ -958,25 +958,22 @@
                 }
             });
         } else {
-    // MODO DE CORRIDO
-    container.className = "pitch-body mode-text";
-    chunks.forEach((chunk) => {
-        if (chunk.text) {
-            const span = document.createElement('span');
-            if (state.isHighlightActive) {
-                span.className = chunk.segClass;
-            }
-            
-            // Solo colocamos el texto (sin agregarle el espacio dentro de la etiqueta)
-            span.textContent = chunk.text;
-            
-            // Mantenemos la interactividad al hacer clic
-            span.onclick = () => speakSingleChunk(chunk.text);
-            
-            container.appendChild(span);
+            // MODO DE CORRIDO (Texto continuo fluido)
+            container.className = "pitch-body mode-text";
+            chunks.forEach((chunk, index) => {
+                if (chunk.text) {
+                    const span = document.createElement('span');
+                    if (state.isHighlightActive) {
+                        span.className = chunk.segClass;
+                    }
+                    span.textContent = chunk.text + (index < chunks.length - 1 ? " " : "");
+                    span.style.cursor = 'pointer'; // Muestra la mano al pasar el cursor
+            span.onclick = () => speakSingleChunk(chunk.text); // Activa la lectura del bloque individual
+                    container.appendChild(span);
+                }
+            });
         }
-    });
-}}
+    }
 
     function toggleViewMode() {
         const btn = document.getElementById('view-mode-btn');
