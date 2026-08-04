@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prototipo Aprendizaje v5 — Fluido y Mejorado</title>
+<style>
+  body {font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f4f7f6;color:#222;max-width:1000px;margin:18px auto;padding:18px;}
+  h1,h2,h3 {color:#005a8d;}
+  textarea {width:100%;min-height:140px;padding:10px;font-size:15px;border-radius:6px;border:1px solid #ccc;}
+  button {background:#0073b1;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;margin:4px;}
+  button.small {padding:6px 8px;font-size:13px;}
+  button.secondary {background:#6c757d;}
+  button.success {background:#28a745;}
+  .panel {background:white;border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin-top:14px;}
+  .analisis-container{display:flex;gap:16px;flex-wrap:wrap;}
+  .analisis-col{flex:1;min-width:220px;}
+  .ejercicio-frase{font-size:1.05em;margin:10px 0;line-height:1.6;}
+  input.input-ej{padding:6px 8px;border-radius:6px;border:1px solid #ccc;font-size:15px;}
+  .ok{border-color:#28a745!important;}
+  .bad{border-color:#dc3545!important;}
+  .fragment{border:1px dashed #ddd;padding:10px;margin:8px 0;border-radius:6px;background:#fafafa;}
+  .tag{background:#e6f4ff;color:#005a8d;padding:6px 8px;border-radius:999px;border:1px solid #d0eaff;}
+  .audio-btn{background:#fff;color:#0073b1;border:1px solid #0073b1;padding:6px 8px;border-radius:6px;cursor:pointer;}
+  .flexrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  #notify {position:fixed;bottom:20px;right:20px;background:#005a8d;color:white;padding:10px 14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);opacity:0;transition:opacity 0.4s;}
+  #notify.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<h1>Prototipo de Aprendizaje (v5)</h1>
+<div class="flexrow">
+  <button onclick="procesarTexto()">Procesar Texto</button>
+  <label>Idioma:
+    <select id="idiomaSelect">
+      <option value="en-US" selected>Inglés 🇺🇸</option>
+      <option value="es-ES">Español 🇪🇸</option>
+      <option value="fr-FR">Francés 🇫🇷</option>
+      <option value="de-DE">Alemán 🇩🇪</option>
+    </select>
+  </label>
+  <button class="secondary" onclick="limpiarProgreso()">Limpiar progreso</button>
+</div>
+
+<textarea id="textoUsuario">The quick brown fox jumps over the lazy dog. This is a sentence to test the processing. The dog is lazy, and the fox is quick. Learning a new language is a journey. This journey requires practice and dedication. Practice makes perfect.</textarea>
+
+<div id="resultados" class="panel" style="display:none;">
+  <h2>Análisis</h2>
+  <div id="metricasTexto"></div>
+</div>
+
+<div id="fragmentsContainer" class="panel" style="display:none;">
+  <h2>Fragmentos</h2>
+  <div id="fragments"></div>
+</div>
+
+<div id="ejercicios" class="panel" style="display:none;">
+  <h2>Ejercicios</h2>
+  <div id="listaEjercicios"></div>
+</div>
+
+<div id="notify"></div>
+
+<script>
+const STOP_WORDS = new Set(['a','an','and','the','is','it','in','on','at','to','for','of','with','this','that','was','are','be','over','new','makes','s','i','you','he','she','they','we','my','his','her']);
+const STORAGE_KEYS={learned:'ap_v5_learned',audios:'ap_v5_audios'};
+function cargarEstado(){return{learned:JSON.parse(localStorage.getItem(STORAGE_KEYS.learned)||'[]'),audios:JSON.parse(localStorage.getItem(STORAGE_KEYS.audios)||'{}')}};function guardarEstado(s){localStorage.setItem(STORAGE_KEYS.learned,JSON.stringify(s.learned||[]));localStorage.setItem(STORAGE_KEYS.audios,JSON.stringify(s.audios||{}));}
+function limpiarTexto(t){return t.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()\"\[\]]/g,"").toLowerCase();}
+function palabrasTokenize(t){return limpiarTexto(t).split(/\s+/).filter(p=>p.length>0);}
+function dividirEnFragmentos(t,maxChars=300){let or=t.match(/[^.!?]+[.!?]*/g)||[t];or=or.map(s=>s.trim()).filter(s=>s.length>0);const frags=[];let cur='';for(const s of or){if(cur.length+s.length+1<=maxChars||cur.length===0)cur+=(cur?' ':'')+s;else{frags.push(cur.trim());cur=s;}}if(cur)frags.push(cur.trim());return frags;}
+function mostrarNoti(txt,ms=2500){const n=document.getElementById('notify');n.textContent=txt;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),ms);}
+let globalFragments=[];let globalTopWords=[];
+function procesarTexto(){
+ const t=document.getElementById('textoUsuario').value.trim();if(!t)return mostrarNoti('⚠️ Escribe un texto primero.',2000);
+ const max=350;const or=t.match(/[^.!?]+[.!?]+/g)||[t];const palabras=palabrasTokenize(t);const freq={};const filtradas=[];
+ for(const p of palabras){if(p.length>1&&!STOP_WORDS.has(p)){freq[p]=(freq[p]||0)+1;filtradas.push(p);}}
+ const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,10);globalTopWords=top;
+ document.getElementById('metricasTexto').innerHTML=`Total palabras: <b>${palabras.length}</b> · Oraciones: <b>${or.length}</b> · Palabras clave: <b>${filtradas.length}</b>`;
+ document.getElementById('resultados').style.display='block';
+ globalFragments=dividirEnFragmentos(t,max);
+ renderFragments(); generarEjercicios(or,top); document.getElementById('fragmentsContainer').style.display='block';document.getElementById('ejercicios').style.display='block';
+}
+function renderFragments(){
+ const {learned,audios}=cargarEstado();const lang=document.getElementById('idiomaSelect').value;const c=document.getElementById('fragments');c.innerHTML='';
+ globalFragments.forEach((frag,i)=>{
+  let html=frag;learned.forEach(w=>{const r=new RegExp(`\\b${w}\\b`,'ig');if(audios[w])html=html.replace(r,`<button class='audio-btn' onclick="playCombined(${i})">🎧 ${w}</button>`);});
+  const d=document.createElement('div');d.className='fragment';
+  d.innerHTML=`<div><b>Fragmento ${i+1}</b></div><div style="margin-top:6px;">${html}</div>
+   <div class='flexrow' style='margin-top:8px;'>
+    <button class='small' onclick="leerTexto('${frag}', '${lang}')">▶ Escuchar original</button>
+    <button class='small success' onclick="playCombined(${i})">▶ Escuchar combinado</button>
+   </div>`;
+  c.appendChild(d);
+ });
+}
+function generarEjercicios(ors,top){
+ const l=document.getElementById('listaEjercicios');l.innerHTML='';const set=new Set(top.map(p=>p[0]));let creados=0;
+ for(const o of ors){if(creados>=10)break;for(const w of Array.from(set)){const r=new RegExp(`\\b${w}\\b`,'i');if(o.match(r)){const s=o.replace(r,`<input class='input-ej' data-respuesta='${w}' placeholder='...'>`);
+ const div=document.createElement('div');div.className='ejercicio-frase';
+ div.innerHTML=s+`<div class='flexrow'>
+ <button class='small' onclick="leerTexto('${w}')">🔊 Escuchar</button>
+ <button class='small secondary' onclick="grabarPalabra('${w}', this)">🎙 Grabar mi voz</button>
+ <button class='small' onclick="verificarPalabra('${w}', this)">🎧 Verificar</button>
+ <button class='small' onclick="playAudio('${w}')">▶ Mi audio</button>
+ <button class='small success' onclick="marcarAprendida('${w}')">✔ Guardar</button></div>`;
+ l.appendChild(div);set.delete(w);creados++;break;}}}
+ l.addEventListener('change',e=>{if(e.target.classList.contains('input-ej')){const r=e.target.dataset.respuesta.toLowerCase();const v=e.target.value.trim().toLowerCase();if(v===r){e.target.classList.add('ok');marcarAprendida(r);mostrarNoti(`✅ "${r}" correcta!`,2000);}else{e.target.classList.add('bad');mostrarNoti(`❌ "${v}" no coincide.`,2000);}}});
+}
+function leerTexto(txt,lang){if(!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(txt);u.lang=lang||document.getElementById('idiomaSelect').value;speechSynthesis.cancel();speechSynthesis.speak(u);}
+let globalStream=null;
+async function grabarPalabra(w,btn){
+ try{
+  if(!navigator.mediaDevices)return mostrarNoti('🎤 No soportado.');
+  const s=globalStream||await navigator.mediaDevices.getUserMedia({audio:true});globalStream=s;
+  const rec=new MediaRecorder(s);const ch=[];rec.ondataavailable=e=>{if(e.data.size)ch.push(e.data);};
+  rec.start();btn.textContent='⏺ Grabando...';btn.disabled=true;
+  await new Promise(r=>setTimeout(r,1500));rec.stop();
+  rec.onstop=async()=>{const b=new Blob(ch,{type:'audio/webm'});const base64=await blobToBase64(b);
+    const st=cargarEstado();st.audios[w]={base64,t:Date.now()};guardarEstado(st);renderFragments();
+    btn.textContent='🎙 Grabar mi voz';btn.disabled=false;mostrarNoti(`🎙 Audio guardado para "${w}"`,2000);}
+ }catch(e){mostrarNoti('Error al grabar '+e.message,2000);}
+}
+function playAudio(w){const s=cargarEstado();const i=s.audios[w];if(!i)return mostrarNoti('No hay audio.');const a=new Audio(i.base64);a.play();}
+function verificarPalabra(w,btn){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return mostrarNoti('Reconocimiento no disponible.');
+ const rec=new SR();rec.lang=document.getElementById('idiomaSelect').value;rec.interimResults=false;rec.maxAlternatives=1;
+ rec.onstart=()=>{btn.textContent='🎧 Escuchando...';btn.disabled=true;};
+ rec.onresult=e=>{const t=e.results[0][0].transcript.toLowerCase();if(t.includes(w.toLowerCase())){marcarAprendida(w);mostrarNoti(`✅ Pronunciación correcta: "${t}"`,2500);}else mostrarNoti(`❌ Se reconoció: "${t}"`,2500);};
+ rec.onend=()=>{btn.textContent='🎧 Verificar';btn.disabled=false;};rec.onerror=e=>mostrarNoti('Error: '+e.error,2000);rec.start();
+}
+function marcarAprendida(w){const s=cargarEstado();if(!s.learned.includes(w))s.learned.push(w);guardarEstado(s);renderFragments();}
+function blobToBase64(b){return new Promise((res,rej)=>{const r=new FileReader();r.onloadend=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b);});}
+function limpiarProgreso(){localStorage.clear();renderFragments();mostrarNoti('Progreso borrado.');}
+
+/* === Audio combinado fluido === */
+async function playCombined(i){
+ const frag=globalFragments[i];if(!frag)return;
+ const {learned,audios}=cargarEstado();const lang=document.getElementById('idiomaSelect').value;
+ const palabras=frag.split(/\b/);
+ let idx=0;function next(){if(idx>=palabras.length)return;const w=limpiarTexto(palabras[idx]);idx++;
+  if(learned.includes(w)&&audios[w]){speechSynthesis.pause();const a=new Audio(audios[w].base64);
+   a.onended=()=>{setTimeout(()=>speechSynthesis.resume(),200);next();};a.play();}
+  else{const u=new SpeechSynthesisUtterance(palabras[idx-1]);u.lang=lang;u.onend=()=>next();speechSynthesis.speak(u);}
+ }
+ speechSynthesis.cancel();next();
+}
+</script>
+</body>
+</html>
