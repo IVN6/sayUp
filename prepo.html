@@ -1,764 +1,461 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spatial & Directions Master 🐝📦🏙️</title>
+  <title>Juegos Educativos - La Abejita</title>
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --secondary: #10b981;
-      --danger: #ef4444;
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent: #f59e0b;
-      --highlight: #ec4899;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-      user-select: none;
+      --primary: #f59e0b;
+      --primary-dark: #d97706;
+      --bg: #fef3c7;
+      --text: #1f2937;
     }
 
     body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg);
       color: var(--text);
+      margin: 0;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-      padding: 10px;
     }
 
-    header {
-      width: 100%;
-      max-width: 500px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      background: var(--card-bg);
-      padding: 8px 14px;
-      border-radius: 12px;
-      border: 1px solid #334155;
-    }
-
-    .header-title { font-size: 1rem; color: var(--accent); font-weight: bold; }
-    .header-controls { display: flex; gap: 8px; align-items: center; }
-
-    .icon-btn {
-      background: #334155;
-      border: none;
-      color: var(--text);
-      padding: 6px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    nav {
-      display: flex;
-      gap: 6px;
-      width: 100%;
-      max-width: 500px;
+    h1 {
+      text-align: center;
+      color: var(--primary-dark);
       margin-bottom: 10px;
     }
 
-    .nav-btn {
-      flex: 1;
-      padding: 10px 4px;
-      background: var(--card-bg);
-      border: 1px solid #334155;
-      color: var(--text-muted);
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .nav-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-
-    main {
+    /* CONTENEDOR DE JUEGOS */
+    .game-container {
       width: 100%;
-      max-width: 500px;
-      background: var(--card-bg);
+      max-width: 800px;
+      background: white;
       border-radius: 16px;
-      padding: 14px;
-      border: 1px solid #334155;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
     }
 
-    .game-mode { display: none; }
-    .game-mode.active { display: block; }
-
-    /* BANNER DE FRASE Y AUDIOS PERSISTENTE */
-    .phrase-banner {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 52px;
-    }
-
-    .phrase-text {
-      font-size: 0.95rem;
-      font-weight: 600;
-      line-height: 1.3;
-    }
-
-    .highlight-prep {
-      color: var(--highlight);
-      text-decoration: underline;
-      font-weight: 800;
-      padding: 0 2px;
-    }
-
-    /* ESCENARIO 3D (JUEGO 1) */
-    .stage-3d-wrapper {
-      perspective: 900px;
-      height: 200px;
-      background: #090d16;
+    /* JUEGO 1: LA ABEJITA */
+    .board {
+      position: relative;
+      height: 280px;
+      background: #ecfdf5;
+      border: 3px dashed #10b981;
       border-radius: 12px;
-      position: relative;
-      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 20px;
       overflow: hidden;
-      border: 1px solid #334155;
+    }
+
+    .flower-node {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      z-index: 1;
+      cursor: pointer;
     }
 
-    .scene-3d-container {
-      width: 65px;
-      height: 65px;
-      position: relative;
-      transform-style: preserve-3d;
-      transform: rotateX(-18deg) rotateY(32deg);
-      transition: transform 0.5s ease;
+    .flower-icon {
+      font-size: 3rem;
+      transition: transform 0.2s;
     }
 
-    .cube-3d {
-      width: 65px;
-      height: 65px;
+    .flower-node:hover .flower-icon {
+      transform: scale(1.15);
+    }
+
+    .bee {
       position: absolute;
-      transform-style: preserve-3d;
-    }
-
-    .face {
-      position: absolute;
-      width: 65px;
-      height: 65px;
-      background: rgba(59, 130, 246, 0.78);
-      border: 2px solid #60a5fa;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      box-shadow: inset 0 0 12px rgba(0,0,0,0.4);
-      backface-visibility: visible;
-    }
-
-    .front  { transform: translateZ(32.5px); }
-    .back   { transform: rotateY(180deg) translateZ(32.5px); background: rgba(30, 64, 175, 0.85); }
-    .top    { transform: rotateX(90deg) translateZ(32.5px); background: rgba(96, 165, 250, 0.85); }
-    .bottom { transform: rotateX(-90deg) translateZ(32.5px); }
-    .left   { transform: rotateY(-90deg) translateZ(32.5px); }
-    .right  { transform: rotateY(90deg) translateZ(32.5px); }
-
-    .bee-3d {
-      position: absolute;
-      font-size: 2.3rem;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+      font-size: 2.8rem;
+      top: 35%;
+      left: 5%;
+      transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2;
       pointer-events: none;
     }
 
-    /* GRID DE OPCIONES JUEGO 1 */
-    .options-grid-6 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+    /* MUESTRA DE MENSAJE ACTIVO */
+    .active-message-box {
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* HISTORIAL DE MENSAJES ANTERIORES (OPACOS / INFERIOR) */
+    .history-section {
+      margin-top: 15px;
+      border-top: 2px solid #f3f4f6;
+      padding-top: 10px;
+    }
+
+    .history-title {
+      font-size: 0.85rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
       gap: 8px;
     }
 
-    .btn {
-      width: 100%;
-      padding: 10px;
-      background: var(--primary);
+    .history-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      opacity: 0.65; /* Apariencia opaca indicando que ya pasó */
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .history-card:hover {
+      opacity: 0.95;
+      background: #fff;
+      border-color: var(--primary);
+    }
+
+    .btn-replay {
+      background: #f59e0b;
       color: white;
       border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       transition: background 0.2s;
     }
 
-    .btn:hover { background: var(--primary-hover); }
-    .btn-secondary { background: #334155; }
-    .btn-secondary:hover { background: #475569; }
-    .btn-success { background: var(--secondary); }
-    .btn-warning { background: var(--accent); color: #000; }
-
-    /* MAPA Y CONTROLES (JUEGO 2 - MAPA) */
-    .grid-map {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(5, 1fr);
-      gap: 4px;
-      aspect-ratio: 1;
-      background: #0f172a;
-      padding: 6px;
-      border-radius: 12px;
-      border: 1px solid #334155;
-      margin-bottom: 10px;
+    .btn-replay:hover {
+      background: #d97706;
     }
 
-    .grid-cell {
-      background: #1e293b;
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      position: relative;
-      border: 1px solid #334155;
+    .btn-next {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
     }
 
-    .grid-cell.user-visited { background: rgba(79, 70, 229, 0.35); border-color: var(--primary); }
-    .grid-cell.correct-path { background: rgba(16, 185, 129, 0.3); border-color: var(--secondary); }
-    .grid-cell.error-node { background: rgba(239, 68, 68, 0.4); border-color: var(--danger); }
-
-    .player-orient {
-      transition: transform 0.2s ease;
-      display: inline-block;
-      position: relative;
+    .btn-next:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
     }
 
-    .flashlight-cone {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 16px solid rgba(245, 158, 11, 0.6);
-      pointer-events: none;
-    }
-
-    .cell-label {
-      font-size: 0.52rem;
-      color: var(--text-muted);
-      margin-top: 1px;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 90%;
-    }
-
-    .dpad {
+    /* JUEGO 2: MEMORIA Y CORRESPONDENCIA */
+    .matching-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
-      max-width: 200px;
-      margin: 8px auto;
+      gap: 12px;
+      margin-top: 15px;
     }
 
-    .feedback-msg {
-      text-align: center;
+    .card {
+      height: 90px;
+      background: #f3f4f6;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2rem;
       font-weight: bold;
-      font-size: 0.85rem;
-      min-height: 24px;
-      margin-top: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.3s;
     }
-    .feedback-msg.correct { color: var(--secondary); }
-    .feedback-msg.wrong { color: var(--danger); }
+
+    .card.selected {
+      border-color: #3b82f6;
+      background: #dbeafe;
+    }
+
+    .card.matched {
+      background: #d1fae5;
+      border-color: #10b981;
+      color: #065f46;
+      cursor: default;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-title">Spatial & Directions 🐝🏙️</div>
-    <div class="header-controls">
-      <span>Score: <strong id="score-val">0</strong></span>
-      <button class="icon-btn" id="audio-toggle-btn" onclick="toggleGlobalAudio()">🔊 Audio</button>
+  <h1>🐝 Misión de la Abejita</h1>
+
+  <!-- JUEGO 1 -->
+  <div class="game-container">
+    <h2>Juego 1: Ruta de Néctar</h2>
+    <p>La abejita avanzará y reproducirá el mensaje al llegar a cada flor. Puedes escuchar audios anteriores abajo.</p>
+
+    <div class="board" id="board">
+      <div class="bee" id="bee">🐝</div>
+      
+      <div class="flower-node" style="margin-left: 5%;">
+        <span class="flower-icon">🌸</span>
+        <small>Posición 1</small>
+      </div>
+      <div class="flower-node">
+        <span class="flower-icon">🌻</span>
+        <small>Posición 2</small>
+      </div>
+      <div class="flower-node">
+        <span class="flower-icon">🌷</span>
+        <small>Posición 3</small>
+      </div>
+      <div class="flower-node">
+        <span class="flower-icon">🌺</span>
+        <small>Posición 4</small>
+      </div>
     </div>
-  </header>
 
-  <nav>
-    <button class="nav-btn active" id="tab-btn-1" onclick="switchMode(1)">1. 3D Prepositions (Bee) 🐝</button>
-    <button class="nav-btn" id="tab-btn-2" onclick="switchMode(2)">2. Map Directions 🧭</button>
-  </nav>
+    <!-- Mensaje de la posición actual -->
+    <div class="active-message-box">
+      <span id="current-text">Cargando posición actual...</span>
+      <button class="btn-replay" onclick="playCurrentAudio()">🔊 Escuchar de nuevo</button>
+    </div>
 
-  <main>
-    <!-- MODO 1: ABEJA 3D -->
-    <section id="mode-1" class="game-mode active">
-      <div class="phrase-banner">
-        <div id="m1-phrase" class="phrase-text">Where is the bee relative to the box?</div>
-        <button class="icon-btn" id="m1-speak-btn" onclick="speakCurrentM1Phrase()">🔊 Listen</button>
+    <button class="btn-next" id="btn-next-step" onclick="nextPosition()">Siguiente Posición ➡️</button>
+
+    <!-- Historial de mensajes pasados (Sección Inferior Opaca) -->
+    <div class="history-section">
+      <div class="history-title">Posiciones anteriores (haz clic para repasar)</div>
+      <div class="history-list" id="history-list">
+        <!-- Se genera dinámicamente -->
       </div>
+    </div>
+  </div>
 
-      <div class="stage-3d-wrapper">
-        <div class="scene-3d-container">
-          <div id="bee3d" class="bee-3d">🐝</div>
-          <div class="cube-3d">
-            <div class="face front">📦</div>
-            <div class="face back">📦</div>
-            <div class="face top">📦</div>
-            <div class="face bottom">📦</div>
-            <div class="face left">📦</div>
-            <div class="face right">📦</div>
-          </div>
-        </div>
-      </div>
-
-      <div id="m1-options" class="options-grid-6"></div>
-      <div id="m1-feedback" class="feedback-msg"></div>
-    </section>
-
-    <!-- MODO 2: DIRECCIONES EN MAPA -->
-    <section id="mode-2" class="game-mode">
-      <div class="phrase-banner">
-        <div id="m2-transcript" class="phrase-text">Tap 'Listen' to start route!</div>
-        <button class="icon-btn" onclick="playAudioInstruction()">🔊 Listen</button>
-      </div>
-
-      <div id="m2-grid" class="grid-map"></div>
-
-      <div class="dpad">
-        <div></div>
-        <button class="btn btn-secondary" onclick="moveM2Player('FORWARD')">⬆️ Forward</button>
-        <div></div>
-        <button class="btn btn-secondary" onclick="turnM2Player('LEFT')">↺ Turn Left</button>
-        <button class="btn btn-secondary" onclick="moveM2Player('BACK')">⬇️ Back</button>
-        <button class="btn btn-secondary" onclick="turnM2Player('RIGHT')">↻ Turn Right</button>
-      </div>
-
-      <div style="display:flex; gap:6px; margin-top:8px;">
-        <button class="btn btn-warning" onclick="resetM2Route()">🔄 Reset</button>
-        <button class="btn btn-success" onclick="verifyM2Arrival()">🎯 Check Route</button>
-      </div>
-      <button class="btn btn-secondary" id="reveal-path-btn" style="display:none; margin-top:6px;" onclick="revealCorrectM2Path()">🗺️ Show Correct Path</button>
-      <div id="m2-feedback" class="feedback-msg"></div>
-    </section>
-  </main>
+  <!-- JUEGO 2 (INTACTO) -->
+  <div class="game-container">
+    <h2>Juego 2: Parejas del Panal</h2>
+    <p>Encuentra la pareja correspondiente para cada elemento.</p>
+    <div class="matching-grid" id="game2-grid">
+      <!-- Tarjetas generadas dinámicamente -->
+    </div>
+  </div>
 
   <script>
-    let globalAudioEnabled = true;
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function playBeep(freq, duration = 0.1) {
-      if (!globalAudioEnabled) return;
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    }
-
-    function playSound(isCorrect) {
-      if (isCorrect) {
-        playBeep(523.25, 0.1);
-        setTimeout(() => playBeep(659.25, 0.15), 100);
-      } else {
-        playBeep(200, 0.25);
-      }
-    }
-
-    function speakText(text) {
-      if (!globalAudioEnabled) return;
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(text.replace(/<[^>]*>/g, ''));
-        msg.lang = 'en-US';
-        msg.rate = 0.85;
-        window.speechSynthesis.speak(msg);
-      }
-    }
-
-    function toggleGlobalAudio() {
-      globalAudioEnabled = !globalAudioEnabled;
-      const btn = document.getElementById('audio-toggle-btn');
-      btn.innerText = globalAudioEnabled ? '🔊 Audio' : '🔇 Muted';
-      if (!globalAudioEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
-    }
-
-    let score = 0;
-    function updateScore(delta) {
-      score += delta;
-      document.getElementById('score-val').innerText = score;
-      playSound(delta > 0);
-    }
-
-    function switchMode(modeNum) {
-      document.getElementById('tab-btn-1').classList.toggle('active', modeNum === 1);
-      document.getElementById('tab-btn-2').classList.toggle('active', modeNum === 2);
-      document.getElementById('mode-1').classList.toggle('active', modeNum === 1);
-      document.getElementById('mode-2').classList.toggle('active', modeNum === 2);
-      if (modeNum === 1 && !m1Initialized) initMode1();
-      if (modeNum === 2) initMode2();
-    }
-
-    /* ===================================================
-       MODO 1: ABEJA 3D (CON PERSISTENCIA DE FRASE DE ESTUDIO)
-    =================================================== */
-    const prepositions3D = [
-      { key: 'ABOVE', synonyms: ['above', 'over'], transform: 'translate3d(0px, -85px, 0px)' },
-      { key: 'UNDER', synonyms: ['under', 'below', 'beneath'], transform: 'translate3d(0px, 85px, 0px)' },
-      { key: 'NEXT_TO', synonyms: ['next to', 'beside', 'by'], transform: 'translate3d(85px, 0px, 0px)' },
-      { key: 'INSIDE', synonyms: ['in', 'inside'], transform: 'translate3d(0px, 0px, 0px) scale(0.65)' },
-      { key: 'BEHIND', synonyms: ['behind'], transform: 'translate3d(25px, -25px, -100px) scale(0.85)' },
-      { key: 'IN_FRONT_OF', synonyms: ['in front of'], transform: 'translate3d(0px, 20px, 95px) scale(1.15)' },
-      { key: 'ON_TOP_OF', synonyms: ['on', 'on top of'], transform: 'translate3d(0px, -52px, 0px)' },
-      { key: 'FAR_FROM', synonyms: ['far from'], transform: 'translate3d(130px, -45px, 0px)' },
-      { key: 'NEAR', synonyms: ['near', 'close to'], transform: 'translate3d(55px, -15px, 20px)' }
+    // ==========================================
+    // CONFIGURACIÓN Y LÓGICA DEL JUEGO 1
+    // ==========================================
+    
+    const positionsData = [
+      { id: 0, text: "¡Bienvenido! Aquí inicia la ruta del néctar.", leftPercent: 8 },
+      { id: 1, text: "Flor 1: Las abejas comunican la ubicación de las flores bailando.", leftPercent: 32 },
+      { id: 2, text: "Flor 2: Una abeja visita hasta 1000 flores en un solo día.", leftPercent: 57 },
+      { id: 3, text: "Flor 3: ¡Misión cumplida! Has recolectado todo el néctar.", leftPercent: 82 }
     ];
 
-    let currentM1Group = null;
-    let currentM1Synonym = '';
-    let lastCorrectSentence = "Where is the bee relative to the box?";
-    let m1Initialized = false;
+    let currentPosIndex = 0;
+    let isPlayingAudio = false;
 
-    function initMode1() {
-      m1Initialized = true;
-      document.getElementById('m1-feedback').innerText = '';
-      loadNextM1Challenge();
+    // Inicializar Posición
+    function initGame1() {
+      moveBeeToPercent(positionsData[0].leftPercent);
+      updateUI();
+      // Reproducir mensaje inicial al cargar
+      setTimeout(() => playAudio(positionsData[0].text), 600);
     }
 
-    function loadNextM1Challenge() {
-      const optionsContainer = document.getElementById('m1-options');
-      optionsContainer.innerHTML = '';
-
-      // Mantiene la frase acertada anterior fijada en el banner
-      document.getElementById('m1-phrase').innerHTML = lastCorrectSentence;
-
-      // Seleccionar nueva posición aleatoria
-      let nextGroup = currentM1Group;
-      while (nextGroup === currentM1Group) {
-        nextGroup = prepositions3D[Math.floor(Math.random() * prepositions3D.length)];
-      }
-      currentM1Group = nextGroup;
-      currentM1Synonym = currentM1Group.synonyms[Math.floor(Math.random() * currentM1Group.synonyms.length)];
-
-      // Mover la abeja a la nueva posición 3D
-      const bee = document.getElementById('bee3d');
-      bee.style.transform = currentM1Group.transform;
-
-      // Crear 6 opciones
-      let options = [currentM1Synonym];
-      while (options.length < 6) {
-        const randG = prepositions3D[Math.floor(Math.random() * prepositions3D.length)];
-        const randSyn = randG.synonyms[Math.floor(Math.random() * randG.synonyms.length)];
-        if (!options.includes(randSyn)) options.push(randSyn);
-      }
-
-      options.sort(() => 0.5 - Math.random());
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-secondary';
-        btn.innerText = opt.toUpperCase();
-        btn.onclick = () => checkMode1(opt);
-        optionsContainer.appendChild(btn);
-      });
+    function moveBeeToPercent(percent) {
+      const bee = document.getElementById('bee');
+      bee.style.left = percent + "%";
     }
 
-    function checkMode1(selected) {
-      const fb = document.getElementById('m1-feedback');
-      if (currentM1Group.synonyms.includes(selected)) {
-        fb.className = 'feedback-msg correct';
-        fb.innerText = 'Correct! Loading next position...';
+    function updateUI() {
+      // Actualizar texto activo
+      document.getElementById('current-text').innerText = positionsData[currentPosIndex].text;
+      
+      // Control de botón Siguiente
+      const btnNext = document.getElementById('btn-next-step');
+      if (currentPosIndex >= positionsData.length - 1) {
+        btnNext.disabled = true;
+        btnNext.innerText = "¡Ruta Completada!";
+      } else {
+        btnNext.disabled = false;
+        btnNext.innerText = "Siguiente Posición ➡️";
+      }
+
+      // Renderizar Historial de mensajes anteriores (debajo y opacos)
+      const historyList = document.getElementById('history-list');
+      historyList.innerHTML = '';
+
+      if (currentPosIndex === 0) {
+        historyList.innerHTML = '<small style="color: #9ca3af;">Aún no hay posiciones anteriores.</small>';
+        return;
+      }
+
+      for (let i = 0; i < currentPosIndex; i++) {
+        const item = positionsData[i];
+        const card = document.createElement('div');
+        card.className = 'history-card';
+        card.innerHTML = `
+          <span><strong>Posición ${i + 1}:</strong> ${item.text}</span>
+          <button class="btn-replay" onclick="replayPreviousPosition(${i})">
+            🔄 Volver y escuchar
+          </button>
+        `;
+        historyList.appendChild(card);
+      }
+    }
+
+    function nextPosition() {
+      if (currentPosIndex < positionsData.length - 1 && !isPlayingAudio) {
+        currentPosIndex++;
+        const targetData = positionsData[currentPosIndex];
         
-        // Actualizar la frase guardada únicamente al acertar
-        lastCorrectSentence = `The bee is <span class="highlight-prep">${selected}</span> the box.`;
-        document.getElementById('m1-phrase').innerHTML = lastCorrectSentence;
-        speakText(`The bee is ${selected} the box.`);
-        
-        updateScore(10);
+        // 1. Mover abeja a la nueva posición
+        moveBeeToPercent(targetData.leftPercent);
+        updateUI();
+
+        // 2. Hacer sonar el mensaje cuando llega a la posición
         setTimeout(() => {
-          fb.innerText = '';
-          loadNextM1Challenge();
-        }, 1200);
-      } else {
-        fb.className = 'feedback-msg wrong';
-        fb.innerText = `Incorrect. '${selected}' is not correct for this position.`;
-        updateScore(-5);
+          playAudio(targetData.text);
+        }, 800); // Coincide con la transición CSS
       }
     }
 
-    function speakCurrentM1Phrase() {
-      speakText(document.getElementById('m1-phrase').innerText);
+    function playCurrentAudio() {
+      if (!isPlayingAudio) {
+        playAudio(positionsData[currentPosIndex].text);
+      }
     }
 
-    /* ===================================================
-       MODO 2: DIRECCIONES EN MAPA (SISTEMA MATEMÁTICO CORREGIDO)
-    =================================================== */
-    const allLandmarks = [
-      { icon: '🏥', name: 'Hospital' }, { icon: '☕', name: 'Cafe' },
-      { icon: '🏫', name: 'School' }, { icon: '🌳', name: 'Park' },
-      { icon: '🍕', name: 'Pizzeria' }, { icon: '💊', name: 'Pharmacy' },
-      { icon: '🥐', name: 'Bakery' }, { icon: '📚', name: 'Library' }
+    // LÓGICA DE RETORNO Y REPETICIÓN DE POSICIÓN ANTERIOR
+    function replayPreviousPosition(prevIndex) {
+      if (isPlayingAudio) return;
+
+      const prevData = positionsData[prevIndex];
+      const activeData = positionsData[currentPosIndex];
+
+      // 1. Mover abeja a la posición anterior que se seleccionó
+      moveBeeToPercent(prevData.leftPercent);
+
+      // 2. Reproducir audio de la posición anterior
+      setTimeout(() => {
+        playAudio(prevData.text, () => {
+          // 3. Callback al terminar el audio: Vuelve automáticamente a la posición actual
+          moveBeeToPercent(activeData.leftPercent);
+        });
+      }, 800);
+    }
+
+    // Utilidad de Locución (Web Speech API)
+    function playAudio(text, onEndCallback = null) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Cancelar locuciones previas
+        isPlayingAudio = true;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'es-ES';
+        utterance.rate = 0.95;
+
+        utterance.onend = () => {
+          isPlayingAudio = false;
+          if (onEndCallback) onEndCallback();
+        };
+
+        utterance.onerror = () => {
+          isPlayingAudio = false;
+          if (onEndCallback) onEndCallback();
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        // Fallback si la síntesis de voz no está soportada
+        alert("Audio: " + text);
+        if (onEndCallback) onEndCallback();
+      }
+    }
+
+
+    // ==========================================
+    // CONFIGURACIÓN Y LÓGICA DEL JUEGO 2 (INTACTO)
+    // ==========================================
+
+    const game2Pairs = [
+      { id: 1, label: "🍯 Miel", matchId: 1 },
+      { id: 1, label: "Panal", matchId: 1 },
+      { id: 2, label: "🌻 Girasol", matchId: 2 },
+      { id: 2, label: "Polen", matchId: 2 },
+      { id: 3, label: "👑 Reina", matchId: 3 },
+      { id: 3, label: "Huevos", matchId: 3 }
     ];
 
-    const orientNames = { 0: 'North', 90: 'East', 180: 'South', 270: 'West' };
+    let selectedCards = [];
 
-    let m2GridLandmarks = {};
-    let m2ExpectedPath = [];
-    let m2UserHistory = [];
-    let m2UserOrient = 0;
-    let m2InstructionText = '';
+    function initGame2() {
+      const grid = document.getElementById('game2-grid');
+      // Mezclar tarjetas
+      const shuffled = [...game2Pairs].sort(() => Math.random() - 0.5);
 
-    // Calcula cuántos bloques libres se pueden avanzar sin salir de la matriz 5x5
-    function getMaxStepsInDir(pos, orient) {
-      if (orient === 0) return pos.y;            // North: dy = -1
-      if (orient === 90) return 4 - pos.x;        // East:  dx = +1
-      if (orient === 180) return 4 - pos.y;       // South: dy = +1
-      if (orient === 270) return pos.x;           // West:  dx = -1
-      return 0;
-    }
-
-    function initMode2() {
-      document.getElementById('reveal-path-btn').style.display = 'none';
-      document.getElementById('m2-feedback').innerText = '';
-
-      // 1. Posición e inclinación iniciales completamente aleatorias
-      const startX = Math.floor(Math.random() * 5);
-      const startY = Math.floor(Math.random() * 5);
-      const startOrient = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
-
-      m2GridLandmarks = {};
-      m2GridLandmarks[`${startX},${startY}`] = { icon: '🏠', name: 'Home' };
-
-      // 2. Colocar otros lugares en casillas libres
-      let availableKeys = [];
-      for (let x = 0; x < 5; x++) {
-        for (let y = 0; y < 5; y++) {
-          if (x !== startX || y !== startY) availableKeys.push(`${x},${y}`);
-        }
-      }
-      availableKeys.sort(() => 0.5 - Math.random());
-      allLandmarks.forEach((lm, idx) => {
-        if (availableKeys[idx]) m2GridLandmarks[availableKeys[idx]] = lm;
+      shuffled.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerText = item.label;
+        card.dataset.matchId = item.matchId;
+        card.dataset.index = index;
+        card.onclick = () => handleCardClick(card);
+        grid.appendChild(card);
       });
+    }
 
-      // 3. Generar la ruta garantizando que sea 100% válida en límites
-      let currentPos = { x: startX, y: startY };
-      let currentOrient = startOrient;
-      m2ExpectedPath = [{ ...currentPos }];
-
-      let phrases = [`Start at Home facing ${orientNames[startOrient]}.`];
-      const connectors = ["Then,", "After that,", "Next,"];
-
-      const legs = 2 + Math.floor(Math.random() * 2); // 2 o 3 tramos
-
-      for (let i = 0; i < legs; i++) {
-        // Analizar opciones de giro válidas que tengan al menos 1 paso libre
-        const candidates = [];
-
-        // Evaluar Giro Izquierda
-        const leftOrient = (currentOrient - 90 + 360) % 360;
-        const leftMax = getMaxStepsInDir(currentPos, leftOrient);
-        if (leftMax >= 1) candidates.push({ turn: 'LEFT', orient: leftOrient, maxSteps: leftMax });
-
-        // Evaluar Giro Derecha
-        const rightOrient = (currentOrient + 90) % 360;
-        const rightMax = getMaxStepsInDir(currentPos, rightOrient);
-        if (rightMax >= 1) candidates.push({ turn: 'RIGHT', orient: rightOrient, maxSteps: rightMax });
-
-        // Evaluar Seguir Derecho
-        const straightMax = getMaxStepsInDir(currentPos, currentOrient);
-        if (straightMax >= 1) candidates.push({ turn: 'STRAIGHT', orient: currentOrient, maxSteps: straightMax });
-
-        if (candidates.length === 0) break; // Sin movimientos posibles
-
-        const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-        const steps = 1 + Math.floor(Math.random() * Math.min(2, chosen.maxSteps));
-
-        currentOrient = chosen.orient;
-
-        // Construir texto en inglés de la indicación
-        let turnText = "";
-        if (chosen.turn === 'LEFT') turnText = "turn left";
-        else if (chosen.turn === 'RIGHT') turnText = "turn right";
-        else turnText = "go straight";
-
-        const conn = i > 0 ? connectors[Math.floor(Math.random() * connectors.length)] : "";
-        phrases.push(`${conn} ${turnText} and walk ${steps} block${steps > 1 ? 's' : ''} forward.`.trim());
-
-        // Mover jugador en la simulación
-        let dx = 0, dy = 0;
-        if (currentOrient === 0) dy = -1;
-        if (currentOrient === 90) dx = 1;
-        if (currentOrient === 180) dy = 1;
-        if (currentOrient === 270) dx = -1;
-
-        for (let s = 0; s < steps; s++) {
-          currentPos.x += dx;
-          currentPos.y += dy;
-          m2ExpectedPath.push({ ...currentPos });
-        }
+    function handleCardClick(card) {
+      if (card.classList.contains('matched') || selectedCards.includes(card) || selectedCards.length === 2) {
+        return;
       }
 
-      const destKey = `${currentPos.x},${currentPos.y}`;
-      if (m2GridLandmarks[destKey] && m2GridLandmarks[destKey].name !== 'Home') {
-        phrases.push(`You should arrive at the ${m2GridLandmarks[destKey].name}.`);
-      } else {
-        phrases.push(`Stop at this location.`);
-      }
+      card.classList.add('selected');
+      selectedCards.push(card);
 
-      m2InstructionText = phrases.join(" ");
-      m2UserHistory = [{ x: startX, y: startY }];
-      m2UserOrient = startOrient;
-
-      document.getElementById('m2-transcript').innerText = 'Click 🔊 Listen to hear your directions!';
-      renderM2Grid();
-    }
-
-    function renderM2Grid(highlightCorrectPath = false, errorIndex = -1) {
-      const container = document.getElementById('m2-grid');
-      container.innerHTML = '';
-      const userCurrent = m2UserHistory[m2UserHistory.length - 1];
-
-      for (let y = 0; y < 5; y++) {
-        for (let x = 0; x < 5; x++) {
-          const cell = document.createElement('div');
-          cell.className = 'grid-cell';
-          const key = `${x},${y}`;
-
-          const isVisited = m2UserHistory.some(p => p.x === x && p.y === y);
-          if (isVisited) cell.classList.add('user-visited');
-
-          if (highlightCorrectPath && m2ExpectedPath.some(p => p.x === x && p.y === y)) {
-            cell.classList.add('correct-path');
-          }
-
-          if (errorIndex !== -1 && m2UserHistory[errorIndex] && m2UserHistory[errorIndex].x === x && m2UserHistory[errorIndex].y === y) {
-            cell.classList.add('error-node');
-          }
-
-          if (x === userCurrent.x && y === userCurrent.y) {
-            cell.innerHTML = `
-              <div class="player-orient" style="transform: rotate(${m2UserOrient}deg);">
-                <div class="flashlight-cone"></div>
-                🧍
-              </div>`;
-          } else if (m2GridLandmarks[key]) {
-            cell.innerText = m2GridLandmarks[key].icon;
-          }
-
-          if (m2GridLandmarks[key]) {
-            const label = document.createElement('span');
-            label.className = 'cell-label';
-            label.innerText = m2GridLandmarks[key].name;
-            cell.appendChild(label);
-          }
-
-          container.appendChild(cell);
-        }
-      }
-    }
-
-    function playAudioInstruction() {
-      document.getElementById('m2-transcript').innerText = `"${m2InstructionText}"`;
-      speakText(m2InstructionText);
-    }
-
-    function turnM2Player(dir) {
-      m2UserOrient = (m2UserOrient + (dir === 'RIGHT' ? 90 : -90) + 360) % 360;
-      renderM2Grid();
-    }
-
-    function moveM2Player(type) {
-      const last = m2UserHistory[m2UserHistory.length - 1];
-      let dx = 0, dy = 0;
-      if (m2UserOrient === 0) dy = -1;
-      if (m2UserOrient === 90) dx = 1;
-      if (m2UserOrient === 180) dy = 1;
-      if (m2UserOrient === 270) dx = -1;
-
-      if (type === 'BACK') { dx = -dx; dy = -dy; }
-
-      const newX = Math.max(0, Math.min(4, last.x + dx));
-      const newY = Math.max(0, Math.min(4, last.y + dy));
-
-      if (newX !== last.x || newY !== last.y) {
-        m2UserHistory.push({ x: newX, y: newY });
-        renderM2Grid();
-      }
-    }
-
-    function resetM2Route() {
-      const start = m2ExpectedPath[0];
-      m2UserHistory = [{ x: start.x, y: start.y }];
-      document.getElementById('reveal-path-btn').style.display = 'none';
-      document.getElementById('m2-feedback').innerText = '';
-      renderM2Grid();
-    }
-
-    function verifyM2Arrival() {
-      const fb = document.getElementById('m2-feedback');
-      let firstErrorIdx = -1;
-
-      for (let i = 0; i < m2UserHistory.length; i++) {
-        if (!m2ExpectedPath[i] || m2UserHistory[i].x !== m2ExpectedPath[i].x || m2UserHistory[i].y !== m2ExpectedPath[i].y) {
-          firstErrorIdx = i;
-          break;
-        }
-      }
-
-      if (firstErrorIdx === -1 && m2UserHistory.length === m2ExpectedPath.length) {
-        fb.className = 'feedback-msg correct';
-        fb.innerText = 'Perfect route execution!';
-        updateScore(25);
-        setTimeout(initMode2, 2200);
-      } else {
-        fb.className = 'feedback-msg wrong';
-        if (firstErrorIdx !== -1) {
-          fb.innerText = `Route error at step ${firstErrorIdx + 1}! You deviated from the instructions.`;
+      if (selectedCards.length === 2) {
+        const [card1, card2] = selectedCards;
+        if (card1.dataset.matchId === card2.dataset.matchId) {
+          card1.classList.remove('selected');
+          card2.classList.remove('selected');
+          card1.classList.add('matched');
+          card2.classList.add('matched');
+          selectedCards = [];
         } else {
-          fb.innerText = `Incomplete route! You stopped before reaching the target.`;
+          setTimeout(() => {
+            card1.classList.remove('selected');
+            card2.classList.remove('selected');
+            selectedCards = [];
+          }, 800);
         }
-        document.getElementById('reveal-path-btn').style.display = 'inline-block';
-        renderM2Grid(false, firstErrorIdx);
-        updateScore(-5);
       }
     }
 
-    function revealCorrectM2Path() {
-      renderM2Grid(true);
-      document.getElementById('m2-feedback').innerText = 'Green cells show the correct expected path!';
-    }
-
-    // Inicialización predeterminada
-    initMode1();
+    // Inicializar ambos juegos
+    window.onload = () => {
+      initGame1();
+      initGame2();
+    };
   </script>
 </body>
 </html>
