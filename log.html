@@ -1021,55 +1021,70 @@
         };
 
         const DataPort = {
-            async exportJSON() {
-                const data = {
-                    inbox: AppState.inbox,
-                    focus: AppState.focus,
-                    freezer: AppState.freezer,
-                    vectors: AppState.vectors,
-                    retros: AppState.retros,
-                    exportedAt: new Date().toISOString()
-                };
+    async exportJSON() {
+        const data = {
+            inbox: AppState.inbox,
+            focus: AppState.focus,
+            freezer: AppState.freezer,
+            vectors: AppState.vectors,
+            retros: AppState.retros,
+            exportedAt: new Date().toISOString()
+        };
 
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `BacklogMind_Backup_${new Date().toISOString().slice(0, 10)}.json`;
-                a.click();
-            },
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `BacklogMind_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+    },
 
-            async importJSON(e) {
-                const file = e.target.files[0];
-                if (!file) return;
+    async importJSON(e) {
+        const file = e.target.files[0];
+        if (!file) return;
 
-                const reader = new FileReader();
-                reader.onload = async (event) => {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        if (confirm('¿Deseas reemplazar todos los datos actuales con esta copia de seguridad?')) {
-                            await DB.clearStore('inbox');
-                            await DB.clearStore('focus');
-                            await DB.clearStore('freezer');
-                            await DB.clearStore('vectors');
-                            await DB.clearStore('retros');
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+                
+                // Ask user if they want to Append or Overwrite
+                const mode = confirm(
+                    'Press OK to MERGE (add new items to your current data).\nPress CANCEL to OVERWRITE (replace everything).'
+                );
 
-                            for (let item of (data.inbox || [])) await DB.put('inbox', item);
-                            for (let item of (data.focus || [])) await DB.put('focus', item);
-                            for (let item of (data.freezer || [])) await DB.put('freezer', item);
-                            for (let item of (data.vectors || [])) await DB.put('vectors', item);
-                            for (let item of (data.retros || [])) await DB.put('retros', item);
+                if (!mode) {
+                    // If CANCEL (Overwrite), wipe existing database stores first
+                    await DB.clearStore('inbox');
+                    await DB.clearStore('focus');
+                    await DB.clearStore('freezer');
+                    await DB.clearStore('vectors');
+                    await DB.clearStore('retros');
+                }
 
-                            await AppState.loadAll();
-                            alert('Datos importados con éxito.');
-                        }
-                    } catch (err) {
-                        alert('Error al importar el archivo JSON: ' + err.message);
-                    }
-                };
-                reader.readAsText(file);
+                // Helper to ensure imported items get unique IDs during merge
+                const processItem = (item, prefix) => ({
+                    ...item,
+                    id: item.id || `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+                });
+
+                // Add imported items to IndexedDB
+                for (let item of (data.inbox || [])) await DB.put('inbox', processItem(item, 'inbox'));
+                for (let item of (data.focus || [])) await DB.put('focus', processItem(item, 'focus'));
+                for (let item of (data.freezer || [])) await DB.put('freezer', processItem(item, 'freezer'));
+                for (let item of (data.vectors || [])) await DB.put('vectors', processItem(item, 'vectors'));
+                for (let item of (data.retros || [])) await DB.put('retros', processItem(item, 'retro'));
+
+                await AppState.loadAll();
+                alert('Data imported successfully!');
+            } catch (err) {
+                alert('Error importing JSON file: ' + err.message);
             }
         };
+        reader.readAsText(file);
+        e.target.value = ''; // Reset input
+    }
+};
 
         function escapeHtml(str) {
             return str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : '';
@@ -1092,6 +1107,7 @@
             await AppState.loadAll();
             TabManager.switch('inbox');
         });
+        
     </script>
 </body>
 </html>
