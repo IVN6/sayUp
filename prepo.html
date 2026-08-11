@@ -67,7 +67,7 @@
 
     nav {
       display: flex;
-      gap: 4px;
+      gap: 6px;
       width: 100%;
       max-width: 500px;
       margin-bottom: 10px;
@@ -75,12 +75,12 @@
 
     .nav-btn {
       flex: 1;
-      padding: 8px 2px;
+      padding: 10px 4px;
       background: var(--card-bg);
       border: 1px solid #334155;
       color: var(--text-muted);
       border-radius: 8px;
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
@@ -104,22 +104,23 @@
     .game-mode { display: none; }
     .game-mode.active { display: block; }
 
-    /* TARGET PHRASE DISPLAY */
+    /* BANNER DE FRASE Y AUDIOS PERSISTENTE */
     .phrase-banner {
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 10px;
-      padding: 10px;
+      padding: 10px 14px;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 48px;
+      min-height: 52px;
     }
 
     .phrase-text {
       font-size: 0.95rem;
       font-weight: 600;
+      line-height: 1.3;
     }
 
     .highlight-prep {
@@ -129,10 +130,10 @@
       padding: 0 2px;
     }
 
-    /* CSS 3D STAGE FOR MODE 1 */
+    /* ESCENARIO 3D (JUEGO 1) */
     .stage-3d-wrapper {
-      perspective: 800px;
-      height: 180px;
+      perspective: 900px;
+      height: 200px;
       background: #090d16;
       border-radius: 12px;
       position: relative;
@@ -144,44 +145,57 @@
       justify-content: center;
     }
 
+    .scene-3d-container {
+      width: 65px;
+      height: 65px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateX(-18deg) rotateY(32deg);
+      transition: transform 0.5s ease;
+    }
+
     .cube-3d {
-      width: 60px;
-      height: 60px;
+      width: 65px;
+      height: 65px;
       position: absolute;
       transform-style: preserve-3d;
-      transform: rotateX(-20deg) rotateY(30deg);
-      transition: transform 0.5s ease;
     }
 
     .face {
       position: absolute;
-      width: 60px;
-      height: 60px;
-      background: rgba(59, 130, 246, 0.75);
+      width: 65px;
+      height: 65px;
+      background: rgba(59, 130, 246, 0.78);
       border: 2px solid #60a5fa;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+      font-size: 1.3rem;
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.4);
+      backface-visibility: visible;
     }
 
-    .front  { transform: translateZ(30px); }
-    .back   { transform: rotateY(180deg) translateZ(30px); }
-    .top    { transform: rotateX(90deg) translateZ(30px); background: rgba(96, 165, 250, 0.85); }
-    .bottom { transform: rotateX(-90deg) translateZ(30px); }
-    .left   { transform: rotateY(-90deg) translateZ(30px); }
-    .right  { transform: rotateY(90deg) translateZ(30px); }
+    .front  { transform: translateZ(32.5px); }
+    .back   { transform: rotateY(180deg) translateZ(32.5px); background: rgba(30, 64, 175, 0.85); }
+    .top    { transform: rotateX(90deg) translateZ(32.5px); background: rgba(96, 165, 250, 0.85); }
+    .bottom { transform: rotateX(-90deg) translateZ(32.5px); }
+    .left   { transform: rotateY(-90deg) translateZ(32.5px); }
+    .right  { transform: rotateY(90deg) translateZ(32.5px); }
 
     .bee-3d {
       position: absolute;
-      font-size: 2.2rem;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 20;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+      font-size: 2.3rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+      pointer-events: none;
     }
 
-    /* 6 OPTIONS GRID */
+    /* GRID DE OPCIONES JUEGO 1 */
     .options-grid-6 {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -198,40 +212,16 @@
       font-weight: bold;
       font-size: 0.85rem;
       cursor: pointer;
+      transition: background 0.2s;
     }
 
+    .btn:hover { background: var(--primary-hover); }
     .btn-secondary { background: #334155; }
+    .btn-secondary:hover { background: #475569; }
     .btn-success { background: var(--secondary); }
     .btn-warning { background: var(--accent); color: #000; }
 
-    /* MODE 2 STAGE */
-    .mode2-stage {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .scene-card-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .scene-card {
-      background: #0f172a;
-      border: 2px solid #334155;
-      border-radius: 12px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: border 0.2s ease;
-    }
-
-    .scene-card.selected { border-color: var(--primary); }
-
-    /* GRID MAP FOR MODE 3 */
+    /* MAPA Y CONTROLES (JUEGO 2 - MAPA) */
     .grid-map {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -267,7 +257,6 @@
       position: relative;
     }
 
-    /* Flashlight orientation cone */
     .flashlight-cone {
       position: absolute;
       top: -12px;
@@ -277,22 +266,26 @@
       height: 0;
       border-left: 10px solid transparent;
       border-right: 10px solid transparent;
-      border-bottom: 16px solid rgba(245, 158, 11, 0.5);
+      border-bottom: 16px solid rgba(245, 158, 11, 0.6);
       pointer-events: none;
     }
 
     .cell-label {
-      font-size: 0.5rem;
+      font-size: 0.52rem;
       color: var(--text-muted);
       margin-top: 1px;
       text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90%;
     }
 
     .dpad {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 4px;
-      max-width: 180px;
+      max-width: 200px;
       margin: 8px auto;
     }
 
@@ -310,7 +303,7 @@
 <body>
 
   <header>
-    <div class="header-title">English Spatial & Directions 🏙️</div>
+    <div class="header-title">Spatial & Directions 🐝🏙️</div>
     <div class="header-controls">
       <span>Score: <strong id="score-val">0</strong></span>
       <button class="icon-btn" id="audio-toggle-btn" onclick="toggleGlobalAudio()">🔊 Audio</button>
@@ -318,77 +311,64 @@
   </header>
 
   <nav>
-    <button class="nav-btn active" onclick="switchMode(1)">1. 3D Spatial (Bee) 🐝</button>
-    <button class="nav-btn" onclick="switchMode(2)">2. Scene Context 🧩</button>
-    <button class="nav-btn" onclick="switchMode(3)">3. Map Directions 🧭</button>
+    <button class="nav-btn active" id="tab-btn-1" onclick="switchMode(1)">1. 3D Prepositions (Bee) 🐝</button>
+    <button class="nav-btn" id="tab-btn-2" onclick="switchMode(2)">2. Map Directions 🧭</button>
   </nav>
 
   <main>
-    <!-- MODE 1: 3D BEE & PREPOSITIONS -->
+    <!-- MODO 1: ABEJA 3D -->
     <section id="mode-1" class="game-mode active">
       <div class="phrase-banner">
-        <div id="m1-phrase" class="phrase-text">Select the correct preposition...</div>
-        <button class="icon-btn" id="m1-speak-btn" style="display:none;" onclick="speakCurrentM1Phrase()">🔊 Listen</button>
+        <div id="m1-phrase" class="phrase-text">Where is the bee relative to the box?</div>
+        <button class="icon-btn" id="m1-speak-btn" onclick="speakCurrentM1Phrase()">🔊 Listen</button>
       </div>
 
       <div class="stage-3d-wrapper">
-        <div class="cube-3d" id="cube3d">
-          <div class="face front">📦</div>
-          <div class="face back">📦</div>
-          <div class="face top">📦</div>
-          <div class="face bottom">📦</div>
-          <div class="face left">📦</div>
-          <div class="face right">📦</div>
+        <div class="scene-3d-container">
+          <div id="bee3d" class="bee-3d">🐝</div>
+          <div class="cube-3d">
+            <div class="face front">📦</div>
+            <div class="face back">📦</div>
+            <div class="face top">📦</div>
+            <div class="face bottom">📦</div>
+            <div class="face left">📦</div>
+            <div class="face right">📦</div>
+          </div>
         </div>
-        <div id="bee3d" class="bee-3d">🐝</div>
       </div>
 
       <div id="m1-options" class="options-grid-6"></div>
       <div id="m1-feedback" class="feedback-msg"></div>
     </section>
 
-    <!-- MODE 2: SCENE CONTEXT & RELATIVE POSITIONS -->
+    <!-- MODO 2: DIRECCIONES EN MAPA -->
     <section id="mode-2" class="game-mode">
       <div class="phrase-banner">
-        <div id="m2-prompt" class="phrase-text">Loading scene challenge...</div>
-        <button class="icon-btn" onclick="speakText(document.getElementById('m2-prompt').innerText)">🔊</button>
-      </div>
-
-      <div class="mode2-stage">
-        <div id="m2-cards" class="scene-card-container"></div>
-      </div>
-      <div id="m2-feedback" class="feedback-msg"></div>
-    </section>
-
-    <!-- MODE 3: PROCEDURAL DIRECTIONS & PATH TRACING -->
-    <section id="mode-3" class="game-mode">
-      <div class="phrase-banner">
-        <div id="m3-transcript" class="phrase-text" style="font-size:0.8rem;">Tap 'Listen' to start route!</div>
+        <div id="m2-transcript" class="phrase-text">Tap 'Listen' to start route!</div>
         <button class="icon-btn" onclick="playAudioInstruction()">🔊 Listen</button>
       </div>
 
-      <div id="m3-grid" class="grid-map"></div>
+      <div id="m2-grid" class="grid-map"></div>
 
       <div class="dpad">
         <div></div>
-        <button class="btn btn-secondary" onclick="moveM3Player('FORWARD')">⬆️ Forward</button>
+        <button class="btn btn-secondary" onclick="moveM2Player('FORWARD')">⬆️ Forward</button>
         <div></div>
-        <button class="btn btn-secondary" onclick="turnM3Player('LEFT')">↺ Turn Left</button>
-        <button class="btn btn-secondary" onclick="moveM3Player('BACK')">⬇️ Back</button>
-        <button class="btn btn-secondary" onclick="turnM3Player('RIGHT')">↻ Turn Right</button>
+        <button class="btn btn-secondary" onclick="turnM2Player('LEFT')">↺ Turn Left</button>
+        <button class="btn btn-secondary" onclick="moveM2Player('BACK')">⬇️ Back</button>
+        <button class="btn btn-secondary" onclick="turnM2Player('RIGHT')">↻ Turn Right</button>
       </div>
 
       <div style="display:flex; gap:6px; margin-top:8px;">
-        <button class="btn btn-warning" onclick="resetM3Route()">🔄 Reset</button>
-        <button class="btn btn-success" onclick="verifyM3Arrival()">🎯 Check Route</button>
+        <button class="btn btn-warning" onclick="resetM2Route()">🔄 Reset</button>
+        <button class="btn btn-success" onclick="verifyM2Arrival()">🎯 Check Route</button>
       </div>
-      <button class="btn btn-secondary" id="reveal-path-btn" style="display:none; margin-top:6px;" onclick="revealCorrectM3Path()">🗺️ Show Correct Path</button>
-      <div id="m3-feedback" class="feedback-msg"></div>
+      <button class="btn btn-secondary" id="reveal-path-btn" style="display:none; margin-top:6px;" onclick="revealCorrectM2Path()">🗺️ Show Correct Path</button>
+      <div id="m2-feedback" class="feedback-msg"></div>
     </section>
   </main>
 
   <script>
-    // Audio State & Synth
     let globalAudioEnabled = true;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -440,47 +420,60 @@
     }
 
     function switchMode(modeNum) {
-      document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', i === modeNum - 1));
-      document.querySelectorAll('.game-mode').forEach((m, i) => m.classList.toggle('active', i === modeNum - 1));
-      if (modeNum === 1) initMode1();
+      document.getElementById('tab-btn-1').classList.toggle('active', modeNum === 1);
+      document.getElementById('tab-btn-2').classList.toggle('active', modeNum === 2);
+      document.getElementById('mode-1').classList.toggle('active', modeNum === 1);
+      document.getElementById('mode-2').classList.toggle('active', modeNum === 2);
+      if (modeNum === 1 && !m1Initialized) initMode1();
       if (modeNum === 2) initMode2();
-      if (modeNum === 3) initMode3();
     }
 
     /* ===================================================
-       MODE 1: EXPANDED PREPOSITIONS & CSS 3D
+       MODO 1: ABEJA 3D (CON PERSISTENCIA DE FRASE DE ESTUDIO)
     =================================================== */
     const prepositions3D = [
-      { key: 'ABOVE', synonyms: ['above', 'over'], transform: 'translate3d(0px, -75px, 0px)' },
-      { key: 'UNDER', synonyms: ['under', 'below', 'beneath'], transform: 'translate3d(0px, 75px, 0px)' },
-      { key: 'NEXT_TO', synonyms: ['next to', 'beside', 'by'], transform: 'translate3d(75px, 0px, 0px)' },
-      { key: 'INSIDE', synonyms: ['in', 'inside'], transform: 'translate3d(0px, 0px, 0px) scale(0.7)' },
-      { key: 'BEHIND', synonyms: ['behind'], transform: 'translate3d(0px, -15px, -80px)' },
-      { key: 'IN_FRONT_OF', synonyms: ['in front of'], transform: 'translate3d(0px, 15px, 80px)' },
-      { key: 'ON_TOP_OF', synonyms: ['on', 'on top of'], transform: 'translate3d(0px, -42px, 0px)' },
-      { key: 'FAR_FROM', synonyms: ['far from'], transform: 'translate3d(120px, -50px, 0px)' },
-      { key: 'NEAR', synonyms: ['near', 'close to'], transform: 'translate3d(50px, -20px, 0px)' }
+      { key: 'ABOVE', synonyms: ['above', 'over'], transform: 'translate3d(0px, -85px, 0px)' },
+      { key: 'UNDER', synonyms: ['under', 'below', 'beneath'], transform: 'translate3d(0px, 85px, 0px)' },
+      { key: 'NEXT_TO', synonyms: ['next to', 'beside', 'by'], transform: 'translate3d(85px, 0px, 0px)' },
+      { key: 'INSIDE', synonyms: ['in', 'inside'], transform: 'translate3d(0px, 0px, 0px) scale(0.65)' },
+      { key: 'BEHIND', synonyms: ['behind'], transform: 'translate3d(25px, -25px, -100px) scale(0.85)' },
+      { key: 'IN_FRONT_OF', synonyms: ['in front of'], transform: 'translate3d(0px, 20px, 95px) scale(1.15)' },
+      { key: 'ON_TOP_OF', synonyms: ['on', 'on top of'], transform: 'translate3d(0px, -52px, 0px)' },
+      { key: 'FAR_FROM', synonyms: ['far from'], transform: 'translate3d(130px, -45px, 0px)' },
+      { key: 'NEAR', synonyms: ['near', 'close to'], transform: 'translate3d(55px, -15px, 20px)' }
     ];
 
     let currentM1Group = null;
     let currentM1Synonym = '';
-    let currentM1FullSentence = '';
+    let lastCorrectSentence = "Where is the bee relative to the box?";
+    let m1Initialized = false;
 
     function initMode1() {
+      m1Initialized = true;
+      document.getElementById('m1-feedback').innerText = '';
+      loadNextM1Challenge();
+    }
+
+    function loadNextM1Challenge() {
       const optionsContainer = document.getElementById('m1-options');
       optionsContainer.innerHTML = '';
-      document.getElementById('m1-feedback').innerText = '';
-      document.getElementById('m1-speak-btn').style.display = 'none';
 
-      currentM1Group = prepositions3D[Math.floor(Math.random() * prepositions3D.length)];
+      // Mantiene la frase acertada anterior fijada en el banner
+      document.getElementById('m1-phrase').innerHTML = lastCorrectSentence;
+
+      // Seleccionar nueva posición aleatoria
+      let nextGroup = currentM1Group;
+      while (nextGroup === currentM1Group) {
+        nextGroup = prepositions3D[Math.floor(Math.random() * prepositions3D.length)];
+      }
+      currentM1Group = nextGroup;
       currentM1Synonym = currentM1Group.synonyms[Math.floor(Math.random() * currentM1Group.synonyms.length)];
 
+      // Mover la abeja a la nueva posición 3D
       const bee = document.getElementById('bee3d');
       bee.style.transform = currentM1Group.transform;
 
-      document.getElementById('m1-phrase').innerHTML = 'Where is the bee relative to the box?';
-
-      // Pick 6 unique options
+      // Crear 6 opciones
       let options = [currentM1Synonym];
       while (options.length < 6) {
         const randG = prepositions3D[Math.floor(Math.random() * prepositions3D.length)];
@@ -502,18 +495,21 @@
       const fb = document.getElementById('m1-feedback');
       if (currentM1Group.synonyms.includes(selected)) {
         fb.className = 'feedback-msg correct';
-        fb.innerText = 'Excelente!';
+        fb.innerText = 'Correct! Loading next position...';
         
-        currentM1FullSentence = `The bee is <span class="highlight-prep">${selected}</span> the box.`;
-        document.getElementById('m1-phrase').innerHTML = currentM1FullSentence;
-        document.getElementById('m1-speak-btn').style.display = 'inline-flex';
-        
+        // Actualizar la frase guardada únicamente al acertar
+        lastCorrectSentence = `The bee is <span class="highlight-prep">${selected}</span> the box.`;
+        document.getElementById('m1-phrase').innerHTML = lastCorrectSentence;
         speakText(`The bee is ${selected} the box.`);
+        
         updateScore(10);
-        setTimeout(initMode1, 2500);
+        setTimeout(() => {
+          fb.innerText = '';
+          loadNextM1Challenge();
+        }, 1200);
       } else {
         fb.className = 'feedback-msg wrong';
-        fb.innerText = `Incorrect. '${selected}' does not match the bee's position.`;
+        fb.innerText = `Incorrect. '${selected}' is not correct for this position.`;
         updateScore(-5);
       }
     }
@@ -523,68 +519,7 @@
     }
 
     /* ===================================================
-       MODE 2: SCENE CONTEXT & EXPLANATORY FEEDBACK
-    =================================================== */
-    const mode2Questions = [
-      {
-        prompt: "Which picture shows the cat <span class='highlight-prep'>UNDER</span> the table?",
-        prep: "under",
-        cards: [
-          { icon: "🐱\n🪵", label: "Cat under table", correct: true, exp: "Correct! The cat is beneath the table surface." },
-          { icon: "🐱🪵", label: "Cat on table", correct: false, exp: "Incorrect! Here the cat is ON TOP OF the table." }
-        ]
-      },
-      {
-        prompt: "Select the image where the dog is <span class='highlight-prep'>BEHIND</span> the door.",
-        prep: "behind",
-        cards: [
-          { icon: "🚪🐕", label: "Dog behind door", correct: true, exp: "Correct! The door blocks the view of the dog." },
-          { icon: "🐕🚪", label: "Dog in front of door", correct: false, exp: "Incorrect! The dog is IN FRONT OF the door." }
-        ]
-      },
-      {
-        prompt: "Where is the apple <span class='highlight-prep'>BETWEEN</span> two boxes?",
-        prep: "between",
-        cards: [
-          { icon: "📦🍎📦", label: "Apple between boxes", correct: true, exp: "Correct! The apple has a box on both sides." },
-          { icon: "🍎📦📦", label: "Apple next to boxes", correct: false, exp: "Incorrect! The apple is NEXT TO the boxes." }
-        ]
-      }
-    ];
-
-    function initMode2() {
-      const container = document.getElementById('m2-cards');
-      container.innerHTML = '';
-      document.getElementById('m2-feedback').innerText = '';
-
-      const q = mode2Questions[Math.floor(Math.random() * mode2Questions.length)];
-      document.getElementById('m2-prompt').innerHTML = q.prompt;
-      speakText(q.prompt);
-
-      q.cards.sort(() => 0.5 - Math.random());
-      q.cards.forEach(card => {
-        const div = document.createElement('div');
-        div.className = 'scene-card';
-        div.innerHTML = `<div style="font-size:2.5rem; white-space:pre-line; text-align:center;">${card.icon}</div>`;
-        div.onclick = () => {
-          const fb = document.getElementById('m2-feedback');
-          if (card.correct) {
-            fb.className = 'feedback-msg correct';
-            fb.innerText = card.exp;
-            updateScore(10);
-            setTimeout(initMode2, 2200);
-          } else {
-            fb.className = 'feedback-msg wrong';
-            fb.innerText = card.exp; // Detailed error explanation!
-            updateScore(-5);
-          }
-        };
-        container.appendChild(div);
-      });
-    }
-
-    /* ===================================================
-       MODE 3: PROCEDURAL DIRECTIONS, ORIENTATION & PATH REVEAL
+       MODO 2: DIRECCIONES EN MAPA (SISTEMA MATEMÁTICO CORREGIDO)
     =================================================== */
     const allLandmarks = [
       { icon: '🏥', name: 'Hospital' }, { icon: '☕', name: 'Cafe' },
@@ -593,93 +528,124 @@
       { icon: '🥐', name: 'Bakery' }, { icon: '📚', name: 'Library' }
     ];
 
-    let m3GridLandmarks = {};
-    let m3ExpectedPath = [];
-    let m3UserHistory = [];
-    let m3UserOrient = 0; // 0: North (Up), 90: East (Right), 180: South (Down), 270: West (Left)
-    let m3InstructionText = '';
+    const orientNames = { 0: 'North', 90: 'East', 180: 'South', 270: 'West' };
 
-    function initMode3() {
+    let m2GridLandmarks = {};
+    let m2ExpectedPath = [];
+    let m2UserHistory = [];
+    let m2UserOrient = 0;
+    let m2InstructionText = '';
+
+    // Calcula cuántos bloques libres se pueden avanzar sin salir de la matriz 5x5
+    function getMaxStepsInDir(pos, orient) {
+      if (orient === 0) return pos.y;            // North: dy = -1
+      if (orient === 90) return 4 - pos.x;        // East:  dx = +1
+      if (orient === 180) return 4 - pos.y;       // South: dy = +1
+      if (orient === 270) return pos.x;           // West:  dx = -1
+      return 0;
+    }
+
+    function initMode2() {
       document.getElementById('reveal-path-btn').style.display = 'none';
-      document.getElementById('m3-feedback').innerText = '';
+      document.getElementById('m2-feedback').innerText = '';
 
-      // Randomize landmark positions on 5x5 grid
-      m3GridLandmarks = { '0,0': { icon: '🏠', name: 'Start' } };
+      // 1. Posición e inclinación iniciales completamente aleatorias
+      const startX = Math.floor(Math.random() * 5);
+      const startY = Math.floor(Math.random() * 5);
+      const startOrient = [0, 90, 180, 270][Math.floor(Math.random() * 4)];
+
+      m2GridLandmarks = {};
+      m2GridLandmarks[`${startX},${startY}`] = { icon: '🏠', name: 'Home' };
+
+      // 2. Colocar otros lugares en casillas libres
       let availableKeys = [];
       for (let x = 0; x < 5; x++) {
         for (let y = 0; y < 5; y++) {
-          if (x !== 0 || y !== 0) availableKeys.push(`${x},${y}`);
+          if (x !== startX || y !== startY) availableKeys.push(`${x},${y}`);
         }
       }
       availableKeys.sort(() => 0.5 - Math.random());
-
       allLandmarks.forEach((lm, idx) => {
-        if (availableKeys[idx]) m3GridLandmarks[availableKeys[idx]] = lm;
+        if (availableKeys[idx]) m2GridLandmarks[availableKeys[idx]] = lm;
       });
 
-      // Procedural Route Generation
-      let current = { x: 0, y: 0 };
-      m3ExpectedPath = [{ ...current }];
-      let phrases = ["Start at Home facing North."];
+      // 3. Generar la ruta garantizando que sea 100% válida en límites
+      let currentPos = { x: startX, y: startY };
+      let currentOrient = startOrient;
+      m2ExpectedPath = [{ ...currentPos }];
+
+      let phrases = [`Start at Home facing ${orientNames[startOrient]}.`];
       const connectors = ["Then,", "After that,", "Next,"];
 
-      let currentOrient = 0; // facing North
-      const legs = 2;
+      const legs = 2 + Math.floor(Math.random() * 2); // 2 o 3 tramos
 
       for (let i = 0; i < legs; i++) {
-        // Choose turn: left (-90) or right (+90)
-        const turnRight = Math.random() > 0.5;
-        const turnAngle = turnRight ? 90 : -90;
-        currentOrient = (currentOrient + turnAngle + 360) % 360;
+        // Analizar opciones de giro válidas que tengan al menos 1 paso libre
+        const candidates = [];
 
-        const turnText = turnRight ? "turn right" : "turn left";
-        const blocks = 1 + Math.floor(Math.random() * 2);
+        // Evaluar Giro Izquierda
+        const leftOrient = (currentOrient - 90 + 360) % 360;
+        const leftMax = getMaxStepsInDir(currentPos, leftOrient);
+        if (leftMax >= 1) candidates.push({ turn: 'LEFT', orient: leftOrient, maxSteps: leftMax });
 
-        // Calculate step vector based on current orientation
+        // Evaluar Giro Derecha
+        const rightOrient = (currentOrient + 90) % 360;
+        const rightMax = getMaxStepsInDir(currentPos, rightOrient);
+        if (rightMax >= 1) candidates.push({ turn: 'RIGHT', orient: rightOrient, maxSteps: rightMax });
+
+        // Evaluar Seguir Derecho
+        const straightMax = getMaxStepsInDir(currentPos, currentOrient);
+        if (straightMax >= 1) candidates.push({ turn: 'STRAIGHT', orient: currentOrient, maxSteps: straightMax });
+
+        if (candidates.length === 0) break; // Sin movimientos posibles
+
+        const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        const steps = 1 + Math.floor(Math.random() * Math.min(2, chosen.maxSteps));
+
+        currentOrient = chosen.orient;
+
+        // Construir texto en inglés de la indicación
+        let turnText = "";
+        if (chosen.turn === 'LEFT') turnText = "turn left";
+        else if (chosen.turn === 'RIGHT') turnText = "turn right";
+        else turnText = "go straight";
+
+        const conn = i > 0 ? connectors[Math.floor(Math.random() * connectors.length)] : "";
+        phrases.push(`${conn} ${turnText} and walk ${steps} block${steps > 1 ? 's' : ''} forward.`.trim());
+
+        // Mover jugador en la simulación
         let dx = 0, dy = 0;
         if (currentOrient === 0) dy = -1;
         if (currentOrient === 90) dx = 1;
         if (currentOrient === 180) dy = 1;
         if (currentOrient === 270) dx = -1;
 
-        // Check bounds
-        let validSteps = 0;
-        for (let b = 1; b <= blocks; b++) {
-          const nx = current.x + dx * b;
-          const ny = current.y + dy * b;
-          if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5) validSteps++;
-          else break;
-        }
-
-        if (validSteps > 0) {
-          const conn = i > 0 ? connectors[Math.floor(Math.random() * connectors.length)] : "";
-          phrases.push(`${conn} ${turnText} and walk ${validSteps} block${validSteps > 1 ? 's' : ''} forward.`.trim());
-
-          for (let s = 0; s < validSteps; s++) {
-            current.x += dx;
-            current.y += dy;
-            m3ExpectedPath.push({ ...current });
-          }
+        for (let s = 0; s < steps; s++) {
+          currentPos.x += dx;
+          currentPos.y += dy;
+          m2ExpectedPath.push({ ...currentPos });
         }
       }
 
-      const destKey = `${current.x},${current.y}`;
-      if (m3GridLandmarks[destKey]) {
-        phrases.push(`You should arrive at the ${m3GridLandmarks[destKey].name}.`);
+      const destKey = `${currentPos.x},${currentPos.y}`;
+      if (m2GridLandmarks[destKey] && m2GridLandmarks[destKey].name !== 'Home') {
+        phrases.push(`You should arrive at the ${m2GridLandmarks[destKey].name}.`);
+      } else {
+        phrases.push(`Stop at this location.`);
       }
 
-      m3InstructionText = phrases.join(" ");
-      m3UserHistory = [{ x: 0, y: 0 }];
-      m3UserOrient = 0;
+      m2InstructionText = phrases.join(" ");
+      m2UserHistory = [{ x: startX, y: startY }];
+      m2UserOrient = startOrient;
 
-      document.getElementById('m3-transcript').innerText = 'Click 🔊 Listen to hear your directions!';
-      renderM3Grid();
+      document.getElementById('m2-transcript').innerText = 'Click 🔊 Listen to hear your directions!';
+      renderM2Grid();
     }
 
-    function renderM3Grid(highlightCorrectPath = false, errorIndex = -1) {
-      const container = document.getElementById('m3-grid');
+    function renderM2Grid(highlightCorrectPath = false, errorIndex = -1) {
+      const container = document.getElementById('m2-grid');
       container.innerHTML = '';
-      const userCurrent = m3UserHistory[m3UserHistory.length - 1];
+      const userCurrent = m2UserHistory[m2UserHistory.length - 1];
 
       for (let y = 0; y < 5; y++) {
         for (let x = 0; x < 5; x++) {
@@ -687,31 +653,31 @@
           cell.className = 'grid-cell';
           const key = `${x},${y}`;
 
-          const isVisited = m3UserHistory.some(p => p.x === x && p.y === y);
+          const isVisited = m2UserHistory.some(p => p.x === x && p.y === y);
           if (isVisited) cell.classList.add('user-visited');
 
-          if (highlightCorrectPath && m3ExpectedPath.some(p => p.x === x && p.y === y)) {
+          if (highlightCorrectPath && m2ExpectedPath.some(p => p.x === x && p.y === y)) {
             cell.classList.add('correct-path');
           }
 
-          if (errorIndex !== -1 && m3UserHistory[errorIndex] && m3UserHistory[errorIndex].x === x && m3UserHistory[errorIndex].y === y) {
+          if (errorIndex !== -1 && m2UserHistory[errorIndex] && m2UserHistory[errorIndex].x === x && m2UserHistory[errorIndex].y === y) {
             cell.classList.add('error-node');
           }
 
           if (x === userCurrent.x && y === userCurrent.y) {
             cell.innerHTML = `
-              <div class="player-orient" style="transform: rotate(${m3UserOrient}deg);">
+              <div class="player-orient" style="transform: rotate(${m2UserOrient}deg);">
                 <div class="flashlight-cone"></div>
                 🧍
               </div>`;
-          } else if (m3GridLandmarks[key]) {
-            cell.innerText = m3GridLandmarks[key].icon;
+          } else if (m2GridLandmarks[key]) {
+            cell.innerText = m2GridLandmarks[key].icon;
           }
 
-          if (m3GridLandmarks[key]) {
+          if (m2GridLandmarks[key]) {
             const label = document.createElement('span');
             label.className = 'cell-label';
-            label.innerText = m3GridLandmarks[key].name;
+            label.innerText = m2GridLandmarks[key].name;
             cell.appendChild(label);
           }
 
@@ -721,22 +687,22 @@
     }
 
     function playAudioInstruction() {
-      document.getElementById('m3-transcript').innerText = `"${m3InstructionText}"`;
-      speakText(m3InstructionText);
+      document.getElementById('m2-transcript').innerText = `"${m2InstructionText}"`;
+      speakText(m2InstructionText);
     }
 
-    function turnM3Player(dir) {
-      m3UserOrient = (m3UserOrient + (dir === 'RIGHT' ? 90 : -90) + 360) % 360;
-      renderM3Grid();
+    function turnM2Player(dir) {
+      m2UserOrient = (m2UserOrient + (dir === 'RIGHT' ? 90 : -90) + 360) % 360;
+      renderM2Grid();
     }
 
-    function moveM3Player(type) {
-      const last = m3UserHistory[m3UserHistory.length - 1];
+    function moveM2Player(type) {
+      const last = m2UserHistory[m2UserHistory.length - 1];
       let dx = 0, dy = 0;
-      if (m3UserOrient === 0) dy = -1;
-      if (m3UserOrient === 90) dx = 1;
-      if (m3UserOrient === 180) dy = 1;
-      if (m3UserOrient === 270) dx = -1;
+      if (m2UserOrient === 0) dy = -1;
+      if (m2UserOrient === 90) dx = 1;
+      if (m2UserOrient === 180) dy = 1;
+      if (m2UserOrient === 270) dx = -1;
 
       if (type === 'BACK') { dx = -dx; dy = -dy; }
 
@@ -744,54 +710,54 @@
       const newY = Math.max(0, Math.min(4, last.y + dy));
 
       if (newX !== last.x || newY !== last.y) {
-        m3UserHistory.push({ x: newX, y: newY });
-        renderM3Grid();
+        m2UserHistory.push({ x: newX, y: newY });
+        renderM2Grid();
       }
     }
 
-    function resetM3Route() {
-      m3UserHistory = [{ x: 0, y: 0 }];
-      m3UserOrient = 0;
+    function resetM2Route() {
+      const start = m2ExpectedPath[0];
+      m2UserHistory = [{ x: start.x, y: start.y }];
       document.getElementById('reveal-path-btn').style.display = 'none';
-      document.getElementById('m3-feedback').innerText = '';
-      renderM3Grid();
+      document.getElementById('m2-feedback').innerText = '';
+      renderM2Grid();
     }
 
-    function verifyM3Arrival() {
-      const fb = document.getElementById('m3-feedback');
+    function verifyM2Arrival() {
+      const fb = document.getElementById('m2-feedback');
       let firstErrorIdx = -1;
 
-      for (let i = 0; i < m3UserHistory.length; i++) {
-        if (!m3ExpectedPath[i] || m3UserHistory[i].x !== m3ExpectedPath[i].x || m3UserHistory[i].y !== m3ExpectedPath[i].y) {
+      for (let i = 0; i < m2UserHistory.length; i++) {
+        if (!m2ExpectedPath[i] || m2UserHistory[i].x !== m2ExpectedPath[i].x || m2UserHistory[i].y !== m2ExpectedPath[i].y) {
           firstErrorIdx = i;
           break;
         }
       }
 
-      if (firstErrorIdx === -1 && m3UserHistory.length === m3ExpectedPath.length) {
+      if (firstErrorIdx === -1 && m2UserHistory.length === m2ExpectedPath.length) {
         fb.className = 'feedback-msg correct';
         fb.innerText = 'Perfect route execution!';
         updateScore(25);
-        setTimeout(initMode3, 2200);
+        setTimeout(initMode2, 2200);
       } else {
         fb.className = 'feedback-msg wrong';
         if (firstErrorIdx !== -1) {
-          fb.innerText = `Route error at step ${firstErrorIdx + 1}! You deviated from the spoken instructions.`;
+          fb.innerText = `Route error at step ${firstErrorIdx + 1}! You deviated from the instructions.`;
         } else {
           fb.innerText = `Incomplete route! You stopped before reaching the target.`;
         }
         document.getElementById('reveal-path-btn').style.display = 'inline-block';
-        renderM3Grid(false, firstErrorIdx);
+        renderM2Grid(false, firstErrorIdx);
         updateScore(-5);
       }
     }
 
-    function revealCorrectM3Path() {
-      renderM3Grid(true);
-      document.getElementById('m3-feedback').innerText = 'Green cells show the correct expected path!';
+    function revealCorrectM2Path() {
+      renderM2Grid(true);
+      document.getElementById('m2-feedback').innerText = 'Green cells show the correct expected path!';
     }
 
-    // Init App
+    // Inicialización predeterminada
     initMode1();
   </script>
 </body>
