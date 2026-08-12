@@ -7,17 +7,27 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbwF3WTRVnPXfqjYm7Q8aExd
 /**
  * APP ORQUESTADOR Y CHAT P2P
  */
+
 const API = {
   async call(action, payload = {}) {
     payload.action = action;
     try {
+      console.log(`[Enviando a GAS] Acción: ${action}...`);
+      
       const res = await fetch(GAS_URL, {
         method: 'POST',
-        body: JSON.stringify(payload)
+        // 'text/plain' evita el bloqueo de CORS del navegador
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+        body: JSON.stringify(payload),
+        redirect: "follow" // CRUCIAL: Obliga al navegador a seguir a Google
       });
-      return await res.json();
+      
+      const data = await res.json();
+      console.log(`[Respuesta de GAS] Acción: ${action}`, data);
+      return data;
+      
     } catch (e) {
-      console.error("API Error:", e);
+      console.error("[Error Crítico con GAS]:", e);
       return null;
     }
   }
