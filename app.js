@@ -66,27 +66,43 @@ const App = {
     this.loadRooms();
   },
 
-  async loadRooms() {
+   async loadRooms() {
+    this.notify("Buscando salas disponibles..."); // Letrero visual
+    
     const res = await API.call('listRooms');
     const container = document.getElementById('rooms-list');
     container.innerHTML = '';
 
+    // Verificamos si hay salas en la respuesta de GAS
     if (res && res.rooms && res.rooms.length > 0) {
-      res.rooms.forEach(roomId => {
+      res.rooms.forEach(room => {
         const btn = document.createElement('button');
         btn.className = 'room-btn';
-        btn.innerHTML = `<b>Sala #${roomId}</b>`;
-        btn.onclick = () => this.joinRoom(roomId, roomId); 
+        // Aquí extraemos correctamente el ID que nos manda el servidor
+        btn.innerHTML = `<b>Sala #${room.id}</b>`;
+        
+        // Nos unimos enviando el ID de la sala y el ID de su creador real
+        btn.onclick = () => this.joinRoom(room.id, room.creatorId); 
         container.appendChild(btn);
       });
+      this.notify("Salas actualizadas");
     } else {
       container.innerHTML = '<i>No hay salas activas. ¡Crea una!</i>';
     }
   },
 
   async createRoom() {
-    const roomId = Math.floor(1000 + Math.random() * 9000).toString();
-    this.joinRoom(roomId, this.myProfile.id);
+    this.notify("Creando sala pública..."); // Letrero visual
+    
+    // AHORA SÍ LE AVISAMOS A GAS QUE CREE LA SALA
+    const res = await API.call('createRoom', { creatorId: this.myProfile.id });
+    
+    // Si GAS responde que todo salió bien y nos da el ID oficial:
+    if (res && res.status === 'ok' && res.room) {
+      this.joinRoom(res.room.id, this.myProfile.id);
+    } else {
+      this.notify("Error de red: No se pudo crear la sala en el servidor.");
+    }
   },
 
   async joinRoom(roomId, hostId) {
