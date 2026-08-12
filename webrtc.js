@@ -1,5 +1,5 @@
 /**
- * P2P SWARM ENGINE + DATA CHANNELS CHAT
+ * P2P SWARM ENGINE + DATA CHANNELS CHAT (CONSOLIDADOS)
  */
 const SwarmEngine = {
   myId: null,
@@ -19,6 +19,20 @@ const SwarmEngine = {
     this.localStream = stream;
   },
 
+  // Función rescatada de tu código original
+  waitForICE(pc) {
+    return new Promise((resolve) => {
+      if (pc.iceGatheringState === 'complete') return resolve();
+      const timer = setTimeout(() => resolve(), 3000);
+      pc.onicegatheringstatechange = () => {
+        if (pc.iceGatheringState === 'complete') {
+          clearTimeout(timer);
+          resolve();
+        }
+      };
+    });
+  },
+
   async joinRoom(roomId, initialHostId) {
     this.roomId = roomId;
     this.hostId = initialHostId;
@@ -33,6 +47,7 @@ const SwarmEngine = {
   },
 
   async createPeerConnection(peerId, isInitiator, signalingRoute = 'in-band') {
+    console.log(`Creando túnel hacia ${peerId}...`);
     const pc = new RTCPeerConnection(this.config);
     this.peers[peerId] = pc;
     
@@ -48,9 +63,7 @@ const SwarmEngine = {
       pc.ondatachannel = (e) => this.setupDataChannel(peerId, e.channel);
     }
 
-    pc.onicecandidate = (e) => {
-      if (e.candidate) this.routeSignal(peerId, { type: 'ice', candidate: e.candidate }, signalingRoute);
-    };
+    // ELIMINADO: pc.onicecandidate (para no saturar el servidor)
 
     pc.ontrack = (e) => App.playAudio(peerId, e.streams[0]);
 
@@ -67,6 +80,9 @@ const SwarmEngine = {
     if (isInitiator) {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
+      
+      // ESPERAMOS a tener toda la info de red (Tu lógica original)
+      await this.waitForICE(pc); 
       this.routeSignal(peerId, { type: 'offer', sdp: pc.localDescription }, signalingRoute);
     }
     return pc;
@@ -78,10 +94,8 @@ const SwarmEngine = {
     
     dc.onmessage = async (e) => {
       const msg = JSON.parse(e.data);
-      if (['offer', 'answer', 'ice'].includes(msg.type)) {
+      if (['offer', 'answer'].includes(msg.type)) {
         await this.handleWebRTCSignal(peerId, msg);
-      } else if (msg.type === 'connect_to') {
-        this.createPeerConnection(msg.targetId, true, 'in-band');
       } else if (msg.type === 'chat_text') {
         App.appendChatMessage(peerId, msg.text);
       } else if (msg.type === 'chat_file') {
@@ -113,11 +127,12 @@ const SwarmEngine = {
       await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
+      
+      // ESPERAMOS a tener toda la info de red
+      await this.waitForICE(pc);
       this.routeSignal(fromPeerId, { type: 'answer', sdp: pc.localDescription }, 'in-band');
     } else if (signal.type === 'answer') {
       await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
-    } else if (signal.type === 'ice') {
-      await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
     }
   },
 
