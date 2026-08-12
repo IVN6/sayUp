@@ -1,35 +1,22 @@
 /**
- * P2P SWARM ENGINE - Arquitectura Indestructible
- * Cero dependencia de servidor una vez conectado.
+ * P2P SWARM ENGINE + DATA CHANNELS CHAT
  */
-
 const SwarmEngine = {
   myId: null,
-  myRole: 'listener', // 'host', 'speaker', 'listener'
+  myRole: 'listener',
   hostId: null,
   roomId: null,
-  
-  peers: {},          // Conexiones WebRTC activas
-  dataChannels: {},   // Canales de texto de ultra-baja latencia
-  
+  peers: {},
+  dataChannels: {},
   localStream: null,
-  
-  // Variables de resiliencia
   isPolling: false,
   pollTimer: null,
-  connectedPeersList: [], // Para saber quién hereda si el Host muere
+  connectedPeersList: [],
+  config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] },
 
-  config: { 
-    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] 
-  },
-
-  // ---------------------------------------------------------
-  // 1. INICIO Y ENTRADA A LA SALA
-  // ---------------------------------------------------------
-  
   async init(myUserId, stream = null) {
     this.myId = myUserId;
-    this.localStream = stream; // Puede ser null si entra como oyente puro
+    this.localStream = stream;
   },
 
   async joinRoom(roomId, initialHostId) {
@@ -37,121 +24,84 @@ const SwarmEngine = {
     this.hostId = initialHostId;
 
     if (this.myId === this.hostId) {
-      // SOY EL CREADOR: Empiezo a vigilar la puerta (GAS)
       this.myRole = 'host';
-      this.connectedPeersList.push(this.myId);
+      this.connectedPeersList = [this.myId];
       this.startHostPolling();
-      console.log("👑 Soy el Host. Vigilando la entrada...");
     } else {
-      // SOY INVITADO: Toco la puerta del Host por GAS una única vez
-      console.log(`🚪 Tocando la puerta del Host (${this.hostId})...`);
       await this.createPeerConnection(this.hostId, true, 'gas');
     }
   },
-
-  // ---------------------------------------------------------
-  // 2. FÁBRICA DE CONEXIONES Y CANALES DE DATOS
-  // ---------------------------------------------------------
 
   async createPeerConnection(peerId, isInitiator, signalingRoute = 'in-band') {
     const pc = new RTCPeerConnection(this.config);
     this.peers[peerId] = pc;
     
-    // Mantenemos una lista ordenada para el Handover (Resiliencia)
     if (!this.connectedPeersList.includes(peerId)) {
       this.connectedPeersList.push(peerId);
-      this.connectedPeersList.sort(); // Orden alfabético simple para determinismo
+      this.connectedPeersList.sort();
     }
 
-    // --- MAGIA: DATA CHANNELS (El túnel secreto) ---
     if (isInitiator) {
-      const dc = pc.createDataChannel("swarm-signaling");
+      const dc = pc.createDataChannel("swarm-chat");
       this.setupDataChannel(peerId, dc);
     } else {
-      pc.ondatachannel = (event) => this.setupDataChannel(peerId, event.channel);
+      pc.ondatachannel = (e) => this.setupDataChannel(peerId, e.channel);
     }
 
-    // Enviar ICE Candidates por la ruta adecuada
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        this.routeSignal(peerId, { type: 'ice', candidate: event.candidate }, signalingRoute);
-      }
+    pc.onicecandidate = (e) => {
+      if (e.candidate) this.routeSignal(peerId, { type: 'ice', candidate: e.candidate }, signalingRoute);
     };
 
-    // Recibir Audio y Retransmitir (CASCADA / ÁRBOL)
-    pc.ontrack = (event) => {
-      console.log(`🔊 Audio recibido de ${peerId}`);
-      App.playAudio(peerId, event.streams[0]);
+    pc.ontrack = (e) => App.playAudio(peerId, e.streams[0]);
 
-      // Si soy un nodo del árbol con "hijos" asignados, les retransmito este track
-      this.forwardStreamToChildren(event.streams[0]);
-    };
-
-    // Monitoreo de latidos (Caídas de red)
     pc.oniceconnectionstatechange = () => {
       if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
         this.handlePeerDrop(peerId);
       }
     };
 
-    // Si inyectamos audio propio
     if (this.localStream) {
-      this.localStream.getTracks().forEach(track => pc.addTrack(track, this.localStream));
+      this.localStream.getTracks().forEach(t => pc.addTrack(t, this.localStream));
     }
 
-    // Crear oferta si somos los que iniciamos
     if (isInitiator) {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       this.routeSignal(peerId, { type: 'offer', sdp: pc.localDescription }, signalingRoute);
     }
-
     return pc;
   },
 
   setupDataChannel(peerId, dc) {
     this.dataChannels[peerId] = dc;
-    dc.onopen = () => console.log(`⚡ DataChannel abierto con ${peerId}`);
+    dc.onopen = () => App.notify(`Conectado P2P con ${peerId}`);
     
-    dc.onmessage = async (event) => {
-      const msg = JSON.parse(event.data);
-      
-      // Señalización WebRTC que no pasa por GAS
+    dc.onmessage = async (e) => {
+      const msg = JSON.parse(e.data);
       if (['offer', 'answer', 'ice'].includes(msg.type)) {
         await this.handleWebRTCSignal(peerId, msg);
-      }
-      // El Host nos ordena conectarnos con alguien nuevo
-      else if (msg.type === 'connect_to') {
-        console.log(`🔗 El Host me ordenó conectarme a ${msg.targetId}`);
+      } else if (msg.type === 'connect_to') {
         this.createPeerConnection(msg.targetId, true, 'in-band');
-      }
-      // Sincronización del estado de la sala
-      else if (msg.type === 'swarm_state') {
-        this.connectedPeersList = msg.peersList;
+      } else if (msg.type === 'chat_text') {
+        App.appendChatMessage(peerId, msg.text);
+      } else if (msg.type === 'chat_file') {
+        App.appendChatMessage(peerId, msg.fileName, msg.fileType, msg.fileData);
       }
     };
   },
 
-  // ---------------------------------------------------------
-  // 3. ENRUTADOR DE SEÑALES (GAS vs IN-BAND)
-  // ---------------------------------------------------------
+  broadcastData(payload) {
+    const str = JSON.stringify(payload);
+    Object.values(this.dataChannels).forEach(dc => {
+      if (dc && dc.readyState === 'open') dc.send(str);
+    });
+  },
 
   routeSignal(toPeerId, signalData, route) {
     if (route === 'gas') {
-      // Solo se usa al entrar a la sala por primera vez
-      API.call('sendSignal', { fromPeerId: this.myId, toPeerId: toPeerId, signal: signalData });
-    } else {
-      // In-Band: Súper rápido, 0 peticiones al servidor. Pasa por el DataChannel
-      if (this.dataChannels[toPeerId] && this.dataChannels[toPeerId].readyState === 'open') {
-        this.dataChannels[toPeerId].send(JSON.stringify(signalData));
-      } else {
-        // Si el canal directo no está abierto, usamos al Host como router
-        if (this.hostId !== this.myId && this.dataChannels[this.hostId]) {
-           this.dataChannels[this.hostId].send(JSON.stringify({
-             type: 'relay', targetId: toPeerId, signal: signalData
-           }));
-        }
-      }
+      API.call('sendSignal', { roomId: this.roomId, fromPeerId: this.myId, toPeerId: toPeerId, signal: signalData });
+    } else if (this.dataChannels[toPeerId] && this.dataChannels[toPeerId].readyState === 'open') {
+      this.dataChannels[toPeerId].send(JSON.stringify(signalData));
     }
   },
 
@@ -164,18 +114,12 @@ const SwarmEngine = {
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
       this.routeSignal(fromPeerId, { type: 'answer', sdp: pc.localDescription }, 'in-band');
-    } 
-    else if (signal.type === 'answer') {
+    } else if (signal.type === 'answer') {
       await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
-    } 
-    else if (signal.type === 'ice') {
+    } else if (signal.type === 'ice') {
       await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
     }
   },
-
-  // ---------------------------------------------------------
-  // 4. LÓGICA DEL HOST Y AUTO-REPARACIÓN (RESILIENCIA)
-  // ---------------------------------------------------------
 
   startHostPolling() {
     this.isPolling = true;
@@ -184,103 +128,29 @@ const SwarmEngine = {
 
   async pollLoop() {
     if (!this.isPolling) return;
-    
-    const res = await API.call('getSignals', { myPeerId: this.myId });
+    const res = await API.call('getSignals', { roomId: this.roomId, myPeerId: this.myId });
     if (res && res.signals && res.signals.length > 0) {
       for (let item of res.signals) {
-        // Alguien nuevo tocó la puerta mediante GAS
         await this.handleWebRTCSignal(item.fromPeerId, item.signal);
-        
-        // Una vez conectado con el nuevo, el Host le presenta a los demás
-        this.onNewPeerJoined(item.fromPeerId);
       }
     }
-    // El host vigila la puerta cada 5 segundos. Nadie más hace esto.
-    this.pollTimer = setTimeout(() => this.pollLoop(), 5000);
+    this.pollTimer = setTimeout(() => this.pollLoop(), 4000);
   },
 
-  onNewPeerJoined(newPeerId) {
-    // Sincroniza la lista global para todos
-    this.broadcastToSwarm({ type: 'swarm_state', peersList: this.connectedPeersList });
-
-    // Aquí decides la topología:
-    // Si es un hablante (MESH): Dile a todos los hablantes actuales que se conecten con él.
-    // Si es un oyente (TREE): Búscale un padre con menos de 3 hijos.
-    
-    const isSpeaker = true; // Lógica que viene de la UI
-
-    if (isSpeaker) {
-      for (let existingPeer of this.connectedPeersList) {
-        if (existingPeer !== newPeerId && existingPeer !== this.myId) {
-          // Le ordena por DataChannel interno al nuevo que se conecte al existente
-          this.dataChannels[newPeerId].send(JSON.stringify({
-            type: 'connect_to', targetId: existingPeer
-          }));
-        }
-      }
-    } else {
-      // TODO: Asignar un nodo padre para la topología de árbol
-    }
-  },
-
-  broadcastToSwarm(messageObj) {
-    const msgStr = JSON.stringify(messageObj);
-    Object.values(this.dataChannels).forEach(dc => {
-      if (dc.readyState === 'open') dc.send(msgStr);
-    });
-  },
-
-  // --- HOST HANDOVER (LA CORONA CAYÓ) ---
   handlePeerDrop(deadPeerId) {
-    console.warn(`☠️ Conexión perdida con ${deadPeerId}`);
     if (this.peers[deadPeerId]) {
       this.peers[deadPeerId].close();
       delete this.peers[deadPeerId];
       delete this.dataChannels[deadPeerId];
     }
-    
-    // Lo sacamos de la lista
     this.connectedPeersList = this.connectedPeersList.filter(id => id !== deadPeerId);
-
-    // ¿Era el Host quien murió?
-    if (deadPeerId === this.hostId) {
-      console.error("🚨 EL HOST HA CAÍDO. INICIANDO PROTOCOLO DE HERENCIA.");
-      this.electNewHost();
-    }
   },
 
-  electNewHost() {
-    // Como todos tienen la misma lista ordenada (`connectedPeersList`), 
-    // todos llegarán a la misma conclusión sin tener que hablar con un servidor.
-    const newHostId = this.connectedPeersList[0]; 
-    
-    this.hostId = newHostId;
-    console.log(`👑 El nuevo Host indiscutible es: ${newHostId}`);
-
-    if (this.myId === newHostId) {
-      this.myRole = 'host';
-      console.log("¡Yo soy el nuevo Host! Tomando control de la puerta principal.");
-      // Actualizamos GAS para que las nuevas personas nos busquen a nosotros
-      API.call('updateHost', { roomId: this.roomId, newHostId: this.myId });
-      this.startHostPolling();
-    }
-  },
-
-  // ---------------------------------------------------------
-  // 5. CASCADA DE AUDIO (TREE TOPOLOGY)
-  // ---------------------------------------------------------
-  forwardStreamToChildren(stream) {
-    // Si somos un nodo intermedio, agarramos el stream del Host 
-    // y lo inyectamos en la conexión de nuestros "hijos" oyentes.
-    const myChildren = []; // Array de IDs asignados a mí por el Host
-    
-    myChildren.forEach(childId => {
-      if (this.peers[childId]) {
-        stream.getTracks().forEach(track => {
-           this.peers[childId].addTrack(track, stream);
-        });
-      }
-    });
+  stop() {
+    this.isPolling = false;
+    clearTimeout(this.pollTimer);
+    Object.values(this.peers).forEach(pc => pc.close());
+    this.peers = {};
+    this.dataChannels = {};
   }
 };
-    
