@@ -12,26 +12,20 @@ const API = {
   async call(action, payload = {}) {
     payload.action = action;
     try {
-      console.log(`[Enviando a GAS] Acción: ${action}...`);
-      
-      const res = await fetch(GAS_URL, {
-        method: 'POST',
-        // 'text/plain' evita el bloqueo de CORS del navegador
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-        body: JSON.stringify(payload),
-        redirect: "follow" // CRUCIAL: Obliga al navegador a seguir a Google
+      console.log(`[GAS] Ejecutando: ${action}...`);
+      // Volvemos a tu fetch original: sin headers extraños ni redirect: "follow"
+      const res = await fetch(GAS_URL, { 
+        method: 'POST', 
+        body: JSON.stringify(payload) 
       });
-      
-      const data = await res.json();
-      console.log(`[Respuesta de GAS] Acción: ${action}`, data);
-      return data;
-      
-    } catch (e) {
-      console.error("[Error Crítico con GAS]:", e);
+      return await res.json();
+    } catch (err) {
+      console.error("Error HTTP:", err.toString());
       return null;
     }
   }
 };
+
 
 const App = {
   myProfile: null,
