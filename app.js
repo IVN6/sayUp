@@ -60,23 +60,21 @@ const App = {
     this.loadRooms();
   },
 
-   async loadRooms() {
-    this.notify("Buscando salas disponibles..."); // Letrero visual
-    
+     async loadRooms() {
+    this.notify("Buscando salas..."); 
     const res = await API.call('listRooms');
     const container = document.getElementById('rooms-list');
     container.innerHTML = '';
 
-    // Verificamos si hay salas en la respuesta de GAS
+    // Tu servidor envía un array simple (ej: ["2345", "6789"])
     if (res && res.rooms && res.rooms.length > 0) {
-      res.rooms.forEach(room => {
+      res.rooms.forEach(roomId => {
         const btn = document.createElement('button');
         btn.className = 'room-btn';
-        // Aquí extraemos correctamente el ID que nos manda el servidor
-        btn.innerHTML = `<b>Sala #${room.id}</b>`;
+        btn.innerHTML = `<b>Sala #${roomId}</b>`;
         
-        // Nos unimos enviando el ID de la sala y el ID de su creador real
-        btn.onclick = () => this.joinRoom(room.id, room.creatorId); 
+        // Usamos tu lógica original: el ID es el protagonista
+        btn.onclick = () => this.joinRoom(roomId, roomId); 
         container.appendChild(btn);
       });
       this.notify("Salas actualizadas");
@@ -86,17 +84,12 @@ const App = {
   },
 
   async createRoom() {
-    this.notify("Creando sala pública..."); // Letrero visual
+    // Volvemos a tu método funcional: Generar ID local y entrar directo
+    const newRoomId = Math.floor(1000 + Math.random() * 9000).toString();
+    this.notify("Entrando a sala #" + newRoomId); 
     
-    // AHORA SÍ LE AVISAMOS A GAS QUE CREE LA SALA
-    const res = await API.call('createRoom', { creatorId: this.myProfile.id });
-    
-    // Si GAS responde que todo salió bien y nos da el ID oficial:
-    if (res && res.status === 'ok' && res.room) {
-      this.joinRoom(res.room.id, this.myProfile.id);
-    } else {
-      this.notify("Error de red: No se pudo crear la sala en el servidor.");
-    }
+    // Al usar joinRoom con un ID nuevo, tu servidor la registra automáticamente
+    this.joinRoom(newRoomId, this.myProfile.id);
   },
 
   async joinRoom(roomId, hostId) {
