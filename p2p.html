@@ -5,30 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>P2P LangApp MVP</title>
   <style>
-    :root { --bg: #121212; --card: #1e1e1e; --primary: #00ff88; --text: #ffffff; }
-    body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+    :root { --bg: #121212; --card: #1e1e1e; --primary: #00ff88; --text: #ffffff; --nav-bg: #1a1a1a; }
+    body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 80px; }
     .view { display: none; max-width: 600px; margin: 0 auto; }
     .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
     input { width: 90%; padding: 12px; margin-bottom: 10px; background: #2a2a2a; border: none; color: white; border-radius: 6px; }
     button { background: var(--primary); color: #000; font-weight: bold; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.2s; }
     button:hover { opacity: 0.8; }
     
-    .room-card { display: block; background: #2a2a2a; margin-bottom: 10px; text-align: left; border: 1px solid #444; }
+    .room-card { display: block; background: #2a2a2a; margin-bottom: 10px; text-align: left; border: 1px solid #444; color: white; width: 100%; padding: 15px; border-radius: 8px; cursor: pointer;}
     #peers-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
     .peer-card { background: #333; padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid var(--primary); }
-    #audio-tags { display: none; } /* Ocultamos las etiquetas de audio */
+    #audio-tags { display: none; }
+
+    /* Barra de Navegación Inferior estilo App */
+    #bottom-nav {
+      display: none; /* Se oculta en el login */
+      position: fixed;
+      bottom: 0; left: 0; width: 100%;
+      background: var(--nav-bg);
+      border-top: 1px solid #333;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+    .nav-btn {
+      background: none; border: none; color: #888; font-size: 12px; cursor: pointer; text-align: center; width: auto;
+    }
+    .nav-btn.active { color: var(--primary); font-weight: bold; }
   </style>
 </head>
 <body>
 
   <!-- VISTA 1: INICIO DE SESIÓN -->
   <div id="login-view" class="view" style="display: block;">
-    <div class="card">
-      <h2>Crea tu Perfil (Local)</h2>
+    <div class="card" style="margin-top: 50px;">
+      <h2>Crea tu Perfil</h2>
       <input type="text" id="username" placeholder="Tu Nombre">
       <input type="text" id="nativeLang" placeholder="Idioma Nativo (Ej: ES)">
       <input type="text" id="learningLang" placeholder="Aprendiendo (Ej: EN)">
-      <button onclick="App.login()">Entrar</button>
+      <button onclick="App.login()">Entrar a la App</button>
     </div>
   </div>
 
@@ -39,9 +56,7 @@
       <button onclick="App.createRoom()">+ Crear Nueva Sala</button>
       <hr style="border-color: #333; margin: 20px 0;">
       <button onclick="App.loadRooms()" style="background: #444; color: white; margin-bottom: 15px;">🔄 Actualizar Lista</button>
-      <div id="rooms-list">
-        <!-- Las salas aparecerán aquí -->
-      </div>
+      <div id="rooms-list"></div>
     </div>
   </div>
 
@@ -49,19 +64,39 @@
   <div id="active-room-view" class="view">
     <div class="card">
       <h2 id="room-title">Sala</h2>
-      <button onclick="location.reload()" style="background: #ff4444;">🚪 Salir de la Sala</button>
-      <div id="peers-container">
-        <!-- Las tarjetas de los usuarios conectados aparecerán aquí -->
-      </div>
+      <button onclick="App.leaveRoom()" style="background: #ff4444;">🚪 Salir de la Sala</button>
+      <div id="peers-container"></div>
     </div>
   </div>
 
-  <!-- Contenedor invisible para los elementos de audio HTML5 -->
+  <!-- VISTA 4: MINI-JUEGOS DE INGLÉS -->
+    <!-- VISTA 4: MINI-JUEGOS DE INGLÉS -->
+  <div id="games-view" class="view">
+    <div class="card" style="padding: 10px;">
+      <h2>Minijuegos de Inglés 🎮</h2>
+      <p style="color: #aaa; padding: 0 10px;">Practica vocabulario mientras esperas gente en las salas.</p>
+      
+      <!-- Selector de juegos (si tienes varios) -->
+      <div style="display: flex; gap: 10px; padding: 0 10px; margin-bottom: 15px;">
+        <button onclick="document.getElementById('game-frame').src='prepo.html'" style="padding: 8px; font-size: 14px;">Juego 1</button>
+        <button onclick="document.getElementById('game-frame').src='c1.html'" style="padding: 8px; font-size: 14px;">Juego 2</button>
+        <button onclick="document.getElementById('game-frame').src='mytext.html'" style="padding: 8px; font-size: 14px;">Juego 2</button>
+     </div>
+
+      <!-- El Iframe que carga tus archivos limpios de la raíz -->
+      <iframe id="game-frame" src="juego1.html" style="width:100%; height:450px; border:none; border-radius:8px; background: #181818;"></iframe>
+    </div>
+  </div>
+
+  <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+  <nav id="bottom-nav">
+    <button class="nav-btn active" onclick="App.switchTab('rooms-view', this)">🏠 Salas</button>
+    <button class="nav-btn" onclick="App.switchTab('games-view', this)">🎮 Minijuegos</button>
+  </nav>
+
   <div id="audio-tags"></div>
 
-  <!-- IMPORTACIÓN DE SCRIPTS -->
   <script src="webrtc.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
-
