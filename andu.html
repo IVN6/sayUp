@@ -1,0 +1,2852 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio-First Conversation Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* === ESTILO GENERAL Y TEMA OSCURO === */
+    :root {
+      --dark-bg: #698623;
+      /* Azul muy oscuro (Fondo) #1a202c;*/
+      --primary: #2d3748;
+      /* Azul oscuro (Contenedores) */
+      --text-primary: #e2e8f0;
+      /* Texto claro */
+      --text-secondary: #a0aec0;
+      /* Texto más suave */
+      --accent: #4299e1;
+      /* Azul brillante (Botones principales) */
+      --success: #48bb78;
+      /* Verde */
+      --warning: #f6e05e;
+      /* Amarillo */
+      --danger: #f56565;
+      /* Rojo */
+      --info: #4fd1c5;
+      /* Turquesa */
+    }
+
+    /* green */
+
+
+    :root {
+      --dark-bg: #0e1926;
+      /* Fondo azul profundo */
+      --primary: #1b2e44;
+      /* Contenedores */
+      --text-primary: #eaf6ff;
+      /* Texto principal */
+      --text-secondary: #b7d3f2;
+      /* Texto secundario */
+      --accent: #4fb3ff;
+      /* Azul claro */
+      --success: #63ffc3;
+      /* Verde menta */
+      --warning: #fff275;
+      /* Amarillo pastel */
+      --danger: #ff7b7b;
+      /* Rojo coral */
+      --info: #9ad4ff;
+      /* Azul bebé */
+    }
+
+    :root {
+      --dark-bg: #2e0f0f;
+      /* Fondo vino oscuro */
+      --primary: #4c1b1b;
+      /* Contenedores */
+      --text-primary: #fff3e0;
+      /* Texto principal claro */
+      --text-secondary: #ffd6a5;
+      /* Texto suave cálido */
+      --accent: #ff914d;
+      /* Naranja brillante */
+      --success: #ffe45c;
+      /* Amarillo sol */
+      --warning: #ffac33;
+      /* Naranja suave */
+      --danger: #ff5f5f;
+      /* Rojo coral */
+      --info: #ffcd94;
+      /* Melocotón claro */
+    }
+
+    :root {
+      --dark-bg: #0d4220;
+      --primary: #14532d;
+      --text-primary: #eafdea;
+      --text-secondary: #a3f7b5;
+      --accent: #a4e869;
+      --success: #67ff8a;
+      --warning: #e6ff7e;
+      --danger: #ff7878;
+      --info: #7affc9;
+    }
+
+    :root {
+      --dark-bg: #050914;
+      /* Fondo negro azulado */
+      --primary: #0f172a;
+      /* Contenedor oscuro */
+      --text-primary: #e2e8f0;
+      /* Texto gris claro */
+      --text-secondary: #94a3b8;
+      /* Texto gris azulado */
+      --accent: #00ffff;
+      /* Cian neón */
+      --success: #00ff99;
+      /* Verde neón */
+      --warning: #ffee58;
+      /* Amarillo neón */
+      --danger: #ff4d6d;
+      /* Rosa fuerte */
+      --info: #66ccff;
+      /* Azul cielo */
+    }
+
+    :root {
+      --dark-bg: #1a1125;
+      /* Fondo morado oscuro */
+      --primary: #2e0f4c;
+      /* Contenedores */
+      --text-primary: #f5eaff;
+      /* Texto principal claro */
+      --text-secondary: #d3b9ff;
+      /* Texto secundario suave */
+      --accent: #b764ff;
+      /* Morado neón */
+      --success: #8effd6;
+      /* Verde menta */
+      --warning: #ffd46b;
+      /* Amarillo cálido */
+      --danger: #ff6b9a;
+      /* Rosa fuerte */
+      --info: #7aa0ff;
+      /* Azul lavanda */
+    }
+
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--dark-bg);
+      color: var(--text-primary);
+      /* Dejar espacio para los controles fijos de abajo y arriba */
+      padding-bottom: 100px;
+      padding-top: 70px;
+    }
+
+    #app-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .container {
+      border: 1px solid #4a5568;
+      padding: 1.5rem;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      background-color: var(--primary);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 5px;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #4a5568;
+      margin: 25px 0;
+    }
+
+    /* === CONTROLES GLOBALES (FIJOS ARRIBA) === */
+    .global-controls {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px;
+      z-index: 1000;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .control-group {
+      display: flex;
+      gap: 5px;
+    }
+
+    .btn-accent,
+    .btn-mode-toggle {
+      background-color: #4a5568;
+      color: var(--text-primary);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-accent:hover,
+    .btn-mode-toggle:hover {
+      background-color: #718096;
+    }
+
+    .btn-accent.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .btn-mode-toggle.simple {
+      background-color: var(--info);
+      color: var(--dark-bg);
+      font-weight: bold;
+    }
+
+    .btn-mode-toggle.sophisticated {
+      background-color: var(--warning);
+      color: var(--dark-bg);
+      font-weight: bold;
+    }
+
+
+    /* === BOTONES GENERALES === */
+    button {
+      font-family: inherit;
+      padding: 10px 15px;
+      margin: 5px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-principal {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    .btn-principal:hover {
+      background-color: #63b3ed;
+    }
+
+    .btn-interaccion {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-interaccion:hover {
+      background-color: #68d391;
+    }
+
+    .btn-aclarar {
+      background-color: var(--warning);
+      color: var(--dark-bg);
+    }
+
+    .btn-aclarar:hover {
+      background-color: #fce98f;
+    }
+
+    .btn-finalizar {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-finalizar:hover {
+      background-color: #f87f7f;
+    }
+
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+      background-color: #718096;
+      color: var(--text-primary);
+    }
+
+    .btn-small:hover {
+      background-color: #a0aec0;
+    }
+
+    /* === BOTÓN ESPECIAL "FIND NEW PERSON" === */
+    .btn-find-new {
+      background: linear-gradient(145deg, var(--accent), #3182ce);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 20px 30px;
+      border-radius: 50px;
+      /* Redondo */
+      width: 80%;
+      max-width: 300px;
+      box-shadow: 0 10px 20px rgba(66, 153, 225, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .btn-find-new:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 25px rgba(66, 153, 225, 0.6);
+    }
+
+    /* === ESTILO "AUDIO-FIRST" === */
+    .dialogo-box {
+      background-color: #2d3748;
+      /* Fondo igual al contenedor */
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #4a5568;
+    }
+
+    /* La respuesta simulada del usuario */
+    .user-response {
+      background-color: #2c5282;
+      /* Un azul más profundo */
+      border-color: var(--accent);
+    }
+
+    .btn-see-text {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    .text-content {
+      padding-top: 10px;
+      margin-top: 10px;
+      border-top: 1px dashed #4a5568;
+      color: var(--text-secondary);
+      /* Texto revelado es más suave */
+    }
+
+    .text-content p {
+      margin: 5px 0;
+      color: var(--text-primary);
+      /* Párrafo principal con color normal */
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+
+    /* === ESTUDIO DE RESPUESTAS === */
+    #respuestas-posibles-container {
+      border: 1px dashed var(--accent);
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #262f3e;
+    }
+
+    .respuesta-posible {
+      padding: 8px;
+      border-bottom: 1px solid #4a5568;
+      color: var(--text-secondary);
+    }
+
+    .respuesta-posible:last-child {
+      border-bottom: none;
+    }
+
+
+    /* === CONTROLES FIJOS (FOOTER) === */
+    #footer-controls {
+      position: fixed;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      background-color: var(--primary);
+      box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 3px 5px;
+      border-top: 2px solid var(--accent);
+      z-index: 1000;
+    }
+
+    .btn-footer-action {
+      font-size: 1.8rem;
+      /* Emojis grandes */
+      padding: 15px;
+      margin: 3px 2px 74px 20px;
+      border-radius: 50%;
+      /* Botones redondos */
+      width: 70px;
+      height: 70px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 3px solid transparent;
+    }
+
+    /* Colores para los botones fijos */
+    .btn-footer-action.continue {
+      background-color: var(--success);
+      color: white;
+      border-color: #2f855a;
+    }
+
+    .btn-footer-action.continue-neutral {
+      background-color: var(--info);
+      color: var(--dark-bg);
+      border-color: #2c7a7b;
+    }
+
+    .btn-footer-action.clarify {
+      background-color: var(--warning);
+      color: var(--dark-bg);
+      border-color: #c05621;
+    }
+
+    .btn-footer-action.finalize {
+      background-color: var(--danger);
+      color: white;
+      border-color: #c53030;
+    }
+
+    .btn-footer-action:hover {
+      transform: scale(1.1);
+      border-color: white;
+    }
+
+    /* === ESTILO DEL MODAL DE TRADUCCIÓN (TECNOLÓGICO / GAMIFICADO) === */
+
+    /* Estilo para el contenedor principal del modal (Overlay) */
+    .modal {
+      /* Por defecto, está oculto */
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      /* Fondo oscuro semi-transparente con más opacidad */
+      background-color: rgba(0, 0, 0, 0.7);
+      overflow: auto;
+      /* Efecto de desenfoque ligero para un look futurista */
+      backdrop-filter: blur(4px);
+    }
+
+    /* Contenido del modal (Panel de Interfaz) */
+    .modal-content {
+      /* Usamos los colores del tema oscuro */
+      background-color: var(--primary);
+      color: var(--text-primary);
+
+      margin: 10% auto;
+      padding: 30px;
+
+      /* Borde distintivo con el color de acento */
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+
+      width: 85%;
+      max-width: 550px;
+      position: relative;
+
+      /* Sombra exterior que imita un resplandor (glow) del acento azul */
+      box-shadow:
+        0 0 5px var(--accent),
+        0 0 20px rgba(66, 153, 225, 0.4),
+        0 10px 30px rgba(0, 0, 0, 0.8);
+
+      /* Propiedades de transición base */
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+
+    /* Animación de entrada: se activa cuando se añade la clase 'open' */
+    .modal-content.open {
+      animation: fadeInScale 0.3s ease-out;
+    }
+
+    /* Definición de la animación */
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+
+    /* Botón de cierre */
+    .close-btn {
+      color: var(--text-secondary);
+      float: right;
+      font-size: 32px;
+      font-weight: lighter;
+      line-height: 1;
+      position: absolute;
+      top: 15px;
+      right: 25px;
+      transition: color 0.2s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: var(--danger);
+      text-decoration: none;
+      transform: rotate(90deg);
+    }
+
+    /* Nuevo: Estilo para el título dentro del modal */
+    .modal h3 {
+      color: var(--info);
+      border-bottom: 2px solid var(--info);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-shadow: 0 0 5px rgba(79, 209, 197, 0.5);
+    }
+
+    /* Contenedor del contenido de la traducción */
+    #translation-content {
+      /* Reseteamos el padding-top si el h3 ya tiene buen margen */
+      padding-top: 0;
+    }
+
+    /* Opcional: Estilo para los inputs dentro del modal */
+    .modal input[type="text"],
+    .modal textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #4a5568;
+      background-color: #262f3e;
+      /* Más oscuro que el fondo del modal */
+      color: var(--text-primary);
+      border-radius: 6px;
+      box-sizing: border-box;
+      /* Asegura que el padding no cambie el ancho */
+    }
+
+    #btn-accent-uk {
+      display: none;
+    }
+
+    #btn-slow-mo {
+      display: none;
+    }
+
+    /* === SECCIÓN DE RESULTADOS Y RECOMPENSAS === */
+    #fin-container {
+      background-color: var(--primary);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      color: var(--text-primary);
+      margin-top: 40px;
+      box-shadow: 0 0 20px rgba(66, 153, 225, 0.3);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    #fin-container h2 {
+      color: var(--accent);
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    #fin-container h3 {
+      color: var(--info);
+      margin-top: 15px;
+      font-size: 1.3rem;
+    }
+
+    #fin-container p {
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 10px 0;
+    }
+
+    /* === BLOQUE DE RECOMPENSA === */
+    .reward-box {
+      background: linear-gradient(145deg, #2d3748, #1a202c);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+      box-shadow: 0 0 10px rgba(66, 153, 225, 0.2);
+    }
+
+    /* === TEXTO DE "DESBLOQUEADO" === */
+    .unlock {
+      background: linear-gradient(90deg, #ffd700, #ffa500);
+      /* De dorado a naranja */
+      color: #230f7c;
+      /* Texto oscuro para contraste */
+      font-weight: bold;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      display: inline-block;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+      font-size: 1.1rem;
+      text-shadow: 0 0 5px rgba(31, 30, 30, 0.4);
+    }
+
+    /* === BLOQUE DE TAREA DEL DÍA === */
+    .daily-task {
+      background: rgba(72, 187, 120, 0.1);
+      border: 1px solid var(--success);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      text-align: left;
+      color: var(--text-primary);
+      box-shadow: inset 0 0 8px rgba(72, 187, 120, 0.3);
+    }
+
+    .daily-task h4 {
+      color: var(--success);
+      margin-bottom: 8px;
+    }
+
+    .daily-task p {
+      color: var(--text-secondary);
+    }
+
+    /* === ANIMACIÓN DE ENTRADA === */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* === MINI FORMULARIO MODAL === */
+
+    #overlay-mini-form {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 5, 20, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(6px);
+      animation: fadeIn 0.3s ease;
+    }
+
+    /* Contenedor principal */
+    #mini-form {
+      background-color: var(--primary);
+      color: var(--text-primary);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      text-align: center;
+      width: 320px;
+      padding: 2rem;
+      box-shadow: 0 0 25px rgba(183, 100, 255, 0.4);
+      position: relative;
+      animation: popIn 0.3s ease;
+    }
+
+    /* Botón cerrar (la “X”) */
+    #cerrar-mini-form {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 22px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    #cerrar-mini-form:hover {
+      color: var(--danger);
+    }
+
+    /* Inputs */
+    #mini-form input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid var(--accent);
+      background-color: var(--dark-bg);
+      color: var(--text-primary);
+      margin-top: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    #mini-form input:focus {
+      border-color: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    /* Botón principal */
+    #btn-guardar {
+      margin-top: 1rem;
+      background: linear-gradient(135deg, var(--accent), var(--info));
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    #btn-guardar:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px rgba(183, 100, 255, 0.6);
+    }
+
+    /* Mensaje de error */
+    #msg-error {
+      color: var(--danger);
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Animaciones suaves */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* === CONTENEDOR GENERAL === */
+    .ranking-container {
+
+      background: var(--primary);
+      color: var(--text-primary);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+      box-shadow: 0 0 15px rgba(183, 100, 255, 0.2);
+    }
+
+    /* === TITULO === */
+    .ranking-container h2 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    :root {
+      --dark-bg: #1a1125;
+      --primary: #2e0f4c;
+      --text-primary: #f5eaff;
+      --text-secondary: #d3b9ff;
+      --accent: #b764ff;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+    }
+
+    /* === CONTENEDOR GENERAL === */
+    .ranking-container {
+      background: var(--primary);
+      color: var(--text-primary);
+      border-radius: 14px;
+      padding: 25px;
+      margin-top: 30px;
+      box-shadow: 0 0 25px rgba(183, 100, 255, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ✨ Difuminado celestial en la parte superior */
+    .ranking-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60%;
+      background: linear-gradient(to top, transparent, rgba(255, 255, 255, 0.25));
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* === TÍTULO === */
+    .ranking-container h2 {
+      text-align: center;
+      color: var(--gold);
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      margin-bottom: 25px;
+      font-size: 1.6rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* === PODIO (TOP 3) === */
+    .podium {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 15px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
+    }
+
+    .podium .rank {
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      width: 100px;
+      position: relative;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      color: #1a0808;
+      font-weight: bold;
+    }
+
+    .podium .rank:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+    }
+
+    /* Alturas tipo podio */
+    .podium .first {
+      height: 130px;
+    }
+
+    .podium .second {
+      height: 110px;
+    }
+
+    .podium .third {
+      height: 100px;
+    }
+
+    /* === Degradados tipo medalla === */
+    .first {
+      background: linear-gradient(180deg, #fff3b0, #ffd700, #b8860b);
+    }
+
+    .second {
+      background: linear-gradient(180deg, #f0f0f0, #c0c0c0, #7a7a7a);
+    }
+
+    .third {
+      background: linear-gradient(180deg, #ffdab9, #cd7f32, #8b4513);
+    }
+
+    /* === MEDALLAS EMOJI === */
+    .first::before {
+      content: "🥇";
+      font-size: 1.8rem;
+      position: absolute;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .second::before {
+      content: "🥈";
+      font-size: 1.6rem;
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .third::before {
+      content: "🥉";
+      font-size: 1.6rem;
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Texto dentro del podio */
+    .rank h3 {
+      margin: 8px 0 3px 0;
+      font-size: 1rem;
+    }
+
+    .rank p {
+      font-size: 0.85rem;
+    }
+
+    /* === OTROS PUESTOS === */
+    .others {
+      margin-top: 25px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .others .rank {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 10px 15px;
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-primary);
+      box-shadow: inset 0 0 10px rgba(183, 100, 255, 0.15);
+    }
+
+    /* === RESPONSIVO === */
+    @media (max-width: 600px) {
+      .podium {
+        gap: 10px;
+      }
+
+      .podium .rank {
+        width: 80px;
+        padding: 10px;
+      }
+
+      .podium .first {
+        height: 110px;
+      }
+
+      .podium .second {
+        height: 90px;
+      }
+
+      .podium .third {
+        height: 80px;
+      }
+
+      .ranking-container h2 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- === MINI FORMULARIO MODAL === -->
+  <div id="overlay-mini-form" style="display:none;">
+    <div id="mini-form">
+      <button id="cerrar-mini-form">&times;</button>
+      <h2>👋 Bienvenido</h2>
+      <p>Antes de comenzar, dinos tu nombre y correo:</p>
+
+      <div id="miniFormElement" autocomplete="on">
+        <input id="input-nombre" name="name" type="text" placeholder="Tu nombre" autocomplete="given-name" required>
+        <input id="input-correo" name="email" type="email" placeholder="Tu correo" autocomplete="email" required>
+        <button id="btn-guardar" >Guardar y continuar</button>
+      </div>
+
+      <p id="msg-error">Por favor, completa ambos campos.</p>
+    </div>
+  </div>
+
+
+  <div class="global-controls">
+    <div class="control-group">
+      <button id="btn-accent-us" class="btn-accent active">🇺🇸</button>
+      <button id="btn-accent-uk" class="btn-accent">🇬🇧</button>
+    </div>
+    <div class="control-group">
+      <button id="btn-slow-mo" class="btn-accent">🐢</button>
+    </div>
+    <div class="control-group">
+      <button id="btn-toggle-mode" class="btn-mode-toggle simple">Modo: Simple</button>
+    </div>
+    <div class="control-group">
+      <button id="btn-toggle-autoanswer" class="btn-mode-toggle">Auto Respuestas : off</button>
+    </div>
+  </div>
+
+
+
+  <div class="ranking-container">
+    <h2>🏆 Ranking de Rachas</h2>
+
+    <!-- === PODIO === -->
+    <div class="podium">
+      <!-- Se llena con JS -->
+    </div>
+
+    <!-- === OTROS PUESTOS === -->
+    <div class="others">
+      <!-- Se llena con JS -->
+    </div>
+  </div>
+
+
+
+  <div id="progreso-container" class="container" style="display: none;">
+    <span id="progreso">Topics: 0/0</span> |
+    <span id="aclaraciones">Clarifications: 0</span> |
+    <span id="puntuacion">Score: 0</span>
+  </div>
+
+
+<div id="inicio-container" class="container">
+    <h2>📝 Instrucciones básicas</h2>
+    <p>
+        • Sube el volumen de tu dispositivo.<br>
+        • Haz clic en <strong>“Comenzar”</strong> para iniciar.<br>
+        • Este ejercicio simula una conversación simple que deberás replicar.
+    </p>
+
+    <h2>🎯 Paso 1: Tener la iniciativa de hablar</h2>
+    
+    <button id="iniciar-btn" class="btn-principal">
+       <strong>Comenzar</strong> conversación
+    </button>
+</div>
+
+
+  <div id="conversacion-container" class="container" style="display: none;">
+    <!-- <h2>Partner (The System)</h2> -->
+ <h3 >
+        Ahora   
+         <strong>abrir</strong> y 
+        <strong>mantener la conversación</strong>.  
+        <!-- No te preocupes si es simple, la idea es ir calentando. -->
+ </h3>
+ <p class="instrucciones">
+        👉 te hablará en inglés.  
+        <br>
+        • <strong>escuchar</strong> (🔊 ),<br>
+        • <strong>traducción</strong> ( 🌐  ),<br>
+        • ✅=entendido,❓repitelo ,👋🏼terminar<strong></strong>.
+    </p>
+    <div id="abridor-texto" class="dialogo-box" style="display: none;">
+    </div>
+
+
+    <div id="abridor-opciones" style="display: none;">
+      <!-- <h3>la Response</h3> -->
+      <h3>la Respuesta si o no </h3>
+      <button id="btn-abrir-si" class="btn-interaccion">Yes, okay !</button>
+      <button id="btn-abrir-no" class="btn-finalizar">No, thanks.</button>
+    </div>
+    <div id="easyOpener" class="dialogo-box">
+      <H5>(Si prefieres este abridor más simple)</H5>
+      <H3>Hello 👋, Nice to meet you. Could we talk?
+        <button class="btn-small" onclick="speak('Hello, nice to meet you. Could we talk?',{ cancel: 1})">🔊</button>
+      </h3>
+
+      <H5> Hola 👋, gusto en conocerte. ¿Podríamos hablar?
+      </H5>
+    </div>
+
+    <hr>
+
+    <div id="dialogo" class="dialogo-box" style="display: none;"></div>
+
+    <div id="pregunta-actual" class="dialogo-box" style="display: none;"></div>
+
+    <div id="respuesta-simulada" class="dialogo-box user-response" style="display: none;"></div>
+
+
+    <!-- <button id="btn-ver-respuestas" class="btn-aclarar">Show All Possible Answers</button> -->
+    <button id="btn-ver-respuestas" class="btn-aclarar">Ver Posibles respuestas</button>
+    <br>
+    <br>
+    <div id="respuestas-posibles-container" style="display: none;">
+      <h3>Possible Answers (Study)</h3>
+      <div id="respuestas-posibles-lista">
+      </div>
+    </div>
+  </div>
+
+  <div id="fin-container" class="container" style="text-align: center; display: none;">
+  </div>
+  <!-- este vive FUERA del contenedor -->
+  <div id="formulario-wrapper" style="display:none; margin-top:10px;">
+    <iframe id="formulario" loading="lazy" style="width:100%; height:600px; border:none; border-radius:10px;"></iframe>
+  </div>
+
+  <div id="find-new-container" class="container" style="text-align: center; display: none;">
+  </div>
+
+  </div>
+  <div id="footer-controls" style="display: none;">
+    <button id="btn-continuar" class="btn-footer-action continue" title="Understood & Continue">✅</button>
+    <button id="btn-continuar-sin-entender" class="btn-footer-action continue-neutral"
+      title="Didn't Understand, but Continue">🤷‍♂️</button>
+    <button id="btn-aclarar" class="btn-footer-action clarify" title="Ask for Clarification">❓</button>
+    <button id="btn-finalizar" class="btn-footer-action finalize" title="End Conversation Casually">👋</button>
+
+  </div>
+
+  </div>
+  </div>
+
+
+  <div id="translation-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal-btn">&times;</span>
+
+      <div id="translation-content">
+      </div>
+
+
+      
+
+      <script>
+        const estudiantes = [
+          { nombre: "Mary81", dias: 7 },
+          { nombre: "AnyaForger", dias: 3 },
+          { nombre: "DanielPove", dias: 1 },
+          { nombre: "LopezFruteria", dias: 1 },
+          { nombre: "Eriannys", dias: 1 },
+          { nombre: "RebecaGarci", dias: 1 },
+          { nombre: "NohoraSalva", dias: 1 }
+        ];
+
+        const ordenados = estudiantes.sort((a, b) => b.dias - a.dias);
+        const top3 = ordenados.slice(0, 3);
+        const otros = ordenados.slice(3, 5);
+
+        const podium = document.querySelector(".podium");
+        const othersContainer = document.querySelector(".others");
+
+        podium.innerHTML = `
+    <div class="rank second">
+      <h3>2. ${top3[1].nombre}</h3>
+      <p>${top3[1].dias} días</p>
+    </div>
+    <div class="rank first">
+      <h3>1. ${top3[0].nombre}</h3>
+      <p>${top3[0].dias} días</p>
+    </div>
+    <div class="rank third">
+      <h3>3. ${top3[2].nombre}</h3>
+      <p>${top3[2].dias} días</p>
+    </div>
+  `;
+
+        othersContainer.innerHTML = otros.map((est, i) => `
+    <div class="rank">
+      <span>${i + 4}. ${est.nombre}</span>
+      <span>${est.dias} días</span>
+    </div>
+  `).join('');
+      </script>
+
+
+
+
+      <script>
+
+        // ===================================
+        // ESTRUCTURAS DE DATOS (EN INGLÉS, CON TRADUCCIÓN)
+        // ===================================
+
+        const conversationTopics = [
+          // 1. Lugar de origen
+          {
+            id: 1,
+            pregunta_simple: {
+              texto: "I'm from Colombia. Where are you from?",
+              traduccion: "Soy de Colombia. ¿De dónde eres?"
+            },
+            pregunta_sofisticada: {
+              texto: "I was born and raised in Colombia. I’ve always enjoyed meeting people from other countries. May I ask where you’re from?",
+              traduccion: "Nací y crecí en Colombia. Siempre me ha gustado conocer gente de otros países. ¿Puedo preguntarte de dónde eres?"
+            },
+            respuestasPosibles: [
+              { texto: "I'm from Argentina.", traduccion: "Soy de Argentina." },
+              { texto: "I'm from the United States.", traduccion: "Soy de Estados Unidos." },
+              { texto: "I'm from Japan.", traduccion: "Soy de Japón." }
+            ]
+          },
+
+          // 2. Edad
+          {
+            id: 2,
+            pregunta_simple: {
+              texto: "I'm 28 years old. How old are you?",
+              traduccion: "Tengo 28 años. ¿Cuántos años tienes?"
+            },
+            pregunta_sofisticada: {
+              texto: "I’m 28 now, though I still feel younger at heart. If you don’t mind me asking, how old are you?",
+              traduccion: "Tengo 28 años, aunque todavía me siento más joven de espíritu. Si no te molesta que pregunte, ¿cuántos años tienes?"
+            },
+            respuestasPosibles: [
+              { texto: "I'm 25.", traduccion: "Tengo 25." },
+              { texto: "I'm 32 years old.", traduccion: "Tengo 32 años." },
+              { texto: "I'm 40.", traduccion: "Tengo 40." }
+            ]
+          },
+
+          // 3. Lugar donde vives
+          {
+            id: 3,
+            pregunta_simple: {
+              texto: "I live in Bogotá. Where do you live?",
+              traduccion: "Vivo en Bogotá. ¿Dónde vives?"
+            },
+            pregunta_sofisticada: {
+              texto: "I live in Bogotá — it’s a lively city with a bit of everything. May I ask, where do you live?",
+              traduccion: "Vivo en Bogotá, es una ciudad animada con un poco de todo. ¿Puedo preguntarte dónde vives?"
+            },
+            respuestasPosibles: [
+              { texto: "I live in Lima.", traduccion: "Vivo en Lima." },
+              { texto: "I live in Madrid.", traduccion: "Vivo en Madrid." },
+              { texto: "I live in Toronto.", traduccion: "Vivo en Toronto." }
+            ]
+          },
+
+          // 4. Profesión
+          {
+            id: 4,
+            pregunta_simple: {
+              texto: "I work as a teacher. What do you do?",
+              traduccion: "Trabajo como profesor. ¿A qué te dedicas?"
+            },
+            pregunta_sofisticada: {
+              texto: "I’m a teacher — I really enjoy helping others learn new things. What about you, what kind of work do you do?",
+              traduccion: "Soy profesor, disfruto mucho ayudar a otros a aprender cosas nuevas. ¿Y tú, a qué te dedicas?"
+            },
+            respuestasPosibles: [
+              { texto: "I’m an engineer.", traduccion: "Soy ingeniero." },
+              { texto: "I’m a designer.", traduccion: "Soy diseñador." },
+              { texto: "I’m a student.", traduccion: "Soy estudiante." }
+            ]
+          },
+
+          // 5. Estado civil
+          {
+            id: 5,
+            pregunta_simple: {
+              texto: "I'm single. Are you married or single?",
+              traduccion: "Estoy soltero. ¿Estás casado o soltero?"
+            },
+            pregunta_sofisticada: {
+              texto: "I’m currently single, enjoying this stage of life. If it’s okay to ask, are you married or single?",
+              traduccion: "Actualmente estoy soltero, disfrutando esta etapa de la vida. Si está bien preguntar, ¿estás casado o soltero?"
+            },
+            respuestasPosibles: [
+              { texto: "I’m married.", traduccion: "Estoy casado." },
+              { texto: "I’m single too.", traduccion: "También estoy soltero." },
+              { texto: "I’m in a relationship.", traduccion: "Estoy en una relación." }
+            ]
+          },
+
+          // 6. Idiomas
+          {
+            id: 6,
+            pregunta_simple: {
+              texto: "I speak Spanish and a bit of English. What languages do you speak?",
+              traduccion: "Hablo español y un poco de inglés. ¿Qué idiomas hablas?"
+            },
+            pregunta_sofisticada: {
+              texto: "My native language is Spanish, and I’m improving my English little by little. What about you — what languages do you speak?",
+              traduccion: "Mi lengua materna es el español, y voy mejorando mi inglés poco a poco. ¿Y tú, qué idiomas hablas?"
+            },
+            respuestasPosibles: [
+              { texto: "I speak English and French.", traduccion: "Hablo inglés y francés." },
+              { texto: "Just English.", traduccion: "Solo inglés." },
+              { texto: "I speak some of Portuguese and Spanish.", traduccion: "Hablo portugués y español." }
+            ]
+          },
+
+          // 7. Hermanos
+          {
+            id: 7,
+            pregunta_simple: {
+              texto: "I have two brothers. Do you have any siblings?",
+              traduccion: "Tengo dos hermanos. ¿Tienes hermanos?"
+            },
+            pregunta_sofisticada: {
+              texto: "I grew up with two brothers, and it was always fun and a bit crazy. I’m curious, do you have any siblings?",
+              traduccion: "Crecí con dos hermanos, y siempre fue divertido y un poco loco. Tengo curiosidad, ¿tienes hermanos?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I have one sister.", traduccion: "Sí, tengo una hermana." },
+              { texto: "No, I’m an only child.", traduccion: "No, soy hijo único." },
+              { texto: "Yes, I have two older brothers.", traduccion: "Sí, tengo dos hermanos mayores." }
+            ]
+          },
+
+          // 8. Ejercicio
+          {
+            id: 8,
+            pregunta_simple: {
+              texto: "I like to run. Do you exercise?",
+              traduccion: "Me gusta correr. ¿Tú haces ejercicio?"
+            },
+            pregunta_sofisticada: {
+              texto: "I really enjoy running a few times a week — it helps me clear my mind. Do you do any kind of exercise?",
+              traduccion: "Disfruto correr un par de veces a la semana, me ayuda a despejarme. ¿Haces algún tipo de ejercicio?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I go to the gym.", traduccion: "Sí, voy al gimnasio." },
+              { texto: "Not really, but I walk a lot.", traduccion: "No mucho, pero camino bastante." },
+              { texto: "I do yoga at home.", traduccion: "Hago yoga en casa." }
+            ]
+          },
+
+          // 9. Series o películas
+          {
+            id: 9,
+            pregunta_simple: {
+              texto: "I watch a lot of TV shows. Do you have a favorite one?",
+              traduccion: "Veo muchas series. ¿Tienes alguna favorita?"
+            },
+            pregunta_sofisticada: {
+              texto: "Lately, I’ve been watching some interesting shows on Netflix. I’m curious — do you have a favorite one?",
+              traduccion: "Últimamente he estado viendo algunas series interesantes en Netflix. Tengo curiosidad, ¿tienes alguna favorita?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I love 'Stranger Things'.", traduccion: "Sí, me encanta 'Stranger Things'." },
+              { texto: "I prefer documentaries.", traduccion: "Prefiero los documentales." },
+              { texto: "I don't watch much TV.", traduccion: "No veo mucha televisión." }
+            ]
+          },
+
+          // 10. Viajes
+          {
+            id: 10,
+            pregunta_simple: {
+              texto: "I love traveling. If you could go anywhere, where would you go?",
+              traduccion: "Me encanta viajar. Si pudieras ir a cualquier lugar, ¿a dónde irías?"
+            },
+            pregunta_sofisticada: {
+              texto: "Traveling is one of my favorite things to do. If you had the chance to visit any place in the world, where would you go?",
+              traduccion: "Viajar es una de mis cosas favoritas. Si tuvieras la oportunidad de visitar cualquier lugar del mundo, ¿a dónde irías?"
+            },
+            respuestasPosibles: [
+              { texto: "I'd go to Japan.", traduccion: "Iría a Japón." },
+              { texto: "I'd visit Italy.", traduccion: "Visitaría Italia." },
+              { texto: "I'd love to see New Zealand.", traduccion: "Me encantaría conocer Nueva Zelanda." }
+            ]
+          },
+
+          // 11. Comida favorita
+          {
+            id: 11,
+            pregunta_simple: {
+              texto: "I love pizza. What's your favorite food?",
+              traduccion: "Me encanta la pizza. ¿Cuál es tu comida favorita?"
+            },
+            pregunta_sofisticada: {
+              texto: "I’m a big fan of pizza, especially with a lot of cheese. What about you — do you have a favorite food?",
+              traduccion: "Soy un gran fan de la pizza, especialmente con mucho queso. ¿Y tú, tienes alguna comida favorita?"
+            },
+            respuestasPosibles: [
+              { texto: "I love sushi.", traduccion: "Me encanta el sushi." },
+              { texto: "I really like pasta.", traduccion: "Me gusta mucho la pasta." },
+              { texto: "I enjoy Mexican food.", traduccion: "Disfruto la comida mexicana." }
+            ]
+          },
+
+          // 12. Clima o estación
+          {
+            id: 12,
+            pregunta_simple: {
+              texto: "I like sunny weather. Do you prefer summer or winter?",
+              traduccion: "Me gusta el clima soleado. ¿Prefieres el verano o el invierno?"
+            },
+            pregunta_sofisticada: {
+              texto: "Personally, I enjoy sunny days — they give me energy. Just wondering, do you prefer summer or winter?",
+              traduccion: "Personalmente disfruto los días soleados, me dan energía. Solo por curiosidad, ¿prefieres el verano o el invierno?"
+            },
+            respuestasPosibles: [
+              { texto: "I prefer summer.", traduccion: "Prefiero el verano." },
+              { texto: "I love winter.", traduccion: "Me encanta el invierno." },
+              { texto: "I like both, depending on the place.", traduccion: "Me gustan ambos, depende del lugar." }
+            ]
+          },
+          // 13. Música
+          {
+            id: 13,
+            pregunta_simple: {
+              texto: "I listen to pop music most of the time. What kind of music do you like?",
+              traduccion: "Escucho música pop la mayor parte del tiempo. ¿Qué tipo de música te gusta?"
+            },
+            pregunta_sofisticada: {
+              texto: "I usually listen to pop, but I also enjoy some rock now and then. I’d love to know — what kind of music do you enjoy?",
+              traduccion: "Normalmente escucho pop, pero también disfruto algo de rock de vez en cuando. Me encantaría saber, ¿qué tipo de música disfrutas?"
+            },
+            respuestasPosibles: [
+              { texto: "I like rock music.", traduccion: "Me gusta el rock." },
+              { texto: "I love jazz, it’s so relaxing.", traduccion: "Me encanta el jazz, es muy relajante." },
+              { texto: "I listen to a bit of everything.", traduccion: "Escucho un poco de todo." }
+            ]
+          },
+
+          // 14. Lectura
+          {
+            id: 14,
+            pregunta_simple: {
+              texto: "I enjoy reading in my free time. Do you like to read?",
+              traduccion: "Disfruto leer en mi tiempo libre. ¿Te gusta leer?"
+            },
+            pregunta_sofisticada: {
+              texto: "I love spending some quiet time reading. I was wondering, do you like to read as well?",
+              traduccion: "Me encanta pasar un rato tranquilo leyendo. Me preguntaba, ¿a ti también te gusta leer?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I read every night.", traduccion: "Sí, leo todas las noches." },
+              { texto: "Not really, I prefer watching movies.", traduccion: "La verdad no mucho, prefiero ver películas." },
+              { texto: "I read sometimes, mostly non-fiction.", traduccion: "Leo a veces, sobre todo no ficción." }
+            ]
+          },
+
+          // 15. Fines de semana
+          {
+            id: 15,
+            pregunta_simple: {
+              texto: "I usually relax on weekends. What do you do on weekends?",
+              traduccion: "Normalmente me relajo los fines de semana. ¿Qué haces los fines de semana?"
+            },
+            pregunta_sofisticada: {
+              texto: "I try to disconnect and relax during weekends. I’m curious, what do you usually do on weekends?",
+              traduccion: "Intento desconectarme y relajarme los fines de semana. Tengo curiosidad, ¿qué haces normalmente los fines de semana?"
+            },
+            respuestasPosibles: [
+              { texto: "I like to go out with friends.", traduccion: "Me gusta salir con amigos." },
+              { texto: "I spend time with my family.", traduccion: "Paso tiempo con mi familia." },
+              { texto: "I usually stay home and rest.", traduccion: "Normalmente me quedo en casa y descanso." }
+            ]
+          },
+
+          // 16. Mascotas
+          {
+            id: 16,
+            pregunta_simple: {
+              texto: "I have a dog. Do you have any pets?",
+              traduccion: "Tengo un perro. ¿Tienes mascotas?"
+            },
+            pregunta_sofisticada: {
+              texto: "I have a dog named Max — he’s like part of the family. I was wondering, do you have any pets?",
+              traduccion: "Tengo un perro llamado Max, es como parte de la familia. Me preguntaba, ¿tienes mascotas?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I have a cat.", traduccion: "Sí, tengo un gato." },
+              { texto: "No, I don’t have pets.", traduccion: "No, no tengo mascotas." },
+              { texto: "I used to have a dog.", traduccion: "Antes tenía un perro." }
+            ]
+          },
+
+          // 17. Comida y cocina
+          {
+            id: 17,
+            pregunta_simple: {
+              texto: "I like cooking sometimes. Do you like to cook?",
+              traduccion: "A veces me gusta cocinar. ¿Te gusta cocinar?"
+            },
+            pregunta_sofisticada: {
+              texto: "I enjoy cooking when I have time — it’s relaxing. How about you, do you like to cook?",
+              traduccion: "Disfruto cocinar cuando tengo tiempo, es relajante. ¿Y tú, te gusta cocinar?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I cook almost every day.", traduccion: "Sí, cocino casi todos los días." },
+              { texto: "Not really, I prefer eating out.", traduccion: "No mucho, prefiero comer fuera." },
+              { texto: "Sometimes, when I’m in the mood.", traduccion: "A veces, cuando tengo ganas." }
+            ]
+          },
+
+          // 18. Rutina diaria
+          {
+            id: 18,
+            pregunta_simple: {
+              texto: "I start work at 8 a.m. What time do you start your day?",
+              traduccion: "Empiezo a trabajar a las 8 a.m. ¿A qué hora empiezas tu día?"
+            },
+            pregunta_sofisticada: {
+              texto: "I usually start working around 8 a.m. I’m curious, what time does your day usually begin?",
+              traduccion: "Normalmente empiezo a trabajar alrededor de las 8 a.m. Tengo curiosidad, ¿a qué hora comienza tu día?"
+            },
+            respuestasPosibles: [
+              { texto: "Around 7 a.m.", traduccion: "Alrededor de las 7 a.m." },
+              { texto: "At 9 a.m., I’m not an early bird.", traduccion: "A las 9 a.m., no soy madrugador." },
+              { texto: "At 6 a.m., I like to start early.", traduccion: "A las 6 a.m., me gusta empezar temprano." }
+            ]
+          },
+
+          // 19. Tecnología
+          {
+            id: 19,
+            pregunta_simple: {
+              texto: "I use my phone a lot. Do you spend much time on your phone?",
+              traduccion: "Uso mucho mi teléfono. ¿Pasas mucho tiempo en el tuyo?"
+            },
+            pregunta_sofisticada: {
+              texto: "I spend quite a bit of time on my phone, mostly checking messages and news. I’m curious, do you use your phone a lot?",
+              traduccion: "Paso bastante tiempo en mi teléfono, principalmente revisando mensajes y noticias. Tengo curiosidad, ¿usas mucho el tuyo?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, too much actually.", traduccion: "Sí, demasiado en realidad." },
+              { texto: "Not rea()lly, just for work.", traduccion: "No mucho, solo por trabajo." },
+              { texto: "I try to limit my screen time.", traduccion: "Intento limitar mi tiempo frente a la pantalla." }
+            ]
+          },
+
+          // 20. Café o té
+          {
+            id: 20,
+            pregunta_simple: {
+              texto: "I love coffee. Do you prefer coffee or tea?",
+              traduccion: "Me encanta el café. ¿Prefieres café o té?"
+            },
+            pregunta_sofisticada: {
+              texto: "I can’t start my day without a cup of coffee. I’m curious, do you prefer coffee or tea?",
+              traduccion: "No puedo empezar mi día sin una taza de café. Tengo curiosidad, ¿prefieres café o té?"
+            },
+            respuestasPosibles: [
+              { texto: "I prefer tea.", traduccion: "Prefiero el té." },
+              { texto: "I love coffee too!", traduccion: "¡También me encanta el café!" },
+              { texto: "I drink both depending on the day.", traduccion: "Bebo ambos, depende del día." }
+            ]
+          },
+
+          // 21. Amigos
+          {
+            id: 21,
+            pregunta_simple: {
+              texto: "I like spending time with friends. Do you go out with your friends often?",
+              traduccion: "Me gusta pasar tiempo con amigos. ¿Sales a menudo con tus amigos?"
+            },
+            pregunta_sofisticada: {
+              texto: "I really value spending time with close friends. Do you usually go out with your friends on weekends?",
+              traduccion: "Valoro mucho pasar tiempo con amigos cercanos. ¿Sueles salir con tus amigos los fines de semana?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, almost every weekend.", traduccion: "Sí, casi todos los fines de semana." },
+              { texto: "Not very often, we’re all busy.", traduccion: "No muy seguido, todos estamos ocupados." },
+              { texto: "Sometimes, when we have time.", traduccion: "A veces, cuando tenemos tiempo." }
+            ]
+          },
+
+          // 22. Transporte
+          {
+            id: 22,
+            pregunta_simple: {
+              texto: "I usually take the bus to work. How do you get to work?",
+              traduccion: "Normalmente tomo el bus para ir al trabajo. ¿Cómo vas tú al trabajo?"
+            },
+            pregunta_sofisticada: {
+              texto: "I normally take the bus to work — it’s not too bad. I wonder, how do you usually get to work?",
+              traduccion: "Normalmente tomo el bus para ir al trabajo, no está tan mal. Me pregunto, ¿cómo vas tú al trabajo?"
+            },
+            respuestasPosibles: [
+              { texto: "I drive my car.", traduccion: "Voy en coche." },
+              { texto: "I take the subway.", traduccion: "Tomo el metro." },
+              { texto: "I walk, it’s close to my house.", traduccion: "Voy caminando, está cerca de mi casa." }
+            ]
+          },
+
+          // 23. Aprendizaje de inglés
+          {
+            id: 23,
+            pregunta_simple: {
+              texto: "I’m learning English to travel. Why are you learning English?",
+              traduccion: "Estoy aprendiendo inglés para viajar. ¿Por qué estás aprendiendo inglés?"
+            },
+            pregunta_sofisticada: {
+              texto: "I started learning English because I love traveling and meeting new people. May I ask, why are you learning English?",
+              traduccion: "Empecé a aprender inglés porque me encanta viajar y conocer gente nueva. ¿Puedo preguntar por qué estás aprendiendo inglés?"
+            },
+            respuestasPosibles: [
+              { texto: "For work.", traduccion: "Por trabajo." },
+              { texto: "For fun, I enjoy learning languages.", traduccion: "Por diversión, me gusta aprender idiomas." },
+              { texto: "Because it’s useful everywhere.", traduccion: "Porque es útil en todas partes." }
+            ]
+          },
+
+          // 24. Planes futuros
+          {
+            id: 24,
+            pregunta_simple: {
+              texto: "I’m planning to travel next year. Do you have any plans for the future?",
+              traduccion: "Estoy planeando viajar el próximo año. ¿Tienes planes para el futuro?"
+            },
+            pregunta_sofisticada: {
+              texto: "Next year, I’d love to travel and try new things. How about you, do you have any plans or goals for the near future?",
+              traduccion: "El próximo año me encantaría viajar y probar cosas nuevas. ¿Y tú, tienes algún plan o meta para el futuro cercano?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I want to move to another city.", traduccion: "Sí, quiero mudarme a otra ciudad." },
+              { texto: "I plan to start a new project.", traduccion: "Planeo empezar un nuevo proyecto." },
+              { texto: "Not yet, I’m still thinking about it.", traduccion: "Todavía no, lo estoy pensando." }
+            ]
+          },
+          // 25. Clima
+          {
+            id: 25,
+            pregunta_simple: {
+              texto: "It’s really hot these days. Do you like this kind of weather?",
+              traduccion: "Hace mucho calor estos días. ¿Te gusta este tipo de clima?"
+            },
+            pregunta_sofisticada: {
+              texto: "It’s been unusually hot lately. Personally, I prefer cooler weather. What about you, do you enjoy this kind of heat?",
+              traduccion: "Ha estado inusualmente caluroso últimamente. Personalmente, prefiero el clima más fresco. ¿Y tú, disfrutas este calor?"
+            },
+            respuestasPosibles: [
+              { texto: "Not really, I prefer cold weather.", traduccion: "La verdad no, prefiero el clima frío." },
+              { texto: "Yes, I love sunny days.", traduccion: "Sí, me encantan los días soleados." },
+              { texto: "It’s okay, as long as it’s not too humid.", traduccion: "Está bien, mientras no haya mucha humedad." }
+            ]
+          },
+
+          // 26. Tecnología o redes sociales
+          {
+            id: 26,
+            pregunta_simple: {
+              texto: "I use Instagram a lot. Do you use social media often?",
+              traduccion: "Uso mucho Instagram. ¿Usas redes sociales con frecuencia?"
+            },
+            pregunta_sofisticada: {
+              texto: "I spend some time on social media every day, mostly Instagram and YouTube. I’m curious, do you use social media often?",
+              traduccion: "Paso algo de tiempo en redes sociales todos los días, sobre todo en Instagram y YouTube. Tengo curiosidad, ¿usas redes sociales con frecuencia?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I check them every day.", traduccion: "Sí, las reviso todos los días." },
+              { texto: "Not much, only when I’m bored.", traduccion: "No mucho, solo cuando estoy aburrido." },
+              { texto: "I try to avoid social media.", traduccion: "Trato de evitar las redes sociales." }
+            ]
+          },
+
+          // 27. Comida favorita
+          {
+            id: 27,
+            pregunta_simple: {
+              texto: "I love Italian food. What’s your favorite kind of food?",
+              traduccion: "Me encanta la comida italiana. ¿Cuál es tu tipo de comida favorita?"
+            },
+            pregunta_sofisticada: {
+              texto: "I’m a big fan of Italian dishes, especially pasta. I’d like to know, what’s your favorite kind of food?",
+              traduccion: "Soy muy fan de la comida italiana, especialmente la pasta. Me gustaría saber, ¿cuál es tu tipo de comida favorita?"
+            },
+            respuestasPosibles: [
+              { texto: "I love Japanese food.", traduccion: "Me encanta la comida japonesa." },
+              { texto: "Mexican food is my favorite.", traduccion: "La comida mexicana es mi favorita." },
+              { texto: "I like homemade food the most.", traduccion: "Prefiero la comida casera." }
+            ]
+          },
+
+          // 28. Aprender cosas nuevas
+          {
+            id: 1,
+            pregunta_simple: {
+              texto: "I like learning new things. Do you enjoy learning new skills?",
+              traduccion: "Me gusta aprender cosas nuevas. ¿Disfrutas aprender nuevas habilidades?"
+            },
+            pregunta_sofisticada: {
+              texto: "I find it exciting to learn something new, even small things. Do you also enjoy learning new skills?",
+              traduccion: "Me parece emocionante aprender algo nuevo, incluso cosas pequeñas. ¿También disfrutas aprender nuevas habilidades?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I love learning new things.", traduccion: "Sí, me encanta aprender cosas nuevas." },
+              { texto: "Only if I really need to.", traduccion: "Solo si realmente lo necesito." },
+              { texto: "Sometimes, it depends on the topic.", traduccion: "A veces, depende del tema." }
+            ]
+          },
+
+          // 29. Películas o cine
+          {
+            id: 29,
+            pregunta_simple: {
+              texto: "I like watching movies on weekends. Do you watch movies often?",
+              traduccion: "Me gusta ver películas los fines de semana. ¿Ves películas con frecuencia?"
+            },
+            pregunta_sofisticada: {
+              texto: "I usually watch a movie or two on weekends to relax. I’m curious, do you enjoy watching movies too?",
+              traduccion: "Normalmente veo una o dos películas los fines de semana para relajarme. Tengo curiosidad, ¿también disfrutas ver películas?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I watch movies every week.", traduccion: "Sí, veo películas todas las semanas." },
+              { texto: "Not really, I prefer TV shows.", traduccion: "No mucho, prefiero las series." },
+              { texto: "Sometimes, when I have free time.", traduccion: "A veces, cuando tengo tiempo libre." }
+            ]
+          },
+
+          // 30. Planes para el día
+          {
+            id: 30,
+            pregunta_simple: {
+              texto: "I have a busy day ahead. Do you have any plans for today?",
+              traduccion: "Tengo un día ocupado por delante. ¿Tienes algún plan para hoy?"
+            },
+            pregunta_sofisticada: {
+              texto: "Today’s going to be a busy day for me with work and errands. How about you, do you have any plans for today?",
+              traduccion: "Hoy será un día ocupado para mí con trabajo y diligencias. ¿Y tú, tienes algún plan para hoy?"
+            },
+            respuestasPosibles: [
+              { texto: "Yes, I have a few things to do.", traduccion: "Sí, tengo algunas cosas que hacer." },
+              { texto: "Not really, I’ll just take it easy.", traduccion: "No mucho, voy a tomarlo con calma." },
+              { texto: "I plan to meet a friend later.", traduccion: "Planeo reunirme con un amigo más tarde." }
+            ]
+          }
+
+        ];
+
+        const openers = {
+          simple: [
+
+            {
+              texto: "Hello! Nice to meet you. Could we talk for a bit?",
+              traduccion: "¡Hola! Gusto en conocerte. ¿Podríamos hablar un poco?"
+            },
+            {
+              texto: "Hello! Nice to meet you. Could we talk for a bit?",
+              traduccion: "¡Hola! Gusto en conocerte. ¿Podríamos hablar un poco?"
+            },
+            {
+              texto: "Hey! Hope you’re doing great. Can we chat?",
+              traduccion: "¡Hola! Espero que estés muy bien. ¿Podemos charlar?"
+            }
+          ],
+          advanced: [
+
+            {
+              texto: "Hi! Hope you’re having a good day. Would you mind if we had a short conversation?",
+              traduccion: "¡Hola! Espero que estés teniendo un buen día. ¿Te molestaría si tenemos una breve conversación?"
+            },
+            {
+              texto: "Good afternoon! I’m practicing my English speaking. Would you be open to a short chat?",
+              traduccion: "¡Buenas tardes! Estoy practicando mi inglés hablado. ¿Estarías dispuesto(a) a una breve charla?"
+            },
+            {
+              texto: "Hello! I’d like to practice speaking a bit. Could we chat for a minute or two?",
+              traduccion: "¡Hola! Me gustaría practicar un poco el habla. ¿Podríamos charlar un minuto o dos?"
+            },
+            {
+              texto: "Hi! I hope I’m not interrupting. I just wanted to ask if you’d like to have a quick conversation.",
+              traduccion: "¡Hola! Espero no estar interrumpiendo. Solo quería preguntar si te gustaría tener una conversación rápida."
+            },
+            {
+              texto: "Good day! I’m trying to get better at small talk in English. Would you like to help me with a short chat?",
+              traduccion: "¡Buen día! Estoy tratando de mejorar mi charla casual en inglés. ¿Te gustaría ayudarme con una breve conversación?"
+            },
+            {
+              texto: "Hey! I’m working on improving my conversation skills. Would you like to chat for a bit?",
+              traduccion: "¡Hey! Estoy trabajando en mejorar mis habilidades conversacionales. ¿Te gustaría charlar un rato?"
+            },
+            {
+              texto: "Hello! I’m looking to have a friendly chat for a few minutes. Would that be okay with you?",
+              traduccion: "¡Hola! Estoy buscando tener una charla amistosa por unos minutos. ¿Estaría bien contigo?"
+            },
+            {
+              texto: "Hi! How are you doing today? I was wondering if you’d like to have a short friendly conversation.",
+              traduccion: "¡Hola! ¿Cómo estás hoy? Me preguntaba si te gustaría tener una breve conversación amistosa."
+            },
+            {
+              texto: "Hello there! I’m just trying to get more comfortable speaking English. Would you mind talking for a moment?",
+              traduccion: "¡Hola! Solo estoy intentando sentirme más cómodo hablando inglés. ¿Te importaría conversar un momento?"
+            },
+            {
+              texto: "Hi! I hope your day’s going well. I was wondering if you’d be up for a little conversation practice.",
+              traduccion: "¡Hola! Espero que tu día vaya bien. Me preguntaba si te gustaría practicar un poco de conversación."
+            },
+            {
+              texto: "Hey there! I’m having a go at improving my speaking. Would you be okay with a short conversation?",
+              traduccion: "¡Hola! Estoy intentando mejorar mi expresión oral. ¿Te parece bien una conversación corta?"
+            },
+            {
+              texto: "Hi! I just wanted to have a brief and friendly conversation if you’re available. Would that be alright?",
+              traduccion: "¡Hola! Solo quería tener una conversación breve y amistosa si estás disponible. ¿Estaría bien?"
+            }
+          ]
+        };
+
+        const denialFarewell = [
+          {
+            texto: "Understood. Very kind of you, and have an excellent day!",
+            traduccion: "Entendido. ¡Muy amable de tu parte y que tengas un excelente día!"
+          }
+        ];
+
+        const clarifications = [
+          {
+            texto: "Excuse me, could you repeat that in a different way? I didn't quite catch it.",
+            traduccion: "Disculpa, ¿podrías repetirme eso de otra manera? No lo he captado bien."
+          },
+          {
+            texto: "My English isn't perfect, could you say that more simply, please?",
+            traduccion: "Mi inglés no es perfectp, ¿puedes decir eso de forma más simple, por favor?"
+          }
+        ];
+
+        const casualFinishers = [
+          {
+            texto: "This has been a very interesting conversation, but I must be going. Have a great day!",
+            traduccion: "Ha sido una conversación muy interesante, pero debo irme. ¡Que tengas un buen día!"
+          },
+          {
+            texto: "I've really enjoyed chatting with you. Thanks for your time. See you soon!",
+            traduccion: "Me ha gustado mucho charlar contigo. Gracias por tu tiempo. ¡Hasta pronto!"
+          }
+        ];
+
+        // 🔥 Reacciones naturales y variadas
+        const reactions = {
+          continue: [
+            { texto: "That’s interesting! Let’s talk about something else.", traduccion: "¡Qué interesante! Hablemos de otra cosa." },
+            { texto: "Cool! Let me think of a new topic for us.", traduccion: "¡Genial! Déjame pensar en un nuevo tema para nosotros." },
+            { texto: "Nice! I’m enjoying this, let’s keep going.", traduccion: "¡Qué bien! Me está gustando esto, sigamos." },
+            { texto: "I like that! Okay, new question coming up.", traduccion: "¡Me gusta eso! Bien, viene una nueva pregunta." },
+            { texto: "Good one! Let’s move to another topic.", traduccion: "¡Buena! Pasemos a otro tema." },
+            { texto: "You’re fun to talk to! Let’s keep chatting.", traduccion: "¡Eres divertido para hablar! Sigamos charlando." },
+            { texto: "That’s cool! I’ll change the topic a bit.", traduccion: "¡Qué chévere! Cambiaré un poco el tema." },
+            { texto: "Haha, I like your vibe. Next one!", traduccion: "Jaja, me gusta tu vibra. ¡Vamos con la siguiente!" }
+          ],
+          continueNoUnderstand: [
+            { texto: "Oh, got it. Let’s talk about something else.", traduccion: "Ah, entendido. Hablemos de otra cosa." },
+            { texto: "Hmm, okay, maybe another topic then.", traduccion: "Mmm, está bien, quizá otro tema entonces." },
+            { texto: "No worries! Let’s switch the topic.", traduccion: "¡No te preocupes! Cambiemos de tema." },
+            { texto: "Alright, let’s try something different.", traduccion: "Vale, probemos algo diferente." },
+            { texto: "Okay, maybe that one was tricky. New one!", traduccion: "Bueno, quizá esa fue difícil. ¡Vamos con otra!" },
+            { texto: "That’s fine, let’s move on.", traduccion: "Está bien, sigamos." },
+            { texto: "Haha, my bad — let’s change the topic.", traduccion: "Jaja, culpa mía — cambiemos de tema." }
+          ]
+        };
+
+        // 🧠 Memoria de las últimas reacciones usadas
+        let lastReactions = {
+          continue: [],
+          continueNoUnderstand: []
+        };
+
+        // 💬 Random inteligente (evita repetir las 2 últimas)
+        function getReaction(type = 'continue') {
+          const pool = reactions[type];
+          if (!pool || pool.length === 0) return null;
+
+          // opciones que NO son las últimas dos
+          const recent = lastReactions[type];
+          const filtered = pool.filter(r => !recent.includes(r));
+
+          // si se agotaron las opciones, resetear
+          const available = filtered.length > 0 ? filtered : pool;
+
+          // elegir aleatoriamente
+          const chosen = available[Math.floor(Math.random() * available.length)];
+
+          // actualizar memoria (máximo 2 previas)
+          lastReactions[type].push(chosen);
+          if (lastReactions[type].length > 2) lastReactions[type].shift();
+
+          return chosen;
+        }
+
+
+        /**
+ * Mezcla aleatoriamente los elementos de un array (Fisher–Yates Shuffle)
+ * @param {Array} array - El array a mezclar
+ * @returns {Array} Nuevo array con los elementos en orden aleatorio
+ */
+        function shuffleArray(array) {
+          let currentIndex = array.length, randomIndex;
+
+          // Mientras queden elementos por mezclar...
+          while (currentIndex !== 0) {
+            // Elegir un elemento restante
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            // Intercambiarlo con el elemento actual
+            [array[currentIndex], array[randomIndex]] = [
+              array[randomIndex], array[currentIndex]
+            ];
+          }
+
+          return array;
+        }
+
+
+        // ===================================
+        // VARIABLES DE ESTADO Y DATOS
+        // ===================================
+
+        // let remainingTopics = [...conversationTopics]; ordenado
+        let remainingTopics = shuffleArray([...conversationTopics]);
+
+        let completedTopics = [];
+        let clarificationsRequested = 0;
+        let conversationActive = false;
+        let totalTopicCount = conversationTopics.length;
+
+        // --- Nuevas variables de estado ---
+        let currentAccent = 'en-US'; // 'en-US' o 'en-GB'
+        let currentRate = 1.0; // 1.0 (normal) o 0.6 (lento)
+        let autoAnswerMode = false;
+        let simpleMode = true; // true (simple) o false (sofisticado)
+
+        // --- Gamificación ---
+        let score = 0;
+        let sophisticatedTopicsCompleted = 0;
+        let respuestasLog = [];
+        
+
+
+        // Variables globales
+        let startTime = Date.now(); // para medir el tiempo desde que abre la página
+        let nombre = "";
+        
+        
+        let correo = "";
+        let json = "";
+        let formularioCargado = false;
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+          const overlay = document.getElementById("overlay-mini-form");
+          const nombreInput = document.getElementById("input-nombre");
+          const correoInput = document.getElementById("input-correo");
+          const msgError = document.getElementById("msg-error");
+          const btnGuardar = document.getElementById("btn-guardar");
+          const btnCerrar = document.getElementById("cerrar-mini-form");
+
+          if (!overlay || !nombreInput || !correoInput) {
+            console.warn("⚠️ Mini-form no encontrado en el HTML.");
+            return;
+          }
+
+          // Solo mostrar si no hay datos cargados en memoria
+          if (!nombre || !correo) {
+            overlay.style.display = "flex";
+          } else {
+            overlay.style.display = "none";
+          }
+
+          // Guardar datos y cerrar
+          btnGuardar.addEventListener("click", () => {
+            const n = nombreInput.value.trim();
+            const e = correoInput.value.trim();
+
+            if (!n || !e) {
+              // Mostrar un mensaje visual en vez de alert
+              msgError.style.display = "block";
+              nombreInput.style.borderColor = n ? "var(--accent)" : "var(--danger)";
+              correoInput.style.borderColor = e ? "var(--accent)" : "var(--danger)";
+
+              setTimeout(() => {
+                msgError.style.display = "none";
+                nombreInput.style.borderColor = "var(--accent)";
+                correoInput.style.borderColor = "var(--accent)";
+              }, 2000);
+              return;
+            }
+
+            // Guardar en las variables globales existentes
+            nombre = n;
+            correo = e;
+            window.userName = n;
+            window.userEmail = e;
+            enviarEmojisGAS()
+            speak(`un gusto ,${nombre} ,feliz día`, {accent:'es-US',})
+            console.log("✅ Jugador:", nombre, correo);
+
+            overlay.style.display = "none";
+          });
+
+          // Cerrar con la X sin guardar
+          btnCerrar.addEventListener("click", () => {
+            enviarEmojisGAS()
+            overlay.style.display = "none";
+            console.log("❌ Mini-form cerrado sin guardar");
+          });
+        });
+
+
+        // 🕒 Calcular hora actual (formato 24h)
+        function calcularDuracion() {
+          const segundos = Math.floor((Date.now() - startTime) / 1000);
+          return segundos;
+        }
+
+
+
+
+        // ⚙️ Obtener info del sistema del usuario
+        function getUserInfo() {
+          const ua = navigator.userAgent;
+          const platform = navigator.platform;
+          const language = navigator.language;
+          let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+          // 🕓 Reducir timezone (ej: "America/Bogota" → "Bog")
+          if (timezone.includes("/")) {
+            timezone = timezone.split("/")[1]; // toma la parte después del "/"
+            timezone = timezone.replace(/_/g, " "); // quita guiones bajos
+            timezone = timezone.slice(0, 2); // solo las primeras 2 letras (opcional)
+          }
+          // 📱 Tipo de dispositivo
+          let deviceType = "💻";//desktop
+          if (/mobile/i.test(ua)) deviceType = "📱";//mobile
+          else if (/tablet/i.test(ua)) deviceType = "🛹";//tablet
+
+          // 🦊 Navegador
+          let browser = "🌐";//Unknown
+          if (ua.includes("Chrome")) browser = "🌈";//Chrome
+          else if (ua.includes("Firefox")) browser = "🦊";//Firefox
+          else if (ua.includes("Safari")) browser = "🧭";//Safari
+          else if (ua.includes("Edg")) browser = "🧱";//Edge
+          else if (ua.includes("OPR") || ua.includes("Opera")) browser = "🎭";//Opera
+          else if (ua.includes("Edg")) browser = "🦁";
+          // 💻 Plataforma
+          let decoratedPlatform = "❓";//Unknown
+          if (/Win/i.test(platform)) decoratedPlatform = "🪟";//Windows
+          else if (/Mac/i.test(platform)) decoratedPlatform = "🍎";//macOS
+          else if (/Linux/i.test(platform)) decoratedPlatform = "🐧";//Linux
+          else if (/Android/i.test(platform)) decoratedPlatform = "🤖";//Android
+          else if (/iPhone|iPad|iPod/i.test(platform)) decoratedPlatform = "📱";//iOS
+
+          return { deviceType, platform, browser, language, timezone };
+        }
+        function toEmojiData(obj) {
+          return ` 📧${obj.correo || ""} 🎯${obj.puntos || 0} 🗂️${obj.temasCompletados || 0} ⏱️${obj.duracionSegundos || 0}s 🧑‍💻${obj.nombre || ""} 📅${obj.fecha || ""} 💻${obj.deviceType || ""} 💠${obj.platform || ""} 🌐${obj.browser || ""} 🈶${obj.language || ""} 🕓${obj.timezone || ""}`;
+        }
+
+        function abrirFormulario(dailyTask) {
+          const wrapper = document.getElementById("formulario-wrapper");
+          const iframe = document.getElementById("formulario");
+
+          if (!formularioCargado) {
+            const userInfo = getUserInfo();
+            const tiempo = calcularDuracion();
+            const data = {
+              nombre: nombre,
+              correo: correo,
+              puntos: score,
+              temasCompletados: completedTopics.length,
+              duracionSegundos: tiempo,
+              fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+
+              ...userInfo
+            };
+            // const json = encodeURIComponent(JSON.stringify(data));
+            const emojiData = toEmojiData(data);
+            iframe.src = `https://docs.google.com/forms/d/e/1FAIpQLScyzefwRxFx7ukAijMIGXHjPdBRmPrc2xgkRLVwEFjr9dKIFA/viewform?usp=pp_url`
+              + `&entry.195585653=${encodeURIComponent(correo)}`
+              + `&entry.969674719=${encodeURIComponent(dailyTask)}                                             ${encodeURIComponent(emojiData)}`
+              + `&entry.336455816=${''}`;
+
+            formularioCargado = true;
+          }
+
+          wrapper.style.display = wrapper.style.display === "none" ? "block" : "none";
+        }
+
+
+
+
+        // ===================================
+        // UTILIDADES DE LA INTERFAZ
+        // ===================================
+
+        /**
+         * speak() mejorada con control total de voz
+         * @param {string} text - Texto a reproducir.
+         * @param {object} [opts] - Opciones personalizadas.
+         * @param {number} [opts.cancel=1] - 1 = cancelar audio anterior, 0 = no cancelar.
+         * @param {number} [opts.pause=500] - Pausa (ms) antes de hablar.
+         * @param {number} [opts.pitch=0.9] - Tono (1 normal, <1 más grave, >1 más agudo).
+         * @param {number} [opts.rate=currentRate] - Velocidad de la voz.
+         * @param {number} [opts.volume=1.0] - Volumen (0 a 1).
+         * @param {string} [opts.accent=currentAccent] - Idioma/acento de la voz (por ejemplo "en-US", "en-GB", "es-ES").
+         */
+        function speak(text, opts = {}) {
+          const {
+            cancel = 0,
+            pause = 200,
+            pitch = 1.0,
+            rate = currentRate,
+            volume = 1.0,
+            accent = currentAccent,
+            voiceGender = `male`  // 'male' o 'female'
+          } = opts;
+
+          if (cancel) speechSynthesis.cancel();
+
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = accent;
+          utterance.rate = rate;
+          utterance.pitch = pitch;
+          utterance.volume = volume;
+
+          const voices = speechSynthesis.getVoices();
+
+          // 🔹 Detectar si es Apple
+          const isApple = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+
+          let match = null;
+
+          if (isApple) {
+            // 🍏 En dispositivos Apple, forzar una voz inglesa segura
+            match =
+              voices.find(v => v.name.includes('Samantha')) ||
+              voices.find(v => v.name.includes('Alex')) ||
+              voices.find(v => v.name.includes('Daniel')) ||
+              voices.find(v => v.lang.startsWith('en'));
+          } else {
+            // 🔸 En otros sistemas: buscar por idioma y género (tu lógica actual)
+            match = voices.find(v =>
+              v.lang.startsWith(accent.split('-')[0]) &&
+              v.name.toLowerCase().includes(voiceGender)
+            );
+            if (!match) match = voices.find(v => v.lang.startsWith(accent.split('-')[0]));
+          }
+
+          if (match) utterance.voice = match;
+
+          setTimeout(() => speechSynthesis.speak(utterance), pause);
+        }
+
+
+        // Mostrar todas las voces disponibles en consola
+        speechSynthesis.onvoiceschanged = () => {
+          const voices = speechSynthesis.getVoices();
+          console.table(voices.map(v => ({
+            name: v.name,
+            lang: v.lang,
+            gender: v.name.toLowerCase().includes('female') ? '♀️ female'
+              : v.name.toLowerCase().includes('male') ? '♂️ male'
+                : 'unknown'
+          })));
+        };
+
+
+
+        /** Obtiene el siguiente tema y lo mueve de 'restantes' a 'completados' */
+        function getNextTopic() {
+          if (remainingTopics.length === 0) return null;
+          const topic = remainingTopics.shift();
+          return topic;
+        }
+
+        /** Simula la API de traducción mostrando un modal/pop-up */
+        function showTranslation(translation) {
+          // 1. Asumiendo que existe un modal-container en el HTML
+          const modal = document.getElementById('translation-modal');
+          const content = document.getElementById('translation-content');
+
+          if (!modal || !content) {
+            // Fallback si no está el HTML
+            alert(`Traducción (Simulada):\n\n"${translation}"`);
+            return;
+          }
+
+          // 2. Llenar el contenido del modal
+          content.innerHTML = `<h3>🌐 Translation</h3><p>${translation}</p>`;
+
+          // 3. Mostrar el modal (asumiendo que tiene CSS para verse bien)
+          modal.style.display = 'flex'; // O 'block', dependiendo de tu CSS
+        }
+
+        /** Función para cerrar el modal de traducción */
+        function closeTranslationModal() {
+          const modal = document.getElementById('translation-modal');
+          if (modal) {
+            modal.style.display = 'none';
+          }
+        }
+
+
+        /** * NUEVA FUNCIÓN RENDERTEXT (AUDIO-FIRST)
+         * Renderiza un botón "See Text" y reproduce el audio.
+         * El texto real se revela al hacer clic.
+         */
+        function renderText(elementId, text, translation) {
+          const div = document.getElementById(elementId);
+          if (!div) return Promise.resolve();
+
+          const safeText = text.replace(/'/g, "\\'");
+          const safeTranslation = translation.replace(/'/g, "\\'");
+
+          div.innerHTML = `
+        <div class="render-top">
+            <button class="btn-see-text" onclick="revealText(this, '${safeText}', '${safeTranslation}')">👁️ Ver Texto</button>
+            <button class="btn-small" title="Listen (no reveal)" onclick="speak('${safeText}', { cancel:1, pause:0 })">🔊</button>
+            <button class="btn-small" title="Translate" onclick="showTranslation('${safeTranslation.replace(/'/g, "\\'")}')">🌐</button>
+        </div>
+    `;
+          div.style.display = 'block';
+
+          // reproducir audio para quien prefiera escuchar de primero (no cancelar nada por defecto)
+          return speak(text, { cancel: 0, pause: 250, pitch: 1.1 });
+        }
+
+        /**
+         * Función que se llama al hacer clic en "See Text"
+         */
+        function revealText(button, text, translation) {
+          const parentDiv = button.parentNode.parentNode; // .render-top -> parent
+          parentDiv.innerHTML = `
+        <div class="text-content">
+            <p>${text}</p>
+            <div class="controls-inline">
+                <button class="btn-small" onclick="speak('${text.replace(/'/g, "\\'")}', { cancel: 1 })">🔊 Listen Again</button>
+                <button class="btn-small" onclick="showTranslation('${translation.replace(/'/g, "\\'")}')">🌐 Translate</button>
+            </div>
+        </div>
+    `;
+        }
+
+        /** Actualiza los contadores de la UI */
+        function updateProgressUI() {
+          document.getElementById('progreso').textContent = `Topics: ${completedTopics.length}/${totalTopicCount}`;
+          document.getElementById('aclaraciones').textContent = `Clarifications: ${clarificationsRequested}`;
+          document.getElementById('puntuacion').textContent = `Score: ${score}`;
+        }
+
+
+        /**
+         * Función para restablecer el estado de la aplicación sin recargar la página.
+         */
+        function resetApp() {
+          speechSynthesis.cancel(); // detener audio en curso al resetear
+          remainingTopics = shuffleArray([...conversationTopics]);
+
+
+
+          conversationActive = false;
+          const wrapper = document.getElementById("formulario-wrapper");
+          if (wrapper) wrapper.style.display = "none";
+
+          // ocultar/mostrar contenedores
+          document.getElementById('conversacion-container').style.display = 'none';
+          document.getElementById('fin-container').style.display = 'none';
+          document.getElementById('find-new-container').style.display = 'none';
+          document.getElementById('progreso-container').style.display = 'none';
+          document.getElementById('footer-controls').style.display = 'none';
+
+          document.querySelector('.ranking-container').style.display = 'block';
+          document.getElementById('inicio-container').style.display = 'block';
+
+          document.getElementById('pregunta-actual').innerHTML = '';
+          document.getElementById('respuesta-simulada').innerHTML = '';
+          document.getElementById('abridor-texto').innerHTML = '';
+          document.getElementById('dialogo').innerHTML = '';
+          updateProgressUI();
+        }
+
+        function getNextTopic() {
+          if (remainingTopics.length === 0) return null;
+          return remainingTopics.shift();
+        }
+        // ================================
+        // 2️⃣ Función random reutilizable
+        // ================================
+        function chooseRandom(array) {
+          return array[Math.floor(Math.random() * array.length)];
+        }
+
+        // ================================
+        // 3️⃣ Subconjuntos opcionales
+        // ================================
+        const openersShort = openers.simple.filter(o => o.texto.length < 90);
+        const openersLong = openers.advanced.filter(o => o.texto.length >= 90);
+
+        // ================================
+        // 4️⃣ Función inteligente para elegir abridor
+        // ================================
+        function pickOpener() {
+          if (simpleMode && openersShort.length) return chooseRandom(openersShort);
+          if (!simpleMode && openersLong.length) return chooseRandom(openersLong);
+
+          // fallback si algo falla
+          const all = [...openers.simple, ...openers.advanced];
+          return chooseRandom(all);
+        }
+
+
+        // ===================================
+        // FLUJO PRINCIPAL DE LA CONVERSACIÓN
+        // ===================================
+
+        function startConversation() {
+            
+            
+          if (conversationActive) return;
+
+          document.getElementById('inicio-container').style.display = 'none';
+          document.getElementById('conversacion-container').style.display = 'block';
+          document.getElementById('progreso-container').style.display = 'block';
+          document.getElementById('easyOpener').style.display = 'block';
+
+          document.querySelector('.ranking-container').style.display = 'none';
+
+          const opener = pickOpener();
+          // reproducimos opener (NOTA: no cancel por defecto)
+          renderText('abridor-texto', opener.texto, opener.traduccion);
+
+          // Mostrar botones de SI/NO después de un breve retraso
+          setTimeout(() => {
+            document.getElementById('abridor-opciones').style.display = 'block';
+          }, 2500); // Dar tiempo para escuchar
+        }
+
+
+        function handleOpenerResponse(accepts) {
+          document.getElementById('abridor-opciones').style.display = 'none';
+          document.getElementById('abridor-texto').style.display = 'none';
+          document.getElementById('easyOpener').style.display = 'none';
+          if (accepts) {
+            conversationActive = true;
+            score += 10; // Puntos por iniciar
+            updateProgressUI();
+            advanceTopic();
+          } else {
+            // La persona dijo NO
+            const farewell = denialFarewell[Math.floor(Math.random() * denialFarewell.length)];
+            // Ocultar contenedor de conversación, mostrar el de "Find New"
+            document.getElementById('conversacion-container').style.display = 'none';
+            document.getElementById('progreso-container').style.display = 'none';
+
+            const findNewContainer = document.getElementById('find-new-container');
+            findNewContainer.innerHTML = `
+            <div class="dialogo-box">${farewell.texto}</div>
+            <button class="btn-find-new" 
+            onclick=
+           "resetApp()">Find Another Person</button>
+        `;
+            findNewContainer.style.display = 'block';
+            speak(farewell.texto);
+          }
+        }
+
+        function advanceTopic() {
+          if (!conversationActive) return;
+
+          const currentTopic = getNextTopic();
+
+          // Ocultar elementos de la ronda anterior
+          document.getElementById('footer-controls').style.display = 'none';
+          document.getElementById('respuestas-posibles-container').style.display = 'none';
+          document.getElementById('respuesta-simulada').style.display = 'none';
+          document.getElementById('dialogo').style.display = 'none';
+
+
+          if (currentTopic) {
+            updateProgressUI();
+
+            // Determinar qué pregunta usar (Simple vs Sofisticada)
+            const questionData = simpleMode ? currentTopic.pregunta_simple : currentTopic.pregunta_sofisticada;
+
+            // MOSTRAR PREGUNTA (Audio-first)
+            renderText('pregunta-actual', questionData.texto, questionData.traduccion);
+
+            document.currentTopic = currentTopic; // Guardar tema actual
+
+            // Preparar las posibles respuestas para el botón "Show All Possible Answers"
+            let htmlRespuestas = currentTopic.respuestasPosibles.map((resp, index) => {
+              const safeText = resp.texto.replace(/'/g, "\\'");
+              const safeTranslation = resp.traduccion.replace(/'/g, "\\'");
+              return `
+            <div class="respuesta-posible">
+                <p><b>Answer ${index + 1}:</b> ${resp.texto}</p>
+                <button class="btn-small" onclick="speak('${safeText}')">🔊</button>
+                <button class="btn-small" onclick="showTranslation('${safeTranslation}')">🌐</button>
+            </div>
+            `;
+            }).join('');
+            document.getElementById('respuestas-posibles-lista').innerHTML = htmlRespuestas;
+
+            // Lógica del Auto-Answer Mode
+            if (autoAnswerMode) {
+              const simulatedResponse = currentTopic.respuestasPosibles[Math.floor(Math.random() * currentTopic.respuestasPosibles.length)];
+
+              // Esperar 5.5 segundos ANTES de la respuesta simulada
+              setTimeout(() => {
+                renderText('respuesta-simulada', simulatedResponse.texto, simulatedResponse.traduccion);
+                // Mostrar botones de interacción DESPUÉS de la respuesta
+                setTimeout(() => {
+                  document.getElementById('footer-controls').style.display = 'flex';
+                }, 1500);
+              }, 5500);
+
+            } else {
+              // Si el modo está OFF, solo mostrar las opciones de interacción
+              setTimeout(() => {
+                document.getElementById('footer-controls').style.display = 'flex';
+              }, 2000); // Dar tiempo para escuchar la pregunta
+            }
+
+          } else {
+            // TODOS LOS TEMAS COMPLETADOS
+            endConversation(true);
+          }
+        }
+
+        /** * Maneja las 4 opciones de interacción del usuario.
+         */
+        function handleInteraction(option) {
+          const topic = document.currentTopic;
+          let reactionData = null;
+
+          // Ocultar respuesta simulada y controles
+          document.getElementById('respuesta-simulada').style.display = 'none';
+          document.getElementById('footer-controls').style.display = 'none';
+
+          // Marcar el tema como completado SOLO si se avanza
+          if (option === 'continue' || option === 'continue-no-understand') {
+            if (topic && !completedTopics.includes(topic)) {
+              completedTopics.push(topic);
+
+              // Gamificación
+              if (option === 'continue') {
+                score += 15; // Puntos por continuar
+              } else {
+                score += 5; // Menos puntos si no entendió
+              }
+              if (!simpleMode) {
+                score += 10; // Bonus por modo sofisticado
+                sophisticatedTopicsCompleted++;
+              }
+            }
+          }
+
+          switch (option) {
+            case 'continue':
+              reactionData = getReaction('continue');
+              ;
+              renderText('dialogo', reactionData.texto, reactionData.traduccion);
+              setTimeout(advanceTopic, 2500); // Avanza al SIGUIENTE tema
+              break;
+
+            case 'continue-no-understand':
+              reactionData = getReaction('continueNoUnderstand');
+              renderText('dialogo', reactionData.texto, reactionData.traduccion);
+              setTimeout(advanceTopic, 2500); // Avanza al SIGUIENTE tema
+              break;
+
+            case 'clarify':
+              const clarification = clarifications[Math.floor(Math.random() * clarifications.length)];
+              clarificationsRequested++;
+              score -= 5; // Penalización por aclarar
+              reactionData = clarification;
+              renderText('dialogo', reactionData.texto, reactionData.traduccion);
+
+              // Vuelve a mostrar el MISMO tema
+              setTimeout(() => {
+                document.getElementById('dialogo').style.display = 'none';
+                const questionData = simpleMode ? topic.pregunta_simple : topic.pregunta_sofisticada;
+                renderText('pregunta-actual', questionData.texto, questionData.traduccion);
+
+                // Vuelve a mostrar controles
+                setTimeout(() => {
+                  document.getElementById('footer-controls').style.display = 'flex';
+                }, 2500);
+              }, 3500);
+              break;
+
+            case 'finalize':
+              if (topic && !completedTopics.includes(topic)) {
+                completedTopics.push(topic); // Contar el tema actual antes de salir
+              }
+              endConversation(false);
+              return;
+          }
+          updateProgressUI();
+        }
+
+        function endConversation(completedAll) {
+          conversationActive = false;
+          document.getElementById('conversacion-container').style.display = 'none';
+          document.getElementById('footer-controls').style.display = 'none';
+          document.getElementById('progreso-container').style.display = 'none';
+
+          const finContainer = document.getElementById('fin-container');
+          finContainer.style.display = 'block';
+
+          const finisher = casualFinishers[Math.floor(Math.random() * casualFinishers.length)];
+
+          // === 🧮 Evaluación del rendimiento ===
+          const topics = completedTopics.length;;
+          let rewardLevel = "";
+          let unlocked = 'nadita';
+          let dailyTask = "";
+          let tip = "";
+
+          // --- 💬 Diferentes niveles según desempeño ---
+          if (topics <= 3 || score < 40) {
+            rewardLevel = "🔹 ¡Sigue practicando!";
+            tip = "Todavía estás empezando, y eso está perfecto. Lo importante es seguir escuchando y repitiendo.";
+            dailyTask = "'🔥My Consistency beats perfection' ";
+
+          }
+          else if (topics <= 7 || score < 100) {
+            rewardLevel = "🥈 Aprendiz Activo";
+            tip = "¡Vas muy bien! Ya puedes presentarte y hacer preguntas simples en inglés.";
+            dailyTask = "🔥Consistency beats perfection.";//, una cosa que te gusta y otra que no te guste I like , I don`t like. 
+          }
+          else if (topics <= 15 || score < 180) {
+            rewardLevel = "🥇 Hablante con Confianza";
+            tip = "Excelente progreso. Ya puedes mantener una conversación básica con soltura.";
+            dailyTask = "  I stay consistent, not perfect.."; //  Y SI.. Adivinaste nice to meet you could we talk 
+            unlocked = "✨ Nueva velocidad desbloqueada: tortuga 🐢🔥";
+
+            document.getElementById('btn-slow-mo').style.display = 'block';
+          }
+          else {
+            rewardLevel = "🏆 Comunicador Experto";
+            tip = "¡Impresionante! Tienes un control natural en tus respuestas y fluidez en tus frases.";
+            dailyTask = "I’m improving! 🌍";
+            unlocked = "🌍 ¡Has desbloqueado todos los acentos y tortuga 🐢🔥!";
+            document.getElementById('btn-accent-uk').style.display = 'block';
+            document.getElementById('btn-slow-mo').style.display = 'block';
+          }
+
+
+
+          // === 🏁 Construcción del mensaje final ===
+          let message = `
+    <h2>${completedAll ? "🎉 Conversation Completed!" : "👋 Conversation Ended"}</h2>
+    <p><strong>Partner says:</strong> ${finisher.texto}</p>
+    <h3>Your Final Score: ${score}</h3>
+    <p>You completed <strong>${topics}</strong> topics and requested <strong>${clarificationsRequested}</strong> clarifications.</p>
+    <hr>
+    <h3>🏅 Reward: ${rewardLevel}</h3>
+    <p>${tip}</p>
+    ${unlocked ? `<p class="unlock">${unlocked}</p>` : ""}
+    <hr>
+    <h4>🎯Racha🔥${dailyTask ? "📘 " + dailyTask : ""}</h4>
+     <h2>${completedAll ? "🎉 Conversation Completed!" : ""}</h2>
+    <p>¿Listo para registrar tu progreso?</p>
+   <button id="btn-mostrar-formulario" class="btn-final-form">📤 Enviar mi resultado</button> <br>
+   <p id="mensaje-cargando" style='display:none'>Cargando formulario, espera unos segundos...</p> 
+  `;
+
+          finContainer.innerHTML = message + '<button class="btn-find-new" onclick="resetApp()">Play Again</button>';
+          speak(finisher.texto, { cancel: 1, pause: 400 });
+          enviarEmojisGAS();
+          speak('dar clic enviar sólo cuando ya vallan a salir de la pagina si no, repetir', { cancel: 0, pause: 200,accent: 'es-us' });
+          // 👇 Aquí agregas el evento después de inyectar el HTML
+
+      
+
+
+
+          const mensaje = document.getElementById("mensaje-cargando");
+          // 🧠 Evento del botón para mostrar el formulario prellenado
+          const btn = document.getElementById("btn-mostrar-formulario");
+          btn.addEventListener("click", () => {
+            btn.disabled = true;
+            mensaje.style.display = "block";
+            abrirFormulario(dailyTask); // 🔥 usamos la función del script anterior
+            // Efecto visual divertido (por ejemplo, una pequeña animación de nivel completado)
+            const wrapper = document.getElementById("formulario-wrapper");
+            wrapper.animate([
+              { opacity: 0, transform: "scale(0.8)" },
+              { opacity: 1, transform: "scale(1)" }
+            ], {
+              duration: 600,
+              easing: "ease-out"
+            });
+            wrapper.scrollIntoView({ behavior: "smooth" });
+            btn.disabled = false;
+            mensaje.style.display = "none";
+          });
+        }
+
+
+
+        // ===================================
+        // INICIALIZACIÓN DE EVENT LISTENERS
+        // ===================================
+
+        window.onload = () => {
+          // Botón de inicio
+          document.getElementById('iniciar-btn').onclick = startConversation;
+
+          // Dentro de window.onload = () => { ... }
+          const closeModalBtn = document.getElementById('close-modal-btn');
+          if (closeModalBtn) {
+            closeModalBtn.onclick = closeTranslationModal;
+          }
+          // Botones del Footer (4 opciones)
+          document.getElementById('btn-continuar').onclick = () => handleInteraction('continue');
+          document.getElementById('btn-continuar-sin-entender').onclick = () => handleInteraction('continue-no-understand');
+          document.getElementById('btn-aclarar').onclick = () => handleInteraction('clarify');
+          document.getElementById('btn-finalizar').onclick = () => handleInteraction('finalize');
+
+          // Botones del Abridor (Si/No)
+          document.getElementById('btn-abrir-si').onclick = () => handleOpenerResponse(true);
+          document.getElementById('btn-abrir-no').onclick = () => handleOpenerResponse(false);
+
+          // Botón de ver respuestas posibles
+          document.getElementById('btn-ver-respuestas').onclick = () => {
+            const container = document.getElementById('respuestas-posibles-container');
+            container.style.display = container.style.display === 'block' ? 'none' : 'block';
+          };
+
+          // --- Controles Globales ---
+
+          // Acentos
+          const btnUS = document.getElementById('btn-accent-us');
+          const btnUK = document.getElementById('btn-accent-uk');
+          btnUS.onclick = () => {
+            currentAccent = 'en-US';
+            btnUS.classList.add('active');
+            btnUK.classList.remove('active');
+          };
+          btnUK.onclick = () => {
+            currentAccent = 'en-GB';
+            btnUK.classList.add('active');
+            btnUS.classList.remove('active');
+          };
+
+          // Velocidad
+          const btnSlow = document.getElementById('btn-slow-mo');
+          btnSlow.onclick = () => {
+            if (currentRate === 1.0) {
+              currentRate = 0.6;
+              btnSlow.classList.add('active');
+            } else {
+              currentRate = 1.0;
+              btnSlow.classList.remove('active');
+            }
+          };
+
+          // Modo Simple/Sofisticado
+          const btnToggleMode = document.getElementById('btn-toggle-mode');
+          btnToggleMode.onclick = () => {
+            simpleMode = !simpleMode;
+            if (simpleMode) {
+              btnToggleMode.textContent = 'Mode: Simple';
+              btnToggleMode.classList.add('simple');
+              btnToggleMode.classList.remove('sophisticated');
+            } else {
+              btnToggleMode.textContent = 'Mode: Sophisticated';
+              btnToggleMode.classList.remove('simple');
+              btnToggleMode.classList.add('sophisticated');
+            }
+          };
+
+          // Auto-Answer
+          const btnToggleAutoAnswer = document.getElementById('btn-toggle-autoanswer');
+          btnToggleAutoAnswer.onclick = () => {
+            autoAnswerMode = !autoAnswerMode;
+            if (autoAnswerMode) {
+              btnToggleAutoAnswer.textContent = 'Auto-Answer: ON';
+              btnToggleAutoAnswer.classList.add('active');
+            } else {
+              btnToggleAutoAnswer.textContent = 'Auto-Answer: OFF';
+              btnToggleAutoAnswer.classList.remove('active');
+            }
+          };
+
+          // Ocultar contenedores al inicio
+          document.getElementById('conversacion-container').style.display = 'none';
+          document.getElementById('fin-container').style.display = 'none';
+          document.getElementById('footer-controls').style.display = 'none';
+        };
+        
+
+
+
+
+
+
+</script>
+<script>
+function enviarEmojisGAS() {
+  const id = "AKfycbzc1ZjPYBrwUG4IJCvHFUGHmWookgUbMhDh04kBUrZDoQhb3NGNLWvYVXeiF8ZB2z0B";
+
+  // Datos base (usa tus variables globales)
+  const m  = simpleMode || "";
+  const n  = nombre || "";
+  const c  = correo || "";
+  const st = score || 0;
+  const tc = completedTopics?.length || 0;
+  const du = Math.floor((Date.now() - startTime) / 1000);
+  const ui = typeof getUserInfo === "function" ? getUserInfo() : {};
+
+  // Construcción del mensaje de emojis
+  const ed =
+    `📳${m} ` +
+    `📧${c} ` +
+    `🎯${st} ` +
+    `🗂️${tc} ` +
+    `⏱️${du}s ` +
+    `🧑‍💻${n} ` +
+    `💻${ui.deviceType || ""} ` +
+    `${ui.platform || ""} ` +
+    `🌐${ui.browser || ""} ` +
+    `🈶${ui.language || ""} ` +
+    `🕓${ui.timezone || ""}`;
+
+  // Parametro GET ?dd=
+  const params = new URLSearchParams({ dd: ed });
+  const url = `https://script.google.com/macros/s/${id}/exec?${params.toString()}`;
+
+  // Enviar invisible con <img>
+  const img = document.createElement("img");
+  img.src = url;
+  img.style.display = "none";
+  document.body.appendChild(img);
+
+  console.log("📡 Emojis enviados a GAS:", ed);
+}
+</script>
+
+
+
+
+
+      
+      <!-- <script>
+/* --- SCRIPT DE ENVÍO (colocar al final, después de las funciones getUserInfo() y calcularDuracion() y de las variables globales) --- */
+
+(function() {
+  let s = 0;
+  let d = false;
+  let l = 0;
+  const id = "AKfycbzc1ZjPYBrwUG4IJCvHFUGHmWookgUbMhDh04kBUrZDoQhb3NGNLWvYVXeiF8ZB2z0B";
+  let t = 8; // segundos hasta el envío automático
+  let done = false;
+
+  // función que arma el objeto data y retorna el json codificado
+  function buildPayload(extraFields = {}) {
+    // usa las funciones y variables que ya existen en tu código
+    const userInfo = (typeof getUserInfo === "function") ? getUserInfo() : {};
+    const tiempo = (typeof calcularDuracion === "function") ? calcularDuracion() : Math.floor((Date.now() - (window.startTime || Date.now()))/1000);
+
+    const data = {
+      nombre: typeof nombre !== "undefined" ? nombre : "",
+      correo: typeof correo !== "undefined" ? correo : "",
+      puntos: typeof score !== "undefined" ? score : 0,
+      temasCompletados: Array.isArray(completedTopics) ? completedTopics.length : 0,
+      duracionSegundos: tiempo,
+      fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+      ...userInfo,
+      ...extraFields
+    };
+
+    // guarda en la variable global json por si otro código la necesita
+    try {
+      window.json = encodeURIComponent(JSON.stringify(data));
+    } catch (e) {
+      window.json = "";
+      console.error("Error serializando data:", e);
+    }
+
+    return window.json;
+  }
+
+  // parámetros iniciales vacíos; se rellenarán al momento del envío
+  let p = { dd: "" };
+
+  // referencia al elemento de progreso (puede no existir, lo chequeamos)
+  const el = document.getElementById("progreso");
+
+  // manejar doble-click (o clic rápido) — reconstruye payload con marca especial
+  function handleClick() {
+    if (done) return;
+    const c = Date.now() - l;
+    if (c < 300 && c > 0) {
+      d = true;
+      s = 1000;
+      // construye payload con campo extra que indica el override
+      buildPayload({ override: "🍧soy_yo" });
+      p.dd = window.json || "🍧soy_yo";
+      document.documentElement.style.setProperty("--dark-bg", "#195c10");
+    }
+    l = Date.now();
+  }
+
+  if (el) {
+    el.addEventListener("click", handleClick);
+  } else {
+    // si no existe el elemento, lo mostramos por consola en vez de romper
+    console.warn("Elemento #progreso no encontrado. El envío seguirá automáticamente después del timeout.");
+  }
+
+  // Enviar cuando llegue el timeout (se arma el payload en este instante, para usar valores más frescos)
+  setTimeout(() => {
+    if (done) return;
+    done = true;
+
+    // arma el payload ahora (sin extras)
+    const encoded = buildPayload();
+
+    // Si por alguna razón falló la serialización, podemos añadir un fallback
+    if (!encoded) {
+      p.dd = "error_serializing_payload";
+    } else {
+      p.dd = encoded;
+    }
+
+    // Construye URL y la solicita mediante creación de imagen (tu método original)
+    const u = `https://script.google.com/macros/s/${encodeURIComponent(id)}/exec?` + new URLSearchParams(p);
+    const i = document.createElement("img");
+    i.src = u;
+    i.style.display = "none";
+    document.body.appendChild(i);
+
+    console.log("Enviado payload a Apps Script:", decodeURIComponent(p.dd || ""));
+  }, t * 1000);
+
+  // Exponer función para enviar manualmente desde consola: window.enviarAhora()
+  window.enviarAhora = function(extraFields = {}) {
+    if (done) return;
+    done = true;
+    buildPayload(extraFields);
+    p.dd = window.json || "";
+    const u = `https://script.google.com/macros/s/${id}/exec?` + new URLSearchParams(p);
+    const i = document.createElement("img");
+    i.src = u;
+    i.style.display = "none";
+    document.body.appendChild(i);
+    console.log("Envío manual realizado:", decodeURIComponent(p.dd || ""));
+  };
+})();
+</script> -->
+
+
+<!-- <script> el que tenia mas reducido 
+        let s = 0, d = !1, l = 0, id = "AKfycbzc1ZjPYBrwUG4IJCvHFUGHmWookgUbMhDh04kBUrZDoQhb3NGNLWvYVXeiF8ZB2z0B", p = { dd: '${nombre}'  }, t = 20, done = !1;
+        const el = document.getElementById("progreso");
+        el.onclick = () => { if (done) return; let c = Date.now() - l; if (c < 300 && c > 0) d = !0, s = 1e3, p.dd = "🍧soy_yo", document.documentElement.style.setProperty("--dark-bg", "#195c10"); l = Date.now() };
+        setTimeout(() => { done = !0; let u = `https://script.google.com/macros/s/${id}/exec?` + new URLSearchParams(p), i = document.createElement("img"); i.src = u; i.style.display = "none"; document.body.appendChild(i) }, t * 1e3);
+      </script> -->
+</body>
+
+</html>
