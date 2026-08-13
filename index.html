@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub de Práctica de Idiomas</title>
+  <style>
+    :root { 
+      --bg: #0d1117; 
+      --card: #161b22; 
+      --primary: #00ff88; 
+      --text: #c9d1d9; 
+      --border: #30363d; 
+      --accent: #1f6beb;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-bottom: 90px; }
+    .view { display: none; max-width: 700px; margin: 0 auto; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    h3 { margin-top: 0; color: #fff; }
+    input[type="text"] { width: 100%; box-sizing: border-box; padding: 12px; background: #0d1117; border: 1px solid var(--border); color: #fff; border-radius: 6px; margin-bottom: 12px; }
+    button { background: #238636; color: #fff; font-weight: bold; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 5px; transition: opacity 0.2s; }
+    button:hover { opacity: 0.9; }
+    
+    .room-btn { background: var(--accent); margin-bottom: 8px; text-align: left; }
+    #peers-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; }
+    .peer-card { background: #0d1117; padding: 10px; border-radius: 6px; border: 1px solid var(--border); text-align: center; border-left: 3px solid var(--primary); }
+    
+    /* CHAT P2P */
+    #chat-box { height: 160px; background: #0d1117; border: 1px solid var(--border); overflow-y: auto; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+    .chat-msg { margin-bottom: 8px; word-break: break-word; }
+    .chat-img { max-width: 100%; border-radius: 6px; margin-top: 5px; }
+    #status-banner { background: #21262d; color: #f0f6fc; padding: 10px 15px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; display: none; border-left: 4px solid var(--primary); }
+
+    /* IFRAMES / CONTENEDORES EXTERNOS */
+    .iframe-container { width: 100%; height: 500px; border: none; border-radius: 8px; background: #0f172a; border: 1px solid var(--border); }
+    
+    /* BOTÓN FLOTANTE DE WHATSAPP */
+    .whatsapp-float {
+      position: fixed; bottom: 75px; right: 20px; background: #25d366; color: #fff;
+      border-radius: 50px; width: 50px; height: 50px; display: flex; align-items: center;
+      justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      z-index: 1001; text-decoration: none; transition: transform 0.2s;
+    }
+    .whatsapp-float:hover { transform: scale(1.1); }
+
+    /* NAVEGACIÓN INFERIOR */
+    #bottom-nav {
+      position: fixed; bottom: 0; left: 0; width: 100%; background: #161b22; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000;
+    }
+    .nav-btn { background: none; border: none; color: #8b949e; font-size: 12px; cursor: pointer; width: auto; margin: 0; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+    .nav-btn.active { color: var(--primary); font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div id="status-banner"></div>
+
+  <!-- VISTA 1: LOGIN -->
+  <div id="login-view" class="view" style="display: block;">
+    <div class="card" style="margin-top: 40px;">
+      <h3>👋 ¡Bienvenido a Clases!</h3>
+      <p style="font-size: 13px; color: #8b949e; margin-bottom: 20px;">Configura tu perfil para acceder al material y salas de práctica.</p>
+      <input type="text" id="username" placeholder="Tu Nombre o Nick">
+      <input type="text" id="nativeLang" placeholder="Idioma Nativo (ej: Español)">
+      <input type="text" id="learningLang" placeholder="Aprendiendo (ej: Inglés)">
+      <button onclick="App.login()">Entrar al Hub</button>
+    </div>
+  </div>
+
+  <!-- VISTA 2: SALAS P2P -->
+  <div id="rooms-view" class="view">
+    <div class="card">
+      <h3>🌐 Salas de Conversación P2P</h3>
+      <p style="font-size: 13px; color: #8b949e;">Espacio secundario para intentar conexión directa con compañeros.</p>
+      <button onclick="App.createRoom()">+ Crear Nueva Sala</button>
+      <button onclick="App.loadRooms()" style="background: #30363d; margin-top: 8px;">Refrescar Lista</button>
+      <hr style="border-color: var(--border); margin: 15px 0;">
+      <div id="rooms-list">Cargando salas...</div>
+    </div>
+  </div>
+
+  <!-- VISTA 3: SALA ACTIVA (AUDIO + CHAT P2P) -->
+  <div id="active-room-view" class="view">
+    <div class="card">
+      <h3 id="room-title">Sala Activa</h3>
+      <div id="peers-container"></div>
+      
+      <h4>Chat Grupal P2P</h4>
+      <div id="chat-box"></div>
+      
+      <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+        <input type="text" id="msgInput" placeholder="Escribe un mensaje..." style="margin:0;">
+        <button onclick="App.sendChatText()" style="width: 80px; margin:0;">Enviar</button>
+      </div>
+      
+      <div style="display: flex; gap: 5px; align-items: center;">
+        <input type="file" id="fileInput" style="font-size: 11px;">
+        <button onclick="App.sendChatFile()" style="background: var(--accent); width: 120px; margin:0;">Archivo</button>
+      </div>
+
+      <button onclick="App.leaveRoom()" style="background: #da3633; margin-top: 15px;">Salir de la Sala</button>
+    </div>
+  </div>
+
+  <!-- VISTA 4: CONVERSACIÓN (andu.html) -->
+  <div id="chat-material-view" class="view">
+    <div class="card" style="padding: 10px;">
+      <h3>💬 Material de Conversación</h3>
+      <iframe src="andu.html" class="iframe-container"></iframe>
+    </div>1
+  </div>
+
+  <!-- VISTA 5: MINIJUEGOS -->
+  <div id="games-view" class="view">
+    <div class="card" style="padding: 10px;">
+      <h3>🎮 Minijuegos de Apoyo</h3>
+      <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
+        <button onclick="document.getElementById('game-frame').src='prepo.html'" style="padding: 6px 10px; font-size: 11px; white-space: nowrap;">Preposiciones 🐝</button>
+        <button onclick="document.getElementById('game-frame').src='c2.html'" style="padding: 6px 10px; font-size: 11px; white-space: nowrap;">Nivel C1 🧠</button>
+        <button onclick="document.getElementById('game-frame').src='mytext.html'" style="padding: 6px 10px; font-size: 11px; white-space: nowrap;">Lectura 📚</button>
+      </div>
+      <iframe id="game-frame" src="prepo.html" class="iframe-container" style="height: 440px;"></iframe>
+    </div>
+  </div>
+
+  <!-- BOTÓN FLOTANTE WHATSAPP (Reemplaza TU_NUMERO con tu enlace real, ej: 573001234567) -->
+  <a href="https://wa.me/3247356178?text=Hola,%20tengo%20una%20duda%20con%20la%20clase" target="_blank" class="whatsapp-float" title="Escríbeme por WhatsApp">
+    💬
+  </a>
+
+  <!-- NAVEGACIÓN INFERIOR UNIFICADA -->
+  <nav id="bottom-nav" style="display: none;">
+    <button class="nav-btn active" onclick="App.switchTab('rooms-view', this)">🏠<span>Salas P2P</span></button>
+    <button class="nav-btn" onclick="App.switchTab('chat-material-view', this)">💬<span>Conversación</span></button>
+    <button class="nav-btn" onclick="App.switchTab('games-view', this)">🎮<span>Minijuegos</span></button>
+  </nav>
+
+  <div id="audio-tags"></div>
+
+  <script src="webrtc.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
