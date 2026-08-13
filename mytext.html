@@ -3,47 +3,83 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prototipo Aprendizaje v5 — Fluido y Mejorado</title>
+<title>Prototipo Aprendizaje v6 — Fluido + Control de Tiempos</title>
 <style>
   body {font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f4f7f6;color:#222;max-width:1000px;margin:18px auto;padding:18px;}
   h1,h2,h3 {color:#005a8d;}
-  textarea {width:100%;min-height:140px;padding:10px;font-size:15px;border-radius:6px;border:1px solid #ccc;}
+  textarea {width:100%;min-height:140px;padding:10px;font-size:15px;border-radius:6px;border:1px solid #ccc;box-sizing: border-box;}
   button {background:#0073b1;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;margin:4px;}
   button.small {padding:6px 8px;font-size:13px;}
   button.secondary {background:#6c757d;}
   button.success {background:#28a745;}
+  button:disabled {opacity: 0.6; cursor: not-allowed;}
+  
   .panel {background:white;border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin-top:14px;}
-  .analisis-container{display:flex;gap:16px;flex-wrap:wrap;}
-  .analisis-col{flex:1;min-width:220px;}
   .ejercicio-frase{font-size:1.05em;margin:10px 0;line-height:1.6;}
   input.input-ej{padding:6px 8px;border-radius:6px;border:1px solid #ccc;font-size:15px;}
-  .ok{border-color:#28a745!important;}
-  .bad{border-color:#dc3545!important;}
+  .ok{border-color:#28a745!important;background:#eaffea;}
+  .bad{border-color:#dc3545!important;background:#ffeaea;}
   .fragment{border:1px dashed #ddd;padding:10px;margin:8px 0;border-radius:6px;background:#fafafa;}
   .tag{background:#e6f4ff;color:#005a8d;padding:6px 8px;border-radius:999px;border:1px solid #d0eaff;}
-  .audio-btn{background:#fff;color:#0073b1;border:1px solid #0073b1;padding:6px 8px;border-radius:6px;cursor:pointer;}
+  .audio-btn{background:#fff;color:#0073b1;border:1px solid #0073b1;padding:2px 6px;border-radius:4px;cursor:pointer;font-size:0.9em;margin:0 2px;}
   .flexrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
-  #notify {position:fixed;bottom:20px;right:20px;background:#005a8d;color:white;padding:10px 14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);opacity:0;transition:opacity 0.4s;}
+  
+  /* Estilos del Panel de Control de Pausas */
+  .control-panel { background: #fff8e1; border: 1px solid #ffe082; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+  .slider-group { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; font-size: 0.9em; }
+  .slider-group input { flex: 1; }
+
+  #notify {position:fixed;bottom:20px;right:20px;background:#005a8d;color:white;padding:10px 14px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);opacity:0;transition:opacity 0.4s; z-index: 100;}
   #notify.show{opacity:1;}
 </style>
+
 </head>
 <body>
 
-<h1>Prototipo de Aprendizaje (v5)</h1>
+<h1>Prototipo v6 (Smart Flow)</h1>
+
+<div class="control-panel">
+  <h3>🎛️ Control de Mezcla (Pausas)</h3>
+  <div class="slider-group">
+    <label>Pausa ANTES de mi voz (ms): <span id="valPre">200</span></label>
+    <input type="range" id="pausePre" min="0" max="2000" step="50" value="200" oninput="document.getElementById('valPre').innerText=this.value">
+  </div>
+  <div class="slider-group">
+    <label>Pausa DESPUÉS de mi voz (ms): <span id="valPost">300</span></label>
+    <input type="range" id="pausePost" min="0" max="2000" step="50" value="300" oninput="document.getElementById('valPost').innerText=this.value">
+  </div>
+  <small style="color:#666;">Ajusta cuánto silencio quieres antes y después de insertar tus grabaciones en el texto.</small>
+</div>
+
 <div class="flexrow">
   <button onclick="procesarTexto()">Procesar Texto</button>
   <label>Idioma:
     <select id="idiomaSelect">
       <option value="en-US" selected>Inglés 🇺🇸</option>
-      <option value="es-ES">Español 🇪🇸</option>
+      <option value="es-CO">Español 🇪🇸</option>
       <option value="fr-FR">Francés 🇫🇷</option>
       <option value="de-DE">Alemán 🇩🇪</option>
+      <option value="it-IT">Italiano 🇮🇹</option>
+      <option value="pt-PT">Portugués 🇵🇹</option>
     </select>
   </label>
-  <button class="secondary" onclick="limpiarProgreso()">Limpiar progreso</button>
+  <button class="secondary" onclick="limpiarProgreso()">Limpiar todo</button>
 </div>
 
-<textarea id="textoUsuario">The quick brown fox jumps over the lazy dog. This is a sentence to test the processing. The dog is lazy, and the fox is quick. Learning a new language is a journey. This journey requires practice and dedication. Practice makes perfect.</textarea>
+<div class="panel" id="projectManager" style="margin-top: 14px;">
+  <h3>📂 Gestor de Proyectos</h3>
+  <div class="flexrow" style="margin-bottom: 10px;">
+    <label>Proyecto Actual:</label>
+    <select id="projectSelect" onchange="cargarProyectoSeleccionado()"></select>
+  </div>
+  <div class="flexrow">
+    <button class="secondary small" onclick="guardarProyectoActual()">Guardar Cambios</button>
+    <button class="success small" onclick="crearNuevoProyecto()">+ Nuevo Texto</button>
+    <button class="secondary small" onclick="eliminarProyectoSeleccionado()">Eliminar Seleccionado</button>
+  </div>
+</div>
+
+<textarea id="textoUsuario">The quick brown fox jumps over the lazy dog. This is a sentence to test the processing. The dog is lazy, and the fox is quick. Learning a new language is a journey.</textarea>
 
 <div id="resultados" class="panel" style="display:none;">
   <h2>Análisis</h2>
@@ -51,100 +87,767 @@
 </div>
 
 <div id="fragmentsContainer" class="panel" style="display:none;">
-  <h2>Fragmentos</h2>
+  <h2>Fragmentos (Lectura Inteligente)</h2>
   <div id="fragments"></div>
 </div>
 
 <div id="ejercicios" class="panel" style="display:none;">
-  <h2>Ejercicios</h2>
+  <h2>Ejercicios (Grabación)</h2>
   <div id="listaEjercicios"></div>
+</div>
+
+<div id="shadowing" class="panel" style="display:none;">
+  <h2>🗣️ Shadowing Mode (N-Grams)</h2>
+  <div class="flexrow">
+      <label>Tamaño de grupo (N):
+          <select id="ngramSize">
+              <option value="3">3-gram (Trigram)</option>
+              <option value="4" selected>4-gram (Quadgram)</option>
+              <option value="5">5-gram</option>
+          </select>
+      </label>
+      <button class="success" onclick="iniciarShadowing()">Start Shadowing</button>
+  </div>
+  <div id="shadowingArea" style="margin-top:15px;">
+      </div>
 </div>
 
 <div id="notify"></div>
 
 <script>
+
+/* === CONSTANTES Y UTILIDADES === */
 const STOP_WORDS = new Set(['a','an','and','the','is','it','in','on','at','to','for','of','with','this','that','was','are','be','over','new','makes','s','i','you','he','she','they','we','my','his','her']);
-const STORAGE_KEYS={learned:'ap_v5_learned',audios:'ap_v5_audios'};
-function cargarEstado(){return{learned:JSON.parse(localStorage.getItem(STORAGE_KEYS.learned)||'[]'),audios:JSON.parse(localStorage.getItem(STORAGE_KEYS.audios)||'{}')}};function guardarEstado(s){localStorage.setItem(STORAGE_KEYS.learned,JSON.stringify(s.learned||[]));localStorage.setItem(STORAGE_KEYS.audios,JSON.stringify(s.audios||{}));}
-function limpiarTexto(t){return t.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()\"\[\]]/g,"").toLowerCase();}
-function palabrasTokenize(t){return limpiarTexto(t).split(/\s+/).filter(p=>p.length>0);}
-function dividirEnFragmentos(t,maxChars=300){let or=t.match(/[^.!?]+[.!?]*/g)||[t];or=or.map(s=>s.trim()).filter(s=>s.length>0);const frags=[];let cur='';for(const s of or){if(cur.length+s.length+1<=maxChars||cur.length===0)cur+=(cur?' ':'')+s;else{frags.push(cur.trim());cur=s;}}if(cur)frags.push(cur.trim());return frags;}
+// Objeto que mapea códigos de idioma a un array de Stop Words
+const LANGUAGE_STOP_WORDS = {
+    'en-US': ['a','an','and','the','is','it','in','on','at','to','for','of','with','this','that','was','are','be','over','new','makes','s','i','you','he','she','they','we','my','his','her','them'],
+    'es-ES': ['el','la','los','las','un','una','unos','unas','y','o','pero','de','a','en','por','para','con','es','se','que','del','al'],
+    'fr-FR': ['le','la','les','un','une','des','et','ou','mais','de','à','en','par','pour','avec','est','se','que','du','au','il','elle','ils','elles'],
+    'de-DE': ['der','die','das','ein','eine','und','oder','aber','von','zu','in','mit','ist','sich','was','dich','er','sie','es','wir','ihr','sie'],
+    // 🚩 Stop Words para ITALIANO
+    'it-IT': ['il','la','i','gli','le','un','uno','una','e','o','ma','di','a','in','su','per','con','è','si','che','dal','al','del','dello','della'],
+    // 🚩 Stop Words para PORTUGUÉS
+    'pt-PT': ['o','a','os','as','um','uma','uns','umas','e','ou','mas','de','a','em','por','para','com','é','se','que','do','da','no','na','ele','ela','eles','elas']
+};
+
+// Función helper para obtener el Set de Stop Words del idioma actual
+function getStopWordsSet() {
+    const lang = document.getElementById('idiomaSelect').value;
+    const words = LANGUAGE_STOP_WORDS[lang] || LANGUAGE_STOP_WORDS['en-US']; // Fallback a inglés
+    return new Set(words);
+}  
+//const STORAGE_KEYS={learned:'ap_v6_learned',audios:'ap_v6_audios'};
+const STORAGE_KEYS={learned:'ap_v6_learned',audios:'ap_v6_audios',     currentText:'ap_v6_current_text',  projects:'ap_v6_projects'};
+  
+function cargarEstado(){return{learned:JSON.parse(localStorage.getItem(STORAGE_KEYS.learned)||'[]'),audios:JSON.parse(localStorage.getItem(STORAGE_KEYS.audios)||'{}')}};
+function guardarEstado(s){localStorage.setItem(STORAGE_KEYS.learned,JSON.stringify(s.learned||[]));localStorage.setItem(STORAGE_KEYS.audios,JSON.stringify(s.audios||{}));}
+
+function limpiarTexto(t){return t.toLowerCase().replace(/[$\%^&*+=\{\}\\|\\[\]~"<>`@#\/]/g,'').replace(/\s{2,}/g,' ').trim();}
+function palabrasTokenize(t){let x=limpiarTexto(t).replace(/[.,?!:;]/g,'');return x.split(/\s+/).filter(p=>p.length>0).map(p=>p.replace(/['"]+/g,'').trim()).filter(p=>p.length>0);}
 function mostrarNoti(txt,ms=2500){const n=document.getElementById('notify');n.textContent=txt;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),ms);}
-let globalFragments=[];let globalTopWords=[];
+function blobToBase64(b){return new Promise((res,rej)=>{const r=new FileReader();r.onloadend=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b);});}
+function escaparRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } // Para evitar errores si la palabra tiene simbolos
+
+let globalFragments=[];
+let globalTopWords=[];
+
+/* === PROCESAMIENTO PRINCIPAL === */
 function procesarTexto(){
- const t=document.getElementById('textoUsuario').value.trim();if(!t)return mostrarNoti('⚠️ Escribe un texto primero.',2000);
- const max=350;const or=t.match(/[^.!?]+[.!?]+/g)||[t];const palabras=palabrasTokenize(t);const freq={};const filtradas=[];
- for(const p of palabras){if(p.length>1&&!STOP_WORDS.has(p)){freq[p]=(freq[p]||0)+1;filtradas.push(p);}}
- const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,10);globalTopWords=top;
- document.getElementById('metricasTexto').innerHTML=`Total palabras: <b>${palabras.length}</b> · Oraciones: <b>${or.length}</b> · Palabras clave: <b>${filtradas.length}</b>`;
- document.getElementById('resultados').style.display='block';
- globalFragments=dividirEnFragmentos(t,max);
- renderFragments(); generarEjercicios(or,top); document.getElementById('fragmentsContainer').style.display='block';document.getElementById('ejercicios').style.display='block';
+  let t=document.getElementById('textoUsuario').value.trim();if(!t)return mostrarNoti('⚠️ Escribe un texto primero.',2000);
+  
+  // *** NUEVA LIMPIEZA DE TEXTO (Punto 3 del feedback) ***
+  // Reemplaza saltos de línea, comillas dobles y otros caracteres de control con espacio simple.
+  // IMPORTANTE: NO REMUEVE comas, puntos, ni signos de interrogación/exclamación.
+  t = t.replace(/[\n\t"“„”‘’]/g, ' ').replace(/\s{2,}/g, ' ').trim();
+  
+  // Analisis basico
+  const or=t.match(/[^.!?]+[.!?]+/g)||[t];
+  const palabras=palabrasTokenize(t);
+  const freq={};
+    // ... dentro de procesarTexto()
+  const stopWordsSet = getStopWordsSet(); // <-- Obtener el Set correcto
+
+  for(const p of palabras){
+    // Usar stopWordsSet para el check
+    if(p.length>1 && !stopWordsSet.has(p)){
+        freq[p]=(freq[p]||0)+1;
+    }
+  }
+  // ...
+  //for(const p of palabras){
+//    if(p.length>1 && !STOP_WORDS.has(p)){
+   //    freq[p]=(freq[p]||0)+1;
+ //   }
+//  }
+  
+  const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  globalTopWords=top;
+  
+  document.getElementById('metricasTexto').innerHTML=`Total palabras: <b>${palabras.length}</b> · Oraciones: <b>${or.length}</b>`;
+  document.getElementById('resultados').style.display='block';
+  
+  // Dividir en fragmentos (chunks)
+  dividirEnFragmentos(t);
+  
+  generarEjercicios(or,top); 
+  renderFragments(); 
+  
+  document.getElementById('fragmentsContainer').style.display='block';
+  document.getElementById('ejercicios').style.display='block';
+  document.getElementById('shadowing').style.display='block'; // Mostrar el nuevo panel
 }
+
+function dividirEnFragmentos(t, maxChars=300){
+    let or=t.match(/[^.!?]+[.!?]*/g)||[t];
+    or=or.map(s=>s.trim()).filter(s=>s.length>0);
+    const frags=[];let cur='';
+    for(const s of or){
+        if(cur.length+s.length+1<=maxChars||cur.length===0) cur+=(cur?' ':'')+s;
+        else{ frags.push(cur.trim()); cur=s; }
+    }
+    if(cur) frags.push(cur.trim());
+    globalFragments = frags;
+}
+
+/* === NUEVA FUNCIÓN PARA N-GRAMS CON PROSODIA (Punto 1 del feedback) === */
+function dividirEnNGrams(t, n=4) {
+    // La expresión regular separa el texto por comas, puntos, etc., pero los mantiene en el array.
+    const tokens = t.match(/[a-zA-Z0-9áéíóúÁÉÍÓÚñÑçÇ']+|[.,?!:;]/g) || [];
+    const nGrams = [];
+    let currentGram = "";
+    let wordCount = 0;
+    
+    for (const token of tokens) {
+        // Si el token es puntuación (excepto apóstrofes), lo añade al grama actual y lo finaliza.
+        if (/[.,?!:;]/.test(token) && token !== "'") {
+            currentGram += token;
+            if (currentGram.trim().length > 0) nGrams.push(currentGram.trim());
+            currentGram = "";
+            wordCount = 0;
+        } 
+        // Si es una palabra o un apóstrofe
+        else {
+            if (wordCount >= n) {
+                // Si el límite de palabras se alcanza, finaliza el grama anterior.
+                nGrams.push(currentGram.trim());
+                currentGram = token;
+                wordCount = 1;
+            } else {
+                currentGram += (wordCount > 0 ? ' ' : '') + token;
+                wordCount++;
+            }
+        }
+    }
+    
+    // Añade el último grama si no está vacío
+    if (currentGram.trim().length > 0) {
+        nGrams.push(currentGram.trim());
+    }
+    
+    // Filtra cualquier fragmento vacío
+    return nGrams.filter(g => g.length > 0);
+}
+
+
+/* === RENDERIZADO VISUAL === */
 function renderFragments(){
- const {learned,audios}=cargarEstado();const lang=document.getElementById('idiomaSelect').value;const c=document.getElementById('fragments');c.innerHTML='';
- globalFragments.forEach((frag,i)=>{
-  let html=frag;learned.forEach(w=>{const r=new RegExp(`\\b${w}\\b`,'ig');if(audios[w])html=html.replace(r,`<button class='audio-btn' onclick="playCombined(${i})">🎧 ${w}</button>`);});
-  const d=document.createElement('div');d.className='fragment';
-  d.innerHTML=`<div><b>Fragmento ${i+1}</b></div><div style="margin-top:6px;">${html}</div>
-   <div class='flexrow' style='margin-top:8px;'>
-    <button class='small' onclick="leerTexto('${frag}', '${lang}')">▶ Escuchar original</button>
-    <button class='small success' onclick="playCombined(${i})">▶ Escuchar combinado</button>
-   </div>`;
-  c.appendChild(d);
- });
+  const {learned,audios}=cargarEstado();
+  const lang=document.getElementById('idiomaSelect').value;
+  const c=document.getElementById('fragments');
+  c.innerHTML='';
+  
+  globalFragments.forEach((frag,i)=>{
+    // Renderizado visual: resaltar palabras con audio
+    let html=frag;
+    // Solo reemplazamos visualmente si tenemos el audio
+    learned.forEach(w=>{
+       if(audios[w]) {
+           const r=new RegExp(`\\b(${escaparRegExp(w)})\\b`,'ig');
+           html=html.replace(r,`<button class='audio-btn' onclick="playSingleWord('${w}')">🎧 $1</button>`);
+       }
+    });
+
+    const d=document.createElement('div');d.className='fragment';
+    d.innerHTML=`
+        <div><b>Fragmento ${i+1}</b></div>
+        <div style="margin-top:6px; line-height:1.6;">${html}</div>
+        <div class='flexrow' style='margin-top:12px; border-top:1px solid #eee; padding-top:8px;'>
+           <button class='small' onclick="leerTextoOriginal('${frag}')">🗣️ Escuchar Original (TTS)</button>
+           <button class='small success' onclick="playSmartMix('${frag}')">✨ Escuchar MEZCLA Inteligente</button>
+        </div>`;
+    c.appendChild(d);
+  });
 }
+
 function generarEjercicios(ors,top){
- const l=document.getElementById('listaEjercicios');l.innerHTML='';const set=new Set(top.map(p=>p[0]));let creados=0;
- for(const o of ors){if(creados>=10)break;for(const w of Array.from(set)){const r=new RegExp(`\\b${w}\\b`,'i');if(o.match(r)){const s=o.replace(r,`<input class='input-ej' data-respuesta='${w}' placeholder='...'>`);
- const div=document.createElement('div');div.className='ejercicio-frase';
- div.innerHTML=s+`<div class='flexrow'>
- <button class='small' onclick="leerTexto('${w}')">🔊 Escuchar</button>
- <button class='small secondary' onclick="grabarPalabra('${w}', this)">🎙 Grabar mi voz</button>
- <button class='small' onclick="verificarPalabra('${w}', this)">🎧 Verificar</button>
- <button class='small' onclick="playAudio('${w}')">▶ Mi audio</button>
- <button class='small success' onclick="marcarAprendida('${w}')">✔ Guardar</button></div>`;
- l.appendChild(div);set.delete(w);creados++;break;}}}
- l.addEventListener('change',e=>{if(e.target.classList.contains('input-ej')){const r=e.target.dataset.respuesta.toLowerCase();const v=e.target.value.trim().toLowerCase();if(v===r){e.target.classList.add('ok');marcarAprendida(r);mostrarNoti(`✅ "${r}" correcta!`,2000);}else{e.target.classList.add('bad');mostrarNoti(`❌ "${v}" no coincide.`,2000);}}});
+  const l=document.getElementById('listaEjercicios');l.innerHTML='';
+  const set=new Set(top.map(p=>p[0]));
+  let creados=0;
+  
+  // Limitar a 10 ejercicios para no saturar
+  for(const o of ors){
+     if(creados>=10)break;
+     for(const w of Array.from(set)){
+         const r=new RegExp(`\\b${escaparRegExp(w)}\\b`,'i');
+         if(o.match(r)){
+             const s=o.replace(r,`<input class='input-ej' data-respuesta='${w}' placeholder='...'>`);
+             
+             const div=document.createElement('div');div.className='ejercicio-frase';
+             div.innerHTML=`
+                <div>${s}</div>
+                <div class='flexrow'>
+                  <span class="tag">${w}</span>
+                  <button class='small' onclick="leerTextoOriginal('${w}')">🔊 Escuchar voz IA</button>
+                  <button class='small secondary' onclick="grabarPalabra('${w}', this)">🎙 Grabar mi voz</button>
+                  <button class='small' onclick="playSingleWord('${w}')">▶ Mi grabación</button>
+                </div>`;
+             l.appendChild(div);
+             set.delete(w);creados++;break;
+         }
+     }
+  }
+  
+  // Evento de validación inputs
+  l.addEventListener('change',e=>{
+     if(e.target.classList.contains('input-ej')){
+         const r=e.target.dataset.respuesta.toLowerCase();
+         const v=e.target.value.trim().toLowerCase();
+         if(v===r){
+             e.target.classList.add('ok');e.target.classList.remove('bad');
+             mostrarNoti(`✅ Correcto!`,1500);
+         }else{
+             e.target.classList.add('bad');e.target.classList.remove('ok');
+             mostrarNoti(`❌ Intenta de nuevo.`,1500);
+         }
+     }
+  });
 }
-function leerTexto(txt,lang){if(!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(txt);u.lang=lang||document.getElementById('idiomaSelect').value;speechSynthesis.cancel();speechSynthesis.speak(u);}
+
+/* === GRABACIÓN Y AUDIO (EXISTENTE) === */
 let globalStream=null;
+
 async function grabarPalabra(w,btn){
  try{
   if(!navigator.mediaDevices)return mostrarNoti('🎤 No soportado.');
   const s=globalStream||await navigator.mediaDevices.getUserMedia({audio:true});globalStream=s;
-  const rec=new MediaRecorder(s);const ch=[];rec.ondataavailable=e=>{if(e.data.size)ch.push(e.data);};
-  rec.start();btn.textContent='⏺ Grabando...';btn.disabled=true;
-  await new Promise(r=>setTimeout(r,1500));rec.stop();
-  rec.onstop=async()=>{const b=new Blob(ch,{type:'audio/webm'});const base64=await blobToBase64(b);
-    const st=cargarEstado();st.audios[w]={base64,t:Date.now()};guardarEstado(st);renderFragments();
-    btn.textContent='🎙 Grabar mi voz';btn.disabled=false;mostrarNoti(`🎙 Audio guardado para "${w}"`,2000);}
- }catch(e){mostrarNoti('Error al grabar '+e.message,2000);}
+  const rec=new MediaRecorder(s);const ch=[];
+  
+  rec.ondataavailable=e=>{if(e.data.size)ch.push(e.data);};
+  rec.start();
+  
+  const originalText = btn.textContent;
+  btn.textContent='⏺ Grabando...';btn.classList.add('bad');btn.disabled=true;
+  
+  // Grabar por 2 segundos (ajustable)
+  await new Promise(r=>setTimeout(r,2000));
+  
+  rec.stop();
+  rec.onstop=async()=>{
+      const b=new Blob(ch,{type:'audio/webm'});
+      const base64=await blobToBase64(b);
+      
+      const st=cargarEstado();
+      st.audios[w]={base64,t:Date.now()};
+      if(!st.learned.includes(w)) st.learned.push(w); // Marcar como aprendida
+      guardarEstado(st);
+      
+      btn.textContent=originalText; btn.classList.remove('bad'); btn.disabled=false;
+      mostrarNoti(`🎙 Audio guardado para "${w}"`,2000);
+      renderFragments(); // Recargar UI
+  }
+ }catch(e){mostrarNoti('Error: '+e.message,2000); btn.disabled=false;}
 }
-function playAudio(w){const s=cargarEstado();const i=s.audios[w];if(!i)return mostrarNoti('No hay audio.');const a=new Audio(i.base64);a.play();}
-function verificarPalabra(w,btn){
- const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return mostrarNoti('Reconocimiento no disponible.');
- const rec=new SR();rec.lang=document.getElementById('idiomaSelect').value;rec.interimResults=false;rec.maxAlternatives=1;
- rec.onstart=()=>{btn.textContent='🎧 Escuchando...';btn.disabled=true;};
- rec.onresult=e=>{const t=e.results[0][0].transcript.toLowerCase();if(t.includes(w.toLowerCase())){marcarAprendida(w);mostrarNoti(`✅ Pronunciación correcta: "${t}"`,2500);}else mostrarNoti(`❌ Se reconoció: "${t}"`,2500);};
- rec.onend=()=>{btn.textContent='🎧 Verificar';btn.disabled=false;};rec.onerror=e=>mostrarNoti('Error: '+e.error,2000);rec.start();
-}
-function marcarAprendida(w){const s=cargarEstado();if(!s.learned.includes(w))s.learned.push(w);guardarEstado(s);renderFragments();}
-function blobToBase64(b){return new Promise((res,rej)=>{const r=new FileReader();r.onloadend=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b);});}
-function limpiarProgreso(){localStorage.clear();renderFragments();mostrarNoti('Progreso borrado.');}
 
-/* === Audio combinado fluido === */
-async function playCombined(i){
- const frag=globalFragments[i];if(!frag)return;
- const {learned,audios}=cargarEstado();const lang=document.getElementById('idiomaSelect').value;
- const palabras=frag.split(/\b/);
- let idx=0;function next(){if(idx>=palabras.length)return;const w=limpiarTexto(palabras[idx]);idx++;
-  if(learned.includes(w)&&audios[w]){speechSynthesis.pause();const a=new Audio(audios[w].base64);
-   a.onended=()=>{setTimeout(()=>speechSynthesis.resume(),200);next();};a.play();}
-  else{const u=new SpeechSynthesisUtterance(palabras[idx-1]);u.lang=lang;u.onend=()=>next();speechSynthesis.speak(u);}
- }
- speechSynthesis.cancel();next();
+function playSingleWord(w){
+    const s=cargarEstado();
+    const i=s.audios[w];
+    if(!i)return mostrarNoti('No has grabado esta palabra.');
+    const a=new Audio(i.base64);
+    a.play();
 }
+
+function leerTextoOriginal(txt){
+    if(!('speechSynthesis'in window))return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang=document.getElementById('idiomaSelect').value;
+    speechSynthesis.speak(u);
+}
+
+/* === EL CÓDIGO CLAVE: MEZCLADOR INTELIGENTE (ASÍNCRONO) === */
+
+// Helper para esperar milisegundos (Promesa)
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+// Helper para reproducir Audio Base64 (Promesa)
+const reproducirAudioBlob = (base64) => {
+    return new Promise((resolve, reject) => {
+        const a = new Audio(base64);
+        a.onended = () => resolve();
+        a.onerror = (e) => resolve(); // Si falla, sigue adelante
+        a.play().catch(e => resolve()); // Si el navegador bloquea, sigue
+    });
+};
+
+// Helper para reproducir TTS (Promesa)
+const hablarTexto = (texto, lang) => {
+    return new Promise((resolve) => {
+        if(!texto.trim()) { resolve(); return; }
+        const u = new SpeechSynthesisUtterance(texto);
+        u.lang = lang;
+        u.onend = () => resolve();
+        u.onerror = () => resolve();
+        speechSynthesis.speak(u);
+    });
+};
+
+async function playSmartMix(fragmentoTexto) {
+    // 1. Preparación
+    speechSynthesis.cancel();
+    const { audios } = cargarEstado();
+    const lang = document.getElementById('idiomaSelect').value;
+    
+    // Obtener configuración de pausas del panel
+    const pausaPre = parseInt(document.getElementById('pausePre').value) || 200;
+    const pausaPost = parseInt(document.getElementById('pausePost').value) || 300;
+
+    // 2. Identificar qué palabras tienen audio grabado
+    // Filtramos las keys del objeto audios para ver cuales están en este texto
+    const palabrasGrabadas = Object.keys(audios).filter(w => {
+        const regex = new RegExp(`\\b${escaparRegExp(w)}\\b`, 'i');
+        return regex.test(fragmentoTexto);
+    });
+
+    if (palabrasGrabadas.length === 0) {
+        mostrarNoti("No hay grabaciones en este fragmento. Leyendo normal...", 2000);
+        return leerTextoOriginal(fragmentoTexto);
+    }
+
+    mostrarNoti("▶ Reproduciendo mezcla...", 3000);
+
+    // 3. LA MAGIA: Split inteligente
+    // Creamos una Regex gigante con todas las palabras grabadas: /\b(perro|gato|casa)\b/gi
+    // Usamos paréntesis de captura () para que el .split() incluya las palabras en el array resultante
+    const patronGigante = new RegExp(`\\b(${palabrasGrabadas.map(escaparRegExp).join('|')})\\b`, 'gi');
+    
+    // Al hacer split con captura, el array queda: ["Texto antes ", "palabra", " texto despues"]
+    const partes = fragmentoTexto.split(patronGigante);
+
+    // 4. Ejecución Secuencial
+    for (let parte of partes) {
+        if (!parte) continue; // Saltar partes vacías
+
+        const palabraClean = parte.toLowerCase().trim();
+        
+        // ¿Es esta parte una de nuestras palabras grabadas?
+        if (audios[palabraClean]) {
+            // SI: Es una grabación
+            await esperar(pausaPre); // Pausa controlada usuario
+            
+            // Efecto visual (opcional, busca botón si existe)
+            // podriamos añadir clase 'active' a los botones aquí
+            
+            await reproducirAudioBlob(audios[palabraClean].base64);
+            
+            await esperar(pausaPost); // Pausa controlada usuario
+        } else {
+            // NO: Es texto normal (puente entre grabaciones)
+            if(parte.trim().length > 0) {
+                await hablarTexto(parte, lang);
+            }
+        }
+    }
+    
+    mostrarNoti("✅ Fin de reproducción", 2000);
+}
+
+function limpiarProgreso(){
+    if(confirm("¿Borrar todo el progreso y audios?")){
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+/* === SHADOWING MODE CORE LOGIC (NUEVO) === */
+let globalNGrams = [];
+let currentGramIndex = 0;
+let attemptsLeft = 3;
+let recognition = null; // Variable global para el Web Speech Recognition
+
+function iniciarShadowing() {
+    // Tomamos el texto limpio de procesarTexto
+    let t=document.getElementById('textoUsuario').value.trim();
+    t = t.replace(/[\n\t"“„”‘’]/g, ' ').replace(/\s{2}/g, ' ').trim(); 
+    if (!t) return mostrarNoti('⚠️ Escribe un texto primero.', 2000);
+
+    const n = parseInt(document.getElementById('ngramSize').value);
+    globalNGrams = dividirEnNGrams(t, n);
+    currentGramIndex = 0;
+    
+    if(globalNGrams.length === 0) {
+        return mostrarNoti('⚠️ No se pudieron generar N-Grams. Intenta con un texto más largo.', 3000);
+    }
+    
+    document.getElementById('shadowingArea').innerHTML = 'Preparando...';
+    
+    // 1. Inicializar el objeto de reconocimiento (webkitSpeechRecognition es un prefijo de Chrome)
+    if (!('webkitSpeechRecognition' in window)) {
+        return mostrarNoti('❌ Reconocimiento de Voz no soportado en tu navegador. Intenta con Chrome/Edge.', 5000);
+    }
+    
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    // La variable de idioma se ancla aquí (Punto 2 del feedback)
+    recognition.lang = document.getElementById('idiomaSelect').value; 
+
+    recognition.onresult = handleRecognitionResult;
+    recognition.onerror = (e) => {
+        // En caso de error (ej: sin micrófono, no speech, no permission)
+        mostrarNoti(`Error de Reconocimiento: ${e.error}`, 3000);
+        // Habilitar el botón para reintentar o saltar
+        renderShadowingUI(true, false); 
+    };
+    recognition.onend = () => {
+        // Si el reconocimiento termina y no hubo un resultado (ej: el usuario no habló a tiempo)
+        const btn = document.querySelector('#shadowingArea .record-btn');
+        if (btn && btn.disabled) {
+            btn.disabled = false;
+            btn.textContent = `🎙 Reintentar (${attemptsLeft} intentos)`;
+        }
+    };
+    
+    nextShadowingStep();
+}
+
+function handleRecognitionResult(event) {
+    const recognizedText = event.results[0][0].transcript.trim();
+    const currentGram = globalNGrams[currentGramIndex];
+    const area = document.getElementById('shadowingArea');
+    
+    // Lógica de Validación: usamos una validación flexible (la mayoría de palabras clave deben estar)
+    const currentWords = palabrasTokenize(currentGram);
+    const recognizedWords = palabrasTokenize(recognizedText);
+    
+    let matches = 0;
+    for(const word of currentWords) {
+        if(recognizedWords.includes(word)) {
+            matches++;
+        }
+    }
+    
+    const requiredMatches = Math.floor(currentWords.length * 0.7); // 70% de las palabras
+    const isClose = matches >= requiredMatches;
+    
+    if (isClose) {
+        mostrarNoti('🎉 Correcto! Pasando al siguiente...', 2500);
+        
+        area.innerHTML = `<p class="ejercicio-frase ok">✅ **${currentGram}**</p> <p>Dijiste: "${recognizedText}"</p>`;
+        
+        currentGramIndex++;
+        attemptsLeft = 3; // Reset intentos
+        setTimeout(nextShadowingStep, 1500);
+    } else {
+        attemptsLeft--;
+        
+        if (attemptsLeft <= 0) {
+            handleFailedAttempt(recognizedText);
+        } else {
+            // Permite ver el texto (a partir del 2do intento, o 3er intento en total) y reintentar
+            mostrarNoti(`❌ No fue correcto. ${attemptsLeft} intentos restantes.`, 2000);
+            const showText = attemptsLeft <= 1; // Mostrar texto en el último intento
+            renderShadowingUI(true, showText, recognizedText); 
+        }
+    }
+}
+
+function handleFailedAttempt(recognizedText = null) {
+    const area = document.getElementById('shadowingArea');
+    
+    const displayResult = recognizedText ? `<p style="font-style: italic;">Último intento: "${recognizedText}"</p>` : '';
+    
+    area.innerHTML = `
+        <p class="ejercicio-frase bad">❌ **Fallaste.** El texto era: ${globalNGrams[currentGramIndex]}</p>
+        ${displayResult}
+        <div class="flexrow" style="margin-top:10px;">
+            <button class='small success' onclick="siguienteGram(true)">Saltar y Continuar</button>
+            <button class='small secondary' onclick="siguienteGram(false)">Reintentar</button>
+        </div>
+    `;
+    attemptsLeft = 3; // Reset para el siguiente gram
+}
+
+function siguienteGram(skip) {
+    // Detener cualquier reconocimiento en curso para evitar conflictos
+    if(recognition) recognition.abort(); 
+    
+    if(skip) currentGramIndex++;
+    // Si no salta, se mantiene currentGramIndex, pero los intentos se reinician en nextShadowingStep
+    nextShadowingStep();
+}
+
+// State machine: Listen (no text) -> Repeat (text hidden/visible)
+async function nextShadowingStep() {
+    if (currentGramIndex >= globalNGrams.length) {
+        document.getElementById('shadowingArea').innerHTML = '<h2>🎉 ¡Ejercicio de Shadowing Terminado!</h2>';
+        currentGramIndex = 0; // Reset para la próxima vez
+        return;
+    }
+    
+    const gram = globalNGrams[currentGramIndex];
+    attemptsLeft = 3; // Reiniciar
+    
+    // STEP 1: LISTEN (TEXT HIDDEN)
+    renderShadowingUI(false); // Ocultar texto, deshabilitar repetición
+    mostrarNoti(`Escucha el Fragmento ${currentGramIndex + 1}/${globalNGrams.length}`, 1500);
+
+    // Reproducción TTS del fragmento
+    await new Promise(resolve => {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(gram);
+        u.lang = document.getElementById('idiomaSelect').value;
+        u.onend = () => resolve();
+        u.onerror = () => resolve();
+        speechSynthesis.speak(u);
+    });
+    
+    // STEP 2: REPEAT (TEXT HIDDEN)
+    renderShadowingUI(true); // Habilitar repetición
+    mostrarNoti('📢 Repite el fragmento ahora.', 2000);
+}
+
+// Renderiza la interfaz de usuario para el paso actual
+function renderShadowingUI(isRepeatStep = false, showText = false, recognizedText = '') {
+    const area = document.getElementById('shadowingArea');
+    const gram = globalNGrams[currentGramIndex];
+    const textDisplay = showText ? gram : '...';
+    
+    area.innerHTML = `
+        <div style="min-height: 40px; margin-bottom: 10px;">
+             <p class="ejercicio-frase" style="font-size:1.2em; font-weight: bold;">
+                ${showText ? gram : 'Fragmento ' + (currentGramIndex + 1)}
+             </p>
+        </div>
+        
+        <div class="flexrow">
+            ${isRepeatStep ? `<button class='small success record-btn' onclick="startRecognition(this)">🎙 Grabar mi voz (${attemptsLeft} intentos)</button>` : '<button class="small secondary" disabled>Escuchando...</button>'}
+            ${showText ? `<button class='small secondary' onclick="leerTextoOriginal('${gram}')">🔊 Escuchar voz IA</button>` : ''}
+            <button class='small secondary' onclick="siguienteGram(true)">Saltar</button>
+        </div>
+        ${recognizedText ? `<p style="margin-top:10px; font-style: italic; color:#dc3545;">Último intento: ${recognizedText}</p>` : ''}
+    `;
+}
+
+function startRecognition(btn) {
+    btn.disabled = true;
+    btn.textContent = '... Habla ahora ...';
+    try {
+        // Establecer un temporizador para re-habilitar el botón si el usuario no habla
+        recognition.stopTimeout = setTimeout(() => {
+            if(btn.disabled) {
+                 btn.disabled = false;
+                 btn.textContent = `🎙 Reintentar (${attemptsLeft} intentos)`;
+            }
+        }, 5000); // 5 segundos para hablar
+        
+        recognition.start();
+    } catch (e) {
+        // En caso de que el reconocimiento ya esté activo
+        mostrarNoti('El reconocimiento ya está activo o hubo un error al iniciar.', 2000);
+        btn.disabled = false;
+        btn.textContent = '🎙 Reintentar';
+    }
+}
+/* === CÓDIGO AÑADIDO: GESTIÓN DE PROYECTOS Y PERSISTENCIA === */
+
+function cargarProyectos() {
+    const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.projects) || '[]');
+    const textareaContent = document.getElementById('textoUsuario').value;
+    
+    if (projects.length === 0) {
+        // Inicializar con el texto de bienvenida
+        projects.push({
+            id: Date.now(),
+            title: "Texto Inicial",
+            content: textareaContent,
+            // 👈 AÑADIDO: Guardar el idioma por defecto (Inglés)
+            lang: "en-US" 
+        });
+        guardarProyectos(projects);
+    }
+    
+    // 👈 AÑADIDO: Si un proyecto viejo no tiene 'lang', lo inicializamos
+    projects.forEach(p => {
+        if (!p.lang) p.lang = 'en-US'; 
+    });
+    
+    return projects;
+}
+
+function guardarProyectos(projects) {
+    localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(projects));
+}
+
+// Persistencia del texto actual (aparte de los proyectos, para un guardado rápido)
+function guardarTextoActual() {
+    const t = document.getElementById('textoUsuario').value;
+    localStorage.setItem(STORAGE_KEYS.currentText, t);
+}
+
+// ----------------------------------------------------
+
+let globalProjects = cargarProyectos();
+// Intentar cargar el último proyecto activo o tomar el primero
+let currentProjectId = parseInt(localStorage.getItem('ap_v6_current_project_id')) || globalProjects[0].id; 
+
+
+function renderProjectSelect() {
+    const select = document.getElementById('projectSelect');
+    select.innerHTML = '';
+    
+    // Asegurarse de que el ID actual siga existiendo
+    if (!globalProjects.find(p => p.id === currentProjectId)) {
+        currentProjectId = globalProjects[0].id;
+    }
+
+    globalProjects.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.id;
+        option.textContent = p.title.substring(0, 30) + (p.title.length > 30 ? '...' : '');
+        if (p.id === currentProjectId) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
+
+function cargarProyectoSeleccionado() {
+    const select = document.getElementById('projectSelect');
+    const newId = parseInt(select.value);
+    const proyecto = globalProjects.find(p => p.id === newId);
+    const textarea = document.getElementById('textoUsuario');
+    
+    // 1. Antes de cambiar, guardar el contenido y el idioma del proyecto ANTERIOR
+    const oldProject = globalProjects.find(p => p.id === currentProjectId);
+    if (oldProject) {
+        oldProject.content = textarea.value;
+        // 👈 AÑADIDO: Guardar el idioma actual del select en el proyecto anterior
+        oldProject.lang = document.getElementById('idiomaSelect').value;
+    }
+
+    if (proyecto) {
+        currentProjectId = newId;
+        localStorage.setItem('ap_v6_current_project_id', currentProjectId); // Guardar ID activo
+        textarea.value = proyecto.content;
+        
+        // 👈 CAMBIO CLAVE: Cargar el idioma guardado en el <select>
+        document.getElementById('idiomaSelect').value = proyecto.lang || 'en-US';
+        
+        // Disparar procesamiento para inicializar la UI con el nuevo texto
+        // Evitamos el "procesarTexto()" automático para no bloquear al inicio si el texto es grande
+        mostrarNoti(`📚 Proyecto "${proyecto.title}" cargado. ¡Procesa para continuar!`, 2500);
+    }
+}
+
+function guardarProyectoActual() {
+    const textarea = document.getElementById('textoUsuario');
+    const idiomaSelect = document.getElementById('idiomaSelect'); // 👈 OBTENER el elemento
+    const proyecto = globalProjects.find(p => p.id === currentProjectId);
+    
+    if (proyecto) {
+        const newTitle = prompt("Guardar cambios. Introduce un nuevo nombre (opcional):", proyecto.title);
+        
+        proyecto.content = textarea.value;
+        proyecto.lang = idiomaSelect.value; // 👈 AÑADIDO: Guardar el idioma seleccionado
+        
+        if (newTitle && newTitle.trim().length > 0) {
+            proyecto.title = newTitle;
+            renderProjectSelect();
+        }
+        guardarProyectos(globalProjects);
+        guardarTextoActual(); 
+        mostrarNoti(`💾 Proyecto "${proyecto.title}" guardado.`, 1500);
+    }
+}
+
+function crearNuevoProyecto() {
+    const title = prompt("Introduce un nombre para el nuevo texto:", `Nuevo Texto ${globalProjects.length + 1}`);
+    if (title && title.trim().length > 0) {
+        const newProject = {
+            id: Date.now(),
+            title: title,
+            content: "",
+            lang: document.getElementById('idiomaSelect').value // 👈 AÑADIDO: El idioma actual
+        };
+        
+        // Guardar el contenido y el idioma del proyecto ANTERIOR antes de crear el nuevo
+        const oldProject = globalProjects.find(p => p.id === currentProjectId);
+        if (oldProject) {
+            oldProject.content = document.getElementById('textoUsuario').value;
+            oldProject.lang = document.getElementById('idiomaSelect').value; // 👈 AÑADIDO: Guardar el idioma actual
+        }
+
+        globalProjects.push(newProject);
+        guardarProyectos(globalProjects);
+        
+        // Seleccionar y cargar el nuevo proyecto
+        currentProjectId = newProject.id;
+        document.getElementById('projectSelect').value = currentProjectId;
+        document.getElementById('textoUsuario').value = ""; // Limpiar textarea
+        
+        // Ya que la función cargarProyectoSeleccionado guarda el estado del anterior
+        // y establece el idioma del nuevo, podemos usarla para completar el proceso.
+        cargarProyectoSeleccionado(); 
+        mostrarNoti(`✨ Proyecto "${newProject.title}" creado.`, 2000);
+    }
+}
+function eliminarProyectoSeleccionado() {
+    if (globalProjects.length <= 1) {
+        return mostrarNoti("No puedes eliminar el único proyecto existente.", 3000);
+    }
+    
+    const proyecto = globalProjects.find(p => p.id === currentProjectId);
+    if (proyecto && confirm(`¿Estás seguro de que quieres eliminar el proyecto "${proyecto.title}"?`)) {
+        globalProjects = globalProjects.filter(p => p.id !== currentProjectId);
+        guardarProyectos(globalProjects);
+        
+        // Cargar el primer proyecto restante como el nuevo activo
+        currentProjectId = globalProjects[0].id;
+        
+        renderProjectSelect();
+        document.getElementById('textoUsuario').value = globalProjects[0].content;
+        procesarTexto(); // Procesar automáticamente el texto del nuevo proyecto activo
+        mostrarNoti("🗑️ Proyecto eliminado.", 2000);
+    }
+}
+
+/* === INICIALIZACIÓN DEL GESTOR DE PROYECTOS === */
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Inicializar la interfaz de proyectos
+    renderProjectSelect();
+    
+    // 2. Cargar el contenido del proyecto activo en el textarea
+    const activeProject = globalProjects.find(p => p.id === currentProjectId);
+    if (activeProject) {
+        document.getElementById('textoUsuario').value = activeProject.content;
+    }
+    
+    // 3. Configurar guardado automático
+    document.getElementById('textoUsuario').addEventListener('input', guardarTextoActual);
+
+    // 4. Si hay texto, procesarlo automáticamente al cargar para inicializar la UI
+    if(activeProject && activeProject.content.trim().length > 0) {
+        procesarTexto();
+    }
+});
+
+// El resto de tu código JS existente continúa aquí...
+  
+
+  
+
+
 </script>
 </body>
 </html>
