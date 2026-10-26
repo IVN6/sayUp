@@ -1,0 +1,1129 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Master - Entrenador Vocal & Juego de Afinación</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        studio: {
+                            bg: '#0a0d14',
+                            card: '#121824',
+                            border: '#1e293b',
+                            accent: '#00f2fe',
+                            purple: '#7928ca',
+                            pink: '#ff0080',
+                            green: '#10b981',
+                            yellow: '#f59e0b',
+                            red: '#ef4444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0d14;
+            color: #f1f5f9;
+            overflow-x: hidden;
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0d14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        .glow-accent {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(121, 40, 202, 0.3);
+        }
+        .glow-green {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+        /* Canvas smooth sizing */
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+
+    <!-- Top Navigation Header -->
+    <header class="border-b border-studio-border bg-studio-card/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                    <i class="fa-solid font-mono fa-music"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 bg-clip-text text-transparent">
+                        PITCH MASTER
+                    </h1>
+                    <p class="text-xs text-slate-400 font-mono">Entrenador Vocal & Afinación Vocal</p>
+                </div>
+            </div>
+
+            <!-- Mode Selector Tabs -->
+            <nav class="flex bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 space-x-1">
+                <button id="btn-mode-arcade" onclick="switchMode('arcade')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 bg-cyan-500 text-slate-950 shadow-md">
+                    <i class="fa-solid fa-gamepad mr-1.5"></i>Caza de Pitch
+                </button>
+                <button id="btn-mode-scales" onclick="switchMode('scales')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-graduation-cap mr-1.5"></i>Escalas y Arpegios
+                </button>
+                <button id="btn-mode-tuner" onclick="switchMode('tuner')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all duration-200">
+                    <i class="fa-solid fa-sliders mr-1.5"></i>Afinador Consola
+                </button>
+            </nav>
+
+            <!-- Mic Control Button -->
+            <div class="flex items-center gap-3">
+                <button id="mic-toggle-btn" onclick="toggleMicrophone()" class="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 transition-all shadow-lg hover:shadow-emerald-500/20 active:scale-95">
+                    <i class="fa-solid fa-microphone" id="mic-icon"></i>
+                    <span id="mic-btn-text">Activar Micrófono</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left / Top Primary Display (8 cols) -->
+        <section class="lg:col-span-8 flex flex-col gap-6">
+
+            <!-- Pitch Visualizer Canvas Container -->
+            <div class="relative bg-studio-card border border-studio-border rounded-2xl p-4 overflow-hidden flex flex-col h-96 shadow-2xl">
+                <!-- Status Overlay Banner -->
+                <div class="flex justify-between items-center mb-2 z-10">
+                    <div class="flex items-center space-x-2">
+                        <span id="live-indicator" class="w-3 h-3 rounded-full bg-slate-600 inline-block animate-pulse"></span>
+                        <span id="status-text" class="text-xs font-mono text-slate-400 uppercase tracking-wider">Micrófono inactivo</span>
+                    </div>
+                    <!-- Detected Pitch HUD Badge -->
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <span class="text-xs text-slate-400 block font-mono">FRECUENCIA</span>
+                            <span id="live-hz" class="text-sm font-mono text-cyan-400 font-bold">0.0 Hz</span>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-700 px-3 py-1 rounded-lg text-center min-w-[70px]">
+                            <span class="text-[10px] text-slate-400 block uppercase font-mono">Nota Emitida</span>
+                            <span id="live-note" class="text-xl font-black text-white font-mono">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Component -->
+                <div class="relative flex-grow rounded-xl overflow-hidden bg-slate-950/80 border border-slate-800/80">
+                    <canvas id="pitch-canvas"></canvas>
+
+                    <!-- Pitch Accuracy Overlay Feedback Target -->
+                    <div id="feedback-overlay" class="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none opacity-0 transition-opacity duration-200 text-center">
+                        <span id="feedback-text" class="text-2xl font-black px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 backdrop-blur-md uppercase tracking-wider">
+                            ¡Afinado Perfect!
+                        </span>
+                    </div>
+
+                    <!-- Mic Prompt Message Overlay -->
+                    <div id="mic-prompt" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-sm z-20 text-center p-6">
+                        <div class="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-2xl mb-4 animate-bounce">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Haz clic para conectar tu voz</h3>
+                        <p class="text-slate-400 text-sm max-w-md mb-6">
+                            Permite el acceso a tu micrófono para comenzar. Pitch Master analizará la frecuencia de tus cuerdas vocales en tiempo real.
+                        </p>
+                        <button onclick="toggleMicrophone()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-extrabold hover:brightness-110 transition shadow-lg shadow-cyan-500/25">
+                            Comenzar Entrenador Vocal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mini Gauge Pitch Deviation Bar -->
+                <div class="mt-3 flex items-center gap-3">
+                    <span class="text-xs font-mono text-slate-400 w-12 text-right">BEMOL</span>
+                    <div class="relative flex-grow h-3 bg-slate-900 rounded-full border border-slate-800 overflow-hidden">
+                        <div class="absolute top-0 bottom-0 left-1/2 w-0.5 bg-slate-500 z-10"></div>
+                        <!-- Perfect Range Box -->
+                        <div class="absolute top-0 bottom-0 left-[42.5%] right-[42.5%] bg-emerald-500/20 border-x border-emerald-500/40"></div>
+                        <!-- Cents Pointer Bar -->
+                        <div id="cents-indicator" class="absolute top-0 bottom-0 left-1/2 w-2 bg-cyan-400 rounded-full -translate-x-1/2 transition-all duration-75"></div>
+                    </div>
+                    <span class="text-xs font-mono text-slate-400 w-12">SOSTENIDO</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Control Panels based on Selected Mode -->
+            
+            <!-- MODE 1: CAZA DE PITCH (ARCADE) -->
+            <div id="panel-arcade" class="bg-studio-card border border-studio-border rounded-2xl p-5 flex flex-col gap-4">
+                <div class="flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye text-cyan-400"></i> Caza de Pitch
+                        </h2>
+                        <p class="text-xs text-slate-400">Alcanza la nota objetivo y mantén el tono estable para acumular puntos.</p>
+                    </div>
+                    <button id="arcade-start-btn" onclick="startArcadeGame()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold hover:brightness-110 transition shadow-lg shadow-purple-600/30">
+                        <i class="fa-solid fa-play mr-2"></i>Iniciar Partida
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 font-mono uppercase block">Puntuación</span>
+                        <span id="arcade-score" class="text-2xl font-black text-cyan-400 font-mono">0</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 font-mono uppercase block">Combo Racha</span>
+                        <span id="arcade-combo" class="text-2xl font-black text-purple-400 font-mono">0x</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 font-mono uppercase block">Tiempo Restante</span>
+                        <span id="arcade-timer" class="text-2xl font-black text-amber-400 font-mono">45s</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 font-mono uppercase block">Precisión</span>
+                        <span id="arcade-accuracy" class="text-2xl font-black text-emerald-400 font-mono">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 font-mono font-bold text-xl" id="arcade-target-display">
+                            C4
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block font-mono">NOTA OBJETIVO ACTUAL</span>
+                            <span class="text-sm font-semibold text-slate-200" id="arcade-target-desc">Sostén una nota limpia y resonante</span>
+                        </div>
+                    </div>
+                    <button onclick="playTargetTone()" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition" title="Escuchar referencia de nota">
+                        <i class="fa-solid fa-volume-high text-cyan-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODE 2: ESCALAS Y ARPEGIOS -->
+            <div id="panel-scales" class="bg-studio-card border border-studio-border rounded-2xl p-5 flex flex-col gap-4 hidden">
+                <div class="flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-stairs text-purple-400"></i> Ejercicios Vocalizació e Intervalos
+                        </h2>
+                        <p class="text-xs text-slate-400">Sigue la ruta melódica para desarrollar flexibilidad y afinación relativa.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 mb-1">TIPO DE EJERCICIO</label>
+                        <select id="scale-type" onchange="setupScaleExercise()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 font-semibold focus:outline-none focus:border-purple-500">
+                            <option value="major">Escala Mayor Pentatónica (5 Notas)</option>
+                            <option value="diatonic">Escala Mayor Completa (Do-Re-Mi)</option>
+                            <option value="arpeggio">Arpegio Mayor (1-3-5-8)</option>
+                            <option value="octave">Salto de Octava (Fundamento Vocal)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 mb-1">TONALIDAD BASE (TÓNICA)</label>
+                        <select id="scale-root" onchange="setupScaleExercise()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 font-semibold focus:outline-none focus:border-purple-500">
+                            <option value="C3">C3 (Voz Grave / Masculina)</option>
+                            <option value="G3">G3 (Tenor / Barítono Alto)</option>
+                            <option value="C4" selected>C4 (Central / Soprano - Mezzo)</option>
+                            <option value="E4">E4 (Agudos Femeninos)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="startScaleExercise()" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Iniciar Secuencia
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sequence Progress Pills -->
+                <div id="scale-notes-container" class="flex flex-wrap gap-2 pt-2">
+                    <!-- Note pills injected dynamically -->
+                </div>
+            </div>
+
+            <!-- MODE 3: AFINADOR CONSOLA -->
+            <div id="panel-tuner" class="bg-studio-card border border-studio-border rounded-2xl p-5 flex flex-col gap-4 hidden">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-emerald-400"></i> Consola de Tono Profesional
+                    </h2>
+                    <p class="text-xs text-slate-400">Análisis detallado de frecuencia, cents de desviación y volumen para estudio técnico.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Large Gauge Display -->
+                    <div class="md:col-span-2 bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden">
+                        <div class="text-xs font-mono text-slate-500 mb-1">DEVIATION CENTS</div>
+                        <div id="tuner-cents-large" class="text-5xl font-black font-mono text-emerald-400 my-1">+0</div>
+                        <div id="tuner-status-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            AFINADO
+                        </div>
+                    </div>
+
+                    <!-- Voice Support & Volume Indicator -->
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-mono text-slate-400 block mb-1">SOPORTE DE AIRE (VOLUMEN)</span>
+                            <div class="h-4 bg-slate-900 rounded-full border border-slate-800 overflow-hidden mb-2">
+                                <div id="volume-meter-bar" class="h-full bg-cyan-400 transition-all duration-75 w-0"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-xs font-mono text-slate-400 block mb-1">ESTABILIDAD DEL TONO</span>
+                            <div class="h-4 bg-slate-900 rounded-full border border-slate-800 overflow-hidden">
+                                <div id="stability-meter-bar" class="h-full bg-purple-500 transition-all duration-75 w-0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right / Side Panel: Vocal Metrics & Pedagogical Feedback (4 cols) -->
+        <aside class="lg:col-span-4 flex flex-col gap-6">
+
+            <!-- Real-Time Metrics Box -->
+            <div class="bg-studio-card border border-studio-border rounded-2xl p-5 shadow-xl">
+                <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center justify-between">
+                    <span><i class="fa-solid fa-chart-line text-cyan-400 mr-2"></i>Métricas de Voz</span>
+                    <span class="text-[10px] font-mono bg-slate-800 px-2 py-0.5 rounded text-slate-400">EN VIVO</span>
+                </h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs font-mono mb-1">
+                            <span class="text-slate-400">Precisión de Afinación</span>
+                            <span id="metric-cents-text" class="text-cyan-400 font-bold">0 cents</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                            <div id="metric-cents-bar" class="h-full bg-cyan-400 w-0 transition-all"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-mono mb-1">
+                            <span class="text-slate-400">Constancia Vocal</span>
+                            <span id="metric-consistency-text" class="text-purple-400 font-bold">0%</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                            <div id="metric-consistency-bar" class="h-full bg-purple-500 w-0 transition-all"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-mono mb-1">
+                            <span class="text-slate-400">Sostenimiento de Nota</span>
+                            <span id="metric-hold-text" class="text-emerald-400 font-bold">0.0s</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                            <div id="metric-hold-bar" class="h-full bg-emerald-400 w-0 transition-all"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expert Vocal Master Coach Advice Box -->
+            <div class="bg-gradient-to-b from-slate-900 to-studio-card border border-studio-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 text-slate-800/20 text-8xl pointer-events-none font-serif">
+                    <i class="fa-solid fa-quote-right"></i>
+                </div>
+                
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white">Feedback del Maestro Vocal</h4>
+                        <p class="text-[10px] font-mono text-slate-400">Análisis técnico en tiempo real</p>
+                    </div>
+                </div>
+
+                <div id="coach-feedback-body" class="text-xs text-slate-300 leading-relaxed space-y-2 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+                    <p>👋 "¡Hola! Soy tu instructor de técnica vocal. Activa el micrófono y canta una nota relajada (como 'Ah' o 'Oo'). Asegúrate de mantener una postura recta y respirar con el diafragma."</p>
+                </div>
+            </div>
+
+            <!-- Virtual Piano Keyboard Reference -->
+            <div class="bg-studio-card border border-studio-border rounded-2xl p-5 shadow-xl">
+                <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-keyboard text-slate-400 mr-2"></i>Teclado Guía</span>
+                    <span class="text-[10px] font-mono text-slate-500">C3 - B4</span>
+                </h3>
+
+                <!-- Mini Piano UI -->
+                <div class="relative flex justify-center bg-slate-950 p-2 rounded-xl border border-slate-800 overflow-x-auto select-none" id="piano-keyboard">
+                    <!-- Keys built dynamically in JS -->
+                </div>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-studio-border py-4 bg-slate-950 text-center text-xs text-slate-500 font-mono">
+        <p>Pitch Master &copy; 2026 - Aplicación Web de Entrenamiento Vocal e Interpretación en Tiempo Real</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ===================================================================
+           1. MUSIC THEORY & AUDIO CONSTANTS
+           =================================================================== */
+        const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const A4_FREQ = 440; // Reference pitch A4 = 440Hz
+
+        // Convert Frequency to Musical Note & Deviation Cents
+        function getNoteFromFrequency(frequency) {
+            if (!frequency || frequency < 50 || frequency > 2000) return null;
+            
+            // Half steps away from A4
+            const noteNum = 12 * (Math.log(frequency / A4_FREQ) / Math.log(2));
+            const roundedNote = Math.round(noteNum);
+            const cents = Math.round((noteNum - roundedNote) * 100);
+            
+            const midiNumber = roundedNote + 69;
+            const noteIndex = (midiNumber % 12 + 12) % 12;
+            const octave = Math.floor(midiNumber / 12) - 1;
+            
+            return {
+                name: NOTE_NAMES[noteIndex],
+                octave: octave,
+                fullNote: `${NOTE_NAMES[noteIndex]}${octave}`,
+                cents: cents,
+                midi: midiNumber,
+                frequency: frequency
+            };
+        }
+
+        // Convert Note Name (e.g., C4) to Frequency Hz
+        function getFrequencyFromNote(noteString) {
+            const regex = /^([A-G]#?)(-?\d+)$/;
+            const match = noteString.match(regex);
+            if (!match) return 440;
+            const noteName = match[1];
+            const octave = parseInt(match[2]);
+            const noteIndex = NOTE_NAMES.indexOf(noteName);
+            const midi = (octave + 1) * 12 + noteIndex;
+            return A4_FREQ * Math.pow(2, (midi - 69) / 12);
+        }
+
+        /* ===================================================================
+           2. AUDIO CONTEXT & AUTOCORRELATION PITCH DETECTION ENGINE (YIN / Autocorrelation)
+           =================================================================== */
+        let audioCtx = null;
+        let analyser = null;
+        let micStream = null;
+        let isMicActive = false;
+        let audioBuffer = new Float32Array(2048);
+
+        // Vocal stats tracking
+        let pitchHistory = [];
+        let currentDetectedNote = null;
+        let targetHoldTime = 0;
+        let activeMode = 'arcade'; // 'arcade' | 'scales' | 'tuner'
+
+        async function toggleMicrophone() {
+            if (isMicActive) {
+                stopMicrophone();
+            } else {
+                await startMicrophone();
+            }
+        }
+
+        async function startMicrophone() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                micStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                const source = audioCtx.createMediaStreamSource(micStream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 2048;
+                source.connect(analyser);
+
+                isMicActive = true;
+                document.getElementById('mic-prompt').classList.add('hidden');
+                document.getElementById('live-indicator').className = 'w-3 h-3 rounded-full bg-emerald-500 inline-block animate-pulse shadow-lg shadow-emerald-500/50';
+                document.getElementById('status-text').innerText = 'Micrófono conectado';
+                document.getElementById('status-text').className = 'text-xs font-mono text-emerald-400 uppercase tracking-wider';
+                document.getElementById('mic-btn-text').innerText = 'Detener Micrófono';
+                document.getElementById('mic-toggle-btn').className = 'flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm bg-rose-600 hover:bg-rose-500 text-white transition-all shadow-lg active:scale-95';
+
+                // Start loop
+                requestAnimationFrame(processAudioLoop);
+            } catch (err) {
+                console.error("Microphone Access Error:", err);
+                alert("No se pudo acceder al micrófono. Revisa los permisos de tu navegador.");
+            }
+        }
+
+        function stopMicrophone() {
+            if (micStream) {
+                micStream.getTracks().forEach(track => track.stop());
+            }
+            if (audioCtx) {
+                audioCtx.close();
+            }
+            isMicActive = false;
+            document.getElementById('mic-prompt').classList.remove('hidden');
+            document.getElementById('live-indicator').className = 'w-3 h-3 rounded-full bg-slate-600 inline-block';
+            document.getElementById('status-text').innerText = 'Micrófono inactivo';
+            document.getElementById('status-text').className = 'text-xs font-mono text-slate-400 uppercase tracking-wider';
+            document.getElementById('mic-btn-text').innerText = 'Activar Micrófono';
+            document.getElementById('mic-toggle-btn').className = 'flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 transition-all shadow-lg active:scale-95';
+        }
+
+        // Optimized Autocorrelation Algorithm
+        function autoCorrelate(buffer, sampleRate) {
+            let SIZE = buffer.length;
+            let rms = 0;
+
+            for (let i = 0; i < SIZE; i++) {
+                let val = buffer[i];
+                rms += val * val;
+            }
+            rms = Math.sqrt(rms / SIZE);
+
+            // Signal too quiet (noise threshold)
+            if (rms < 0.012) return -1;
+
+            let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+            for (let i = 0; i < SIZE / 2; i++) {
+                if (Math.abs(buffer[i]) < thres) { r1 = i; break; }
+            }
+            for (let i = 1; i < SIZE / 2; i++) {
+                if (Math.abs(buffer[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+            }
+
+            buffer = buffer.slice(r1, r2);
+            SIZE = buffer.length;
+
+            let c = new Array(SIZE).fill(0);
+            for (let i = 0; i < SIZE; i++) {
+                for (let j = 0; j < SIZE - i; j++) {
+                    c[i] = c[i] + buffer[j] * buffer[j + i];
+                }
+            }
+
+            let d = 0;
+            while (c[d] > c[d + 1]) d++;
+            let maxval = -1, maxpos = -1;
+            for (let i = d; i < SIZE; i++) {
+                if (c[i] > maxval) {
+                    maxval = c[i];
+                    maxpos = i;
+                }
+            }
+            let T0 = maxpos;
+
+            // Parabolic interpolation for fine accuracy
+            let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+            let a = (x1 + x3 - 2 * x2) / 2;
+            let b = (x3 - x1) / 2;
+            if (a) T0 = T0 - b / (2 * a);
+
+            return sampleRate / T0;
+        }
+
+        /* ===================================================================
+           3. CANVAS PITCH VISUALIZER ENGINE
+           =================================================================== */
+        const canvas = document.getElementById('pitch-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let visualHistory = []; // Array of { pitchNote, cents, targetNote }
+
+        function processAudioLoop() {
+            if (!isMicActive) return;
+
+            analyser.getFloatTimeDomainData(audioBuffer);
+            const pitchHz = autoCorrelate(audioBuffer, audioCtx.sampleRate);
+
+            if (pitchHz !== -1) {
+                currentDetectedNote = getNoteFromFrequency(pitchHz);
+            } else {
+                currentDetectedNote = null;
+            }
+
+            // Update UI elements
+            updateHUD(currentDetectedNote, audioBuffer);
+            
+            // Mode updates
+            if (activeMode === 'arcade') updateArcadeLogic(currentDetectedNote);
+            if (activeMode === 'scales') updateScalesLogic(currentDetectedNote);
+
+            // Render visualizer
+            renderVisualizer();
+
+            requestAnimationFrame(processAudioLoop);
+        }
+
+        function updateHUD(noteObj, buffer) {
+            const hzText = document.getElementById('live-hz');
+            const noteText = document.getElementById('live-note');
+            const centsIndicator = document.getElementById('cents-indicator');
+
+            // Volume Calculation (RMS)
+            let sum = 0;
+            for (let i = 0; i < buffer.length; i++) sum += buffer[i] * buffer[i];
+            let rms = Math.sqrt(sum / buffer.length);
+            let volPercent = Math.min(Math.round(rms * 400), 100);
+
+            document.getElementById('volume-meter-bar').style.width = `${volPercent}%`;
+
+            if (noteObj) {
+                hzText.innerText = `${noteObj.frequency.toFixed(1)} Hz`;
+                noteText.innerText = noteObj.fullNote;
+
+                // Move Cents needle (-50 to +50 cents)
+                const clampedCents = Math.max(-50, Math.min(50, noteObj.cents));
+                const percent = 50 + (clampedCents); // 0% to 100%
+                centsIndicator.style.left = `${percent}%`;
+
+                // Color response
+                if (Math.abs(noteObj.cents) <= 15) {
+                    centsIndicator.className = 'absolute top-0 bottom-0 w-2 bg-emerald-400 rounded-full -translate-x-1/2 transition-all duration-75 shadow-lg shadow-emerald-400/50';
+                    noteText.className = 'text-xl font-black text-emerald-400 font-mono';
+                } else if (noteObj.cents < -15) {
+                    centsIndicator.className = 'absolute top-0 bottom-0 w-2 bg-amber-400 rounded-full -translate-x-1/2 transition-all duration-75';
+                    noteText.className = 'text-xl font-black text-amber-400 font-mono';
+                } else {
+                    centsIndicator.className = 'absolute top-0 bottom-0 w-2 bg-rose-400 rounded-full -translate-x-1/2 transition-all duration-75';
+                    noteText.className = 'text-xl font-black text-rose-400 font-mono';
+                }
+
+                // Add to history
+                pitchHistory.push(noteObj.cents);
+                if (pitchHistory.length > 50) pitchHistory.shift();
+
+                // Compute Stability
+                let avgDev = pitchHistory.reduce((a, b) => a + Math.abs(b), 0) / pitchHistory.length;
+                let stabilityScore = Math.max(0, Math.round(100 - (avgDev * 2)));
+                document.getElementById('stability-meter-bar').style.width = `${stabilityScore}%`;
+                document.getElementById('metric-consistency-text').innerText = `${stabilityScore}%`;
+                document.getElementById('metric-consistency-bar').style.width = `${stabilityScore}%`;
+
+                document.getElementById('metric-cents-text').innerText = `${noteObj.cents > 0 ? '+' : ''}${noteObj.cents} cents`;
+                document.getElementById('metric-cents-bar').style.width = `${Math.min(100, Math.abs(noteObj.cents) * 2)}%`;
+
+                // Tuner Mode Specific
+                document.getElementById('tuner-cents-large').innerText = `${noteObj.cents > 0 ? '+' : ''}${noteObj.cents}`;
+                const badge = document.getElementById('tuner-status-badge');
+                if (Math.abs(noteObj.cents) <= 10) {
+                    badge.innerText = "AFINADO PERFECTO";
+                    badge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                } else if (noteObj.cents < -10) {
+                    badge.innerText = "CALADO (BAJO)";
+                    badge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40";
+                } else {
+                    badge.innerText = "AGUDO (ALTO)";
+                    badge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40";
+                }
+
+                // Highlight Piano Key
+                highlightPianoKey(noteObj.fullNote);
+
+            } else {
+                hzText.innerText = `0.0 Hz`;
+                noteText.innerText = `--`;
+                centsIndicator.style.left = `50%`;
+                centsIndicator.className = 'absolute top-0 bottom-0 w-2 bg-slate-600 rounded-full -translate-x-1/2';
+                noteText.className = 'text-xl font-black text-white font-mono';
+                highlightPianoKey(null);
+            }
+        }
+
+        /* ===================================================================
+           4. VISUALIZER RENDERER (CYBER GRID & PITCH WAVE)
+           =================================================================== */
+        function renderVisualizer() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw Background Grid
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            const gridSpacing = 30;
+
+            for (let x = 0; x < w; x += gridSpacing) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+            }
+            for (let y = 0; y < h; y += gridSpacing) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+
+            // Target Line (if target note exists)
+            let targetNoteName = currentArcadeTarget || currentScaleTargetNote;
+            if (targetNoteName) {
+                const targetFreq = getFrequencyFromNote(targetNoteName);
+                const targetY = h - (Math.log2(targetFreq / 100) * (h / 4));
+
+                // Target Zone Box
+                ctx.fillStyle = 'rgba(0, 242, 254, 0.08)';
+                ctx.fillRect(0, targetY - 20, w, 40);
+
+                // Target Guide Line
+                ctx.strokeStyle = '#00f2fe';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.moveTo(0, targetY);
+                ctx.lineTo(w, targetY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Target Note Text
+                ctx.fillStyle = '#00f2fe';
+                ctx.font = 'bold 12px "JetBrains Mono"';
+                ctx.fillText(`OBJETIVO: ${targetNoteName}`, 15, targetY - 8);
+            }
+
+            // Append current pitch to Visual History Buffer
+            if (currentDetectedNote) {
+                const pitchY = h - (Math.log2(currentDetectedNote.frequency / 100) * (h / 4));
+                visualHistory.push({ y: pitchY, cents: currentDetectedNote.cents });
+            } else {
+                visualHistory.push(null);
+            }
+
+            if (visualHistory.length > w / 3) {
+                visualHistory.shift();
+            }
+
+            // Render Singing Pitch Line Trail
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+
+            for (let i = 0; i < visualHistory.length - 1; i++) {
+                const pt1 = visualHistory[i];
+                const pt2 = visualHistory[i + 1];
+
+                if (pt1 && pt2) {
+                    const x1 = w - ((visualHistory.length - i) * 3);
+                    const x2 = w - ((visualHistory.length - (i + 1)) * 3);
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, pt1.y);
+                    ctx.lineTo(x2, pt2.y);
+
+                    // Dynamic Glow color based on accuracy
+                    if (Math.abs(pt1.cents) <= 15) {
+                        ctx.strokeStyle = '#10b981'; // Green
+                    } else if (pt1.cents < -15) {
+                        ctx.strokeStyle = '#f59e0b'; // Yellow (Flat)
+                    } else {
+                        ctx.strokeStyle = '#ef4444'; // Red (Sharp)
+                    }
+                    ctx.stroke();
+                }
+            }
+        }
+
+        /* ===================================================================
+           5. GAME MODE 1: CAZA DE PITCH (ARCADE LOGIC)
+           =================================================================== */
+        const ARCADE_NOTES = ["C4", "D4", "E4", "F4", "G4", "A4", "B4"];
+        let currentArcadeTarget = null;
+        let arcadeScore = 0;
+        let arcadeCombo = 0;
+        let arcadeTimer = 45;
+        let arcadeInterval = null;
+        let isArcadeRunning = false;
+        let totalArcadeHits = 0;
+        let totalArcadeFrames = 0;
+
+        function startArcadeGame() {
+            if (!isMicActive) {
+                alert("Por favor, activa el micrófono primero.");
+                return;
+            }
+
+            isArcadeRunning = true;
+            arcadeScore = 0;
+            arcadeCombo = 0;
+            arcadeTimer = 45;
+            totalArcadeHits = 0;
+            totalArcadeFrames = 0;
+
+            document.getElementById('arcade-score').innerText = '0';
+            document.getElementById('arcade-combo').innerText = '0x';
+            document.getElementById('arcade-accuracy').innerText = '0%';
+            document.getElementById('arcade-start-btn').disabled = true;
+            document.getElementById('arcade-start-btn').classList.add('opacity-50');
+
+            pickNextArcadeTarget();
+
+            clearInterval(arcadeInterval);
+            arcadeInterval = setInterval(() => {
+                arcadeTimer--;
+                document.getElementById('arcade-timer').innerText = `${arcadeTimer}s`;
+
+                if (arcadeTimer <= 0) {
+                    endArcadeGame();
+                }
+            }, 1000);
+        }
+
+        function pickNextArcadeTarget() {
+            const nextIndex = Math.floor(Math.random() * ARCADE_NOTES.length);
+            currentArcadeTarget = ARCADE_NOTES[nextIndex];
+            document.getElementById('arcade-target-display').innerText = currentArcadeTarget;
+            playTargetTone();
+        }
+
+        function updateArcadeLogic(noteObj) {
+            if (!isArcadeRunning || !currentArcadeTarget) return;
+
+            totalArcadeFrames++;
+
+            if (noteObj && noteObj.fullNote === currentArcadeTarget && Math.abs(noteObj.cents) <= 20) {
+                targetHoldTime += 0.05;
+                totalArcadeHits++;
+
+                // Score Increment
+                arcadeCombo++;
+                arcadeScore += 10 * Math.min(arcadeCombo, 5);
+
+                document.getElementById('arcade-score').innerText = arcadeScore;
+                document.getElementById('arcade-combo').innerText = `${arcadeCombo}x`;
+
+                showFeedback("¡Sostenlo!", "emerald");
+
+                // Target completed after holding 1.8s
+                if (targetHoldTime >= 1.8) {
+                    arcadeScore += 150; // Bonus
+                    targetHoldTime = 0;
+                    showFeedback("¡NOTA ALCANZADA!", "emerald");
+                    pickNextArcadeTarget();
+                }
+            } else {
+                targetHoldTime = Math.max(0, targetHoldTime - 0.02);
+                if (noteObj && noteObj.fullNote !== currentArcadeTarget) {
+                    arcadeCombo = 0;
+                    document.getElementById('arcade-combo').innerText = '0x';
+                }
+            }
+
+            // Accuracy %
+            let accuracy = Math.round((totalArcadeHits / Math.max(1, totalArcadeFrames)) * 100);
+            document.getElementById('arcade-accuracy').innerText = `${accuracy}%`;
+
+            // Hold bar metric
+            document.getElementById('metric-hold-text').innerText = `${targetHoldTime.toFixed(1)}s`;
+            document.getElementById('metric-hold-bar').style.width = `${Math.min(100, (targetHoldTime / 1.8) * 100)}%`;
+        }
+
+        function endArcadeGame() {
+            isArcadeRunning = false;
+            clearInterval(arcadeInterval);
+            currentArcadeTarget = null;
+            document.getElementById('arcade-start-btn').disabled = false;
+            document.getElementById('arcade-start-btn').classList.remove('opacity-50');
+
+            let finalAcc = document.getElementById('arcade-accuracy').innerText;
+
+            // Generate Master Coach Pedagogical Feedback
+            let feedbackHTML = `
+                <p class="font-bold text-cyan-400">🏁 Partida Finalizada - Puntaje: ${arcadeScore}</p>
+                <p>Precisión Final: <strong>${finalAcc}</strong></p>
+            `;
+
+            if (arcadeScore > 1000) {
+                feedbackHTML += `<p>🌟 <strong>¡Increíble afinación!</strong> Tu colocación vocal es muy precisa. Tienes un excelente control resonancial y soporte diafragmático.</p>`;
+            } else if (arcadeScore > 400) {
+                feedbackHTML += `<p>👍 <strong>¡Buen trabajo!</strong> Tienes buena afinación, pero intenta mantener la vibración del aire constante para no perder la racha.</p>`;
+            } else {
+                feedbackHTML += `<p>💡 <strong>Consejo Vocal:</strong> Apoya el sonido con la parte baja del abdomen. No fuerces la garganta para alcanzar la nota.</p>`;
+            }
+
+            document.getElementById('coach-feedback-body').innerHTML = feedbackHTML;
+        }
+
+        /* ===================================================================
+           6. GAME MODE 2: ESCALAS Y ARPEGIOS
+           =================================================================== */
+        let currentScaleSequence = [];
+        let currentScaleIndex = 0;
+        let currentScaleTargetNote = null;
+        let scaleHoldProgress = 0;
+
+        const SCALE_PATTERNS = {
+            major: [0, 2, 4, 7, 9, 12], // Major Pentatonic
+            diatonic: [0, 2, 4, 5, 7, 9, 11, 12], // Major Scale
+            arpeggio: [0, 4, 7, 12], // Arpeggio
+            octave: [0, 12] // Octave jump
+        };
+
+        function setupScaleExercise() {
+            const scaleType = document.getElementById('scale-type').value;
+            const scaleRoot = document.getElementById('scale-root').value;
+
+            const rootFreq = getFrequencyFromNote(scaleRoot);
+            const rootNoteObj = getNoteFromFrequency(rootFreq);
+            const rootMidi = rootNoteObj.midi;
+
+            const offsets = SCALE_PATTERNS[scaleType];
+            currentScaleSequence = offsets.map(offset => {
+                const midi = rootMidi + offset;
+                const noteIndex = (midi % 12 + 12) % 12;
+                const octave = Math.floor(midi / 12) - 1;
+                return `${NOTE_NAMES[noteIndex]}${octave}`;
+            });
+
+            currentScaleIndex = 0;
+            renderScaleNotePills();
+        }
+
+        function renderScaleNotePills() {
+            const container = document.getElementById('scale-notes-container');
+            container.innerHTML = '';
+
+            currentScaleSequence.forEach((note, index) => {
+                const pill = document.createElement('div');
+                if (index === currentScaleIndex) {
+                    pill.className = 'px-4 py-2 rounded-xl bg-purple-600 text-white font-bold font-mono text-sm border border-purple-400 shadow-lg shadow-purple-500/30 animate-pulse';
+                } else if (index < currentScaleIndex) {
+                    pill.className = 'px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold font-mono text-sm border border-emerald-500/40';
+                } else {
+                    pill.className = 'px-4 py-2 rounded-xl bg-slate-900 text-slate-500 font-bold font-mono text-sm border border-slate-800';
+                }
+                pill.innerText = `${index + 1}. ${note}`;
+                container.appendChild(pill);
+            });
+        }
+
+        function startScaleExercise() {
+            if (!isMicActive) {
+                alert("Activa el micrófono para comenzar la vocalización.");
+                return;
+            }
+            setupScaleExercise();
+            currentScaleTargetNote = currentScaleSequence[currentScaleIndex];
+            playTargetTone();
+        }
+
+        function updateScalesLogic(noteObj) {
+            if (!currentScaleTargetNote) return;
+
+            if (noteObj && noteObj.fullNote === currentScaleTargetNote && Math.abs(noteObj.cents) <= 15) {
+                scaleHoldProgress += 0.05;
+                showFeedback("¡Mantén la nota!", "purple");
+
+                if (scaleHoldProgress >= 1.2) {
+                    scaleHoldProgress = 0;
+                    currentScaleIndex++;
+
+                    if (currentScaleIndex >= currentScaleSequence.length) {
+                        currentScaleTargetNote = null;
+                        renderScaleNotePills();
+                        showFeedback("¡EJERCICIO COMPLETADO!", "emerald");
+
+                        document.getElementById('coach-feedback-body').innerHTML = `
+                            <p class="font-bold text-emerald-400">🎉 ¡Escala completada con éxito!</p>
+                            <p>Has trabajado la flexibilidad de tus cuerdas vocales e intervalos de manera precisa. Continúa practicando diariamente.</p>
+                        `;
+                    } else {
+                        currentScaleTargetNote = currentScaleSequence[currentScaleIndex];
+                        renderScaleNotePills();
+                        playTargetTone();
+                    }
+                }
+            } else {
+                scaleHoldProgress = Math.max(0, scaleHoldProgress - 0.02);
+            }
+        }
+
+        /* ===================================================================
+           7. MODE SWITCHER & AUDIO FEEDBACK SYNTHESIZER
+           =================================================================== */
+        function switchMode(mode) {
+            activeMode = mode;
+            document.getElementById('panel-arcade').classList.add('hidden');
+            document.getElementById('panel-scales').classList.add('hidden');
+            document.getElementById('panel-tuner').classList.add('hidden');
+
+            document.getElementById('btn-mode-arcade').className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all";
+            document.getElementById('btn-mode-scales').className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all";
+            document.getElementById('btn-mode-tuner').className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all";
+
+            if (mode === 'arcade') {
+                document.getElementById('panel-arcade').classList.remove('hidden');
+                document.getElementById('btn-mode-arcade').className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-cyan-500 text-slate-950 shadow-md";
+            } else if (mode === 'scales') {
+                document.getElementById('panel-scales').classList.remove('hidden');
+                document.getElementById('btn-mode-scales').className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-purple-600 text-white shadow-md";
+                setupScaleExercise();
+            } else if (mode === 'tuner') {
+                document.getElementById('panel-tuner').classList.remove('hidden');
+                document.getElementById('btn-mode-tuner').className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-emerald-500 text-slate-950 shadow-md";
+            }
+        }
+
+        // Web Audio Synthesizer Reference Tone
+        function playTargetTone() {
+            let noteToPlay = currentArcadeTarget || currentScaleTargetNote || "C4";
+            let freq = getFrequencyFromNote(noteToPlay);
+
+            let tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = tempCtx.createOscillator();
+            let gain = tempCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, tempCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.2, tempCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, tempCtx.currentTime + 1.2);
+
+            osc.connect(gain);
+            gain.connect(tempCtx.destination);
+
+            osc.start();
+            osc.stop(tempCtx.currentTime + 1.2);
+        }
+
+        // Visual HUD Feedback Banner
+        function showFeedback(text, color) {
+            const overlay = document.getElementById('feedback-overlay');
+            const feedbackText = document.getElementById('feedback-text');
+
+            feedbackText.innerText = text;
+            if (color === "emerald") {
+                feedbackText.className = "text-xl font-black px-4 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 backdrop-blur-md uppercase tracking-wider shadow-lg shadow-emerald-500/20";
+            } else if (color === "purple") {
+                feedbackText.className = "text-xl font-black px-4 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 backdrop-blur-md uppercase tracking-wider shadow-lg shadow-purple-500/20";
+            }
+
+            overlay.style.opacity = '1';
+            setTimeout(() => { overlay.style.opacity = '0'; }, 1000);
+        }
+
+        /* ===================================================================
+           8. VIRTUAL PIANO KEYBOARD GENERATOR
+           =================================================================== */
+        function buildPianoKeyboard() {
+            const keyboardEl = document.getElementById('piano-keyboard');
+            const keys = [
+                { note: "C3", isBlack: false }, { note: "C#3", isBlack: true },
+                { note: "D3", isBlack: false }, { note: "D#3", isBlack: true },
+                { note: "E3", isBlack: false }, { note: "F3", isBlack: false },
+                { note: "F#3", isBlack: true }, { note: "G3", isBlack: false },
+                { note: "G#3", isBlack: true }, { note: "A3", isBlack: false },
+                { note: "A#3", isBlack: true }, { note: "B3", isBlack: false },
+                { note: "C4", isBlack: false }, { note: "C#4", isBlack: true },
+                { note: "D4", isBlack: false }, { note: "D#4", isBlack: true },
+                { note: "E4", isBlack: false }, { note: "F4", isBlack: false },
+                { note: "F#4", isBlack: true }, { note: "G4", isBlack: false },
+                { note: "G#4", isBlack: true }, { note: "A4", isBlack: false },
+                { note: "A#4", isBlack: true }, { note: "B4", isBlack: false }
+            ];
+
+            keys.forEach(k => {
+                const keyDiv = document.createElement('div');
+                keyDiv.dataset.note = k.note;
+
+                if (k.isBlack) {
+                    keyDiv.className = 'w-5 h-16 bg-slate-900 border border-slate-700 rounded-b -mx-2.5 z-10 cursor-pointer hover:bg-slate-700 transition flex items-end justify-center pb-1 text-[8px] font-mono text-slate-400';
+                } else {
+                    keyDiv.className = 'w-8 h-24 bg-slate-200 border border-slate-400 rounded-b cursor-pointer hover:bg-white transition flex items-end justify-center pb-1 text-[9px] font-mono font-bold text-slate-800';
+                }
+
+                keyDiv.innerText = k.note;
+                keyDiv.onclick = () => {
+                    playToneByName(k.note);
+                };
+
+                keyboardEl.appendChild(keyDiv);
+            });
+        }
+
+        function highlightPianoKey(noteName) {
+            const keys = document.querySelectorAll('#piano-keyboard div');
+            keys.forEach(key => {
+                if (key.dataset.note === noteName) {
+                    key.classList.add('ring-2', 'ring-cyan-400', 'bg-cyan-400');
+                } else {
+                    key.classList.remove('ring-2', 'ring-cyan-400', 'bg-cyan-400');
+                }
+            });
+        }
+
+        function playToneByName(noteString) {
+            let freq = getFrequencyFromNote(noteString);
+            let tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = tempCtx.createOscillator();
+            let gain = tempCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, tempCtx.currentTime);
+            gain.gain.setValueAtTime(0.3, tempCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, tempCtx.currentTime + 1);
+
+            osc.connect(gain);
+            gain.connect(tempCtx.destination);
+
+            osc.start();
+            osc.stop(tempCtx.currentTime + 1);
+        }
+
+        // Initialize Piano on window load
+        window.onload = function() {
+            buildPianoKeyboard();
+            setupScaleExercise();
+        };
+    </script>
+</body>
+</html>
+```
